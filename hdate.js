@@ -400,7 +400,7 @@ var zemanim = {
 	mincha_ketana: function mincha_ketana(hdate) {
 		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 9.5));
 	},
-	plag_hamincha: function plag_hamincha(hdate) {
+	plag_hamincha: function plag(hdate) {
 		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 10.75));
 	},
 	tzeit: function tzeit(hdate) {
@@ -408,6 +408,12 @@ var zemanim = {
 		g.setHours(d.getHours());
 		g.setMinutes(d.getMinutes());
 		return suncalc.getTimes(g, hdate.lat, hdate.long).tzeit;
+	},
+	neitz_hachama: function neitz(hdate) {
+		return hdate.sunrise();
+	},
+	shkiah: function shkiah(hdate) {
+		return hdate.sunset();
 	}
 };
 

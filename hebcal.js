@@ -30,7 +30,10 @@ var c = require('./common'),
 	HDate = require('./hdate'),
 	holidays = require('./holidays'),
 	dafyomi = require('./dafyomi'),
-	cities = require('./cities');
+	cities = require('./cities'),
+	EventEmitter = require('events').EventEmitter;
+
+// Main Hebcal function
 
 function Hebcal(year, month) {
 	if (!year) {
@@ -240,6 +243,8 @@ Hebcal.prototype.find.strings.rosh_hashana = function rosh_hashana() {
 };
 Hebcal.prototype.find.strings.rosh_hashanah = Hebcal.prototype.find.strings.rosh_hashana;
 
+// Hebcal properties
+
 Hebcal.addZeman = HDate.addZeman;
 
 Hebcal.cities = cities;
@@ -258,10 +263,22 @@ Object.defineProperty(Hebcal, 'defaultLocation', {
 		return HDate.defaultLocation;
 	},
 	set: function(loc) {
+		Hebcal.events.emit('locationChange', HDate.defaultLocation);
 		HDate.defaultLocation = loc;
 	}
 });
-Object.defineProperty(Hebcal, 'defaultCity', Object.getOwnPropertyDescriptor(HDate, 'defaultCity'));
+Object.defineProperty(Hebcal, 'defaultCity', {
+	enumerable: true,
+	configurable: true,
+
+	get: function() {
+		return HDate.defaultCity;
+	},
+	set: function(city) {
+		var loc = cities.getLocation(cities.getCity(city));
+		Hebcal.defaultLocation = [loc.lat, loc.long]; // call the event
+	}
+});
 
 Object.defineProperty(Hebcal, 'candleLighting', {
 	enumerable: true,
@@ -286,6 +303,8 @@ Object.defineProperty(Hebcal, 'havdalah', {
 		holidays.Event.havdalah = mins;
 	}
 });
+
+// Months
 
 Hebcal.Month = function Month(month, year) {
 	if (typeof month == 'string') {
@@ -453,6 +472,8 @@ Hebcal.Month.prototype.find.strings.shabbat_mevarchim = function shabbat_mevarch
 };
 Hebcal.Month.prototype.find.strings.shabbos_mevarchim = Hebcal.Month.prototype.find.strings.shabbat_mevarchim;
 
+// HDate days
+
 Hebcal.HDate = HDate;
 
 HDate.prototype.getMonthObject = function getMonthObject() {
@@ -511,5 +532,65 @@ HDate.prototype.omer = function omer() {
 HDate.prototype.dafyomi = function daf(o) {
 	return dafyomi.dafname(dafyomi.dafyomi(this.greg()), o);
 };
+
+// Events
+
+(function(events){
+	var refreshInterval, refresh, today = new HDate();
+
+	Object.defineProperty(events, 'refreshInterval', {
+		configurable: true,
+		enumerable: true,
+
+		get: function() {
+			return refreshInterval;
+		},
+		set: function(ms) {
+			if (refresh) {
+				refresh = clearInterval(refresh);
+			}
+			refreshInterval = ms;
+			if (ms) {
+				refresh = setInterval(checkTimes, ms);
+			}
+		}
+	});
+
+	events.beforeZeman = 1000 * 60 * 10; // 10 minutes
+
+	function checkTimes() {
+		var now = new HDate();
+
+		if (!today.isSameDate(now)) {
+			events.emit('dayChange');
+			today = now;
+		}
+
+		var nowGreg = new Date(), almostTime = c.filter(c.map(now.getZemanim(), function(time){
+			return time - nowGreg;
+		}), function(time) {
+			return time > 0 && time - events.beforeZeman < 0;
+		}), customTimes = c.filter(c.map(events.customs, function(time){
+			return time - nowGreg;
+		}), function(time) {
+			return time > 0 && time - events.refreshInterval < 0;
+		});
+		for (var zeman in almostTime) {
+			events.emit('almostZeman', zeman, almostTime[zeman]);
+			if (almostTime[zeman] < events.refreshInterval) {
+				events.emit('atZeman', zeman);
+			}
+		}
+		for (var custom in customTimes) {
+			events.emit('custom', custom);
+		}
+	}
+	checkTimes();
+
+	events.refreshInterval = 1000 * 60 * 5; // 5 minutes
+	// set the interval
+
+	events.customs = {};
+})(Hebcal.events = new EventEmitter());
 
 module.exports = Hebcal;

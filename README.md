@@ -20,6 +20,8 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.0. It is approximately equivalent to Hebcal C 3.14.
 I (Eyal) did not write Hebcal JS 1.0. 2.0 is a nearly-complete rewrite of it.
 
+The version documented here is 2.1.0 alpha.
+
 ## Contributors
 
 Hebcal JS was ported from C by Eyal Schachter.
@@ -35,7 +37,7 @@ Hebcal JavaScript is distributed under the GNU Public License version 3. The ori
 
 Remember, the GPL means you can't use this in a closed-source program!
 
-If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that I can adjust the program to meet users' needs.
+If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that i can adjust the program to meet users' needs.
 
 # API
 
@@ -58,19 +60,19 @@ Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, A
 
 ### Sun times
 
-Hebcal JS uses the [SunCalc](https://github.com/mourner/suncalc) JavaScript library to calculate sun times. They do not provide an accuracy claim, but I have found their times to be up to 3 minutes off from the accepted times. Do not rely on Zemanim until the last moment!
+Hebcal JS uses the [SunCalc](https://github.com/mourner/suncalc) JavaScript library to calculate sun times. They do not provide an accuracy claim, but i have found their times to be up to 3 minutes off from the accepted times. Do not rely on Zemanim until the last moment!
 
 ### Finding location in browser
 
-Both scripts run on the exact same code, except for one thing. In the browser, Hebcal will attempt to set `Hebcal.defaultLocation` to the user's location using the [geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) API. The `Hebcal.onready` event is fired once the location has been obtained, or failed to be obtained.
+Both scripts run on the exact same code, except for one thing. In the browser, Hebcal will attempt to set `Hebcal.defaultLocation` to the user's location using the [geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) API. The `ready` event (see `Hebcal.events`) is fired once the location has been obtained, or failed to be obtained.
 
 This will cause any webpages with the Hebcal script to request the user's permission to view their location. If they deny it, the default location will be `[0, 0]`.
 
-To turn of this feature, use the `client.noloc.min.js` script instead of the usual `client.min.js` script. The unminified version is `client.noloc.js`.
+To turn off this feature, use the `client.noloc.min.js` script instead of the usual `client.min.js` script. The unminified version is `client.noloc.js`.
 
 ## `Hebcal`
 
-The global variable (if running in the browser) `Hebcal` is the entrypoint to Hebcal. It is a constructor returning an object represtenting a Hebrew year, and also has other useful properties.
+The global variable (if running in the browser) `Hebcal` is the entrypoint to Hebcal. It is a constructor returning an object represtenting a Hebrew year, and also has many other properties.
 
 ```
 new Hebcal([year[, month]]);
@@ -79,6 +81,7 @@ new Hebcal([year[, month]]);
 `year`, if provided, should be an `int` representing a Hebrew year, for example, `5774`. If it is falsey (includes `null`, `undefined`, `0`, `false`, etc), it defaults to the current year. If it is not falsy, and not a number, Hebcal will throw an error.
 
 `month`, if provided, supports multiple types:
+
 * String -- The name of a single month.
 * Number -- The number of a single month (Nisan is 1, Tishrei 7).
 * Array -- An array of either of the above two, or mixed. Basically, anything that can be passed to `Hebcal.Month` (see below).
@@ -384,7 +387,7 @@ An alias of `Hebcal.holidays.Event.candleLighting`.
 
 An alias of `Hebcal.holidays.Event.havdalah`.
 
-## `Hebcal.gematriya(num | string[, limit])`
+## `Hebcal.gematriya(string | num[, limit])`
 
 Return a gematriya string from a number, or a number from a string. Is imperfect above 1000.
 
@@ -692,11 +695,13 @@ Returns an object containing halachik times (zemanim) for the day. Each property
 * `alot_hashacher` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx))
 * `misheyakir` (calculated as when the sun is at -11.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `misheyakir_machmir` (calculated as when the sun is at -10.2 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
+* `neitz_hachama` (the same as sunrise, but allows an event to be fired (added 2.1))
 * `sof_zman_shma` (calculated as sunrise + 3 hours, according to the Gra and Baal HaTanya)
 * `sof_zman_tfilla` (calculated as sunrise + 4 hours, according to the Gra and Baal HaTanya)
 * `mincha_gedola` (calculated as sunrise + 6.5 hours)
 * `mincha_ketana` (calculated as sunrise + 9.5 hours)
 * `plag_hamincha` (calculated as sunrise + 10.75 hours)
+* `shkiah` (the same as sunset, but allows an event to be fired (added 2.1))
 * `tzeit` (calculated as when the sun is at -8.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 
 You can add a zeman to be returned with `Hebcal.HDate.addZeman()` (aliased as `Hebcal.addZeman()`).
@@ -811,11 +816,79 @@ Add a zeman to the object of times returned by `Hebcal.HDate.prototype.getZemani
 
 Boolean; whether the geolocating code has completed or failed yet. If using the noloc script, it is always true.
 
-## `Hebcal.onready()` (client-side only)
+## `Hebcal.onready()` (client-side only, deprecated 2.1)
 
 Set this to a function to be executed when geolocation has finished. Is called immediately upon being set in a no-loc environment.
 
 This function is liable to be buggy.
+
+This has been replaced as of Hebcal 2.1 with the `ready` event (see below). It will still work, but it is preferable not to use it.
+
+## `Hebcal.events`
+
+A bunch of Hebcal-related events. This object is an instance of Node's [`events.EventEmitter`](http://nodejs.org/api/events.html). See there for methods.
+
+Just a quick overview in case you don't feel like looking there right now:
+
+```js
+Hebcal.events.on('locationChange', function(oldloc){
+	console.log('moved from '+oldloc+' to '+Hebcal.defaultLocation);
+});
+Hebcal.events.removeListener('locationChange', Hebcal.events.listeners('locationChange')[0]);
+```
+
+This property is new in Hebcal 2.1.
+
+### `Hebcal.events.refreshInterval`
+
+Number get/set. How often, in milliseconds, to check for zemanim and day changes.
+Upon being set, it updates the time of the interval.
+Defaults to 300000, which is 5 minutes.
+
+### `Hebcal.events.beforeZeman`
+
+Number. If it is under this number of milliseconds before a zeman, call the `almostZeman` event.
+Defaults to 600000, which is 10 minutes.
+
+### `Hebcal.events.customs`
+
+Object of custom events, default empty. Each key in the object should be the name of a custom event, the property a `Date` object or UNIX timestamp number.
+
+A `custom` event will be fired when the date reaches one of these times.
+
+I figured that as long as i was building in time-based alerts, i could add this.
+
+### Events that can be emitted
+
+#### `ready` (client-side only)
+
+Fires when geolocating finished. If it is only set after geolocation finishes, all `ready` events are called then.
+
+#### `locationChange`
+
+Fires when the location is set using `Hebcal.defaultLocation` or `Hebcal.defaultCity`. WARNING: it does not fire when using `Hebcal.HDate.defaultLocation` or `Hebcal.HDate.defaultCity`.
+
+#### `dayChange`
+
+Fires at sunset. Sunset is calculated according to `Hebcal.defaultLocation`.
+
+#### `almostZeman(zeman, msUntil)`
+
+Fires when it is almost a zeman. Almost is if the current time is less than `Hebcal.events.beforeZeman` milliseconds until a zeman. Zemanim are calculated according to `Hebcal.defaultLocation`.
+
+The callback function for this event is passed two parameters: the name of the zeman, and the number of milliseconds until it occurs (approximately).
+
+#### `atZeman(zeman)`
+
+Fires when the time is at a zeman. Zemanim are calculated according to `Hebcal.defaultLocation`. This is not precise; rather, it fires if there will not be another check before the zeman passes.
+
+The callback function for this event is passed one parameter: the name of the zeman.
+
+#### `custom(time)`
+
+Fires when the time is at a custom breakpoint. This is not precise; rather, it fires if there will not be another check before the time passes.
+
+The callback function for this event is passed one parameter: the name of the custom event.
 
 ## Finale
 
