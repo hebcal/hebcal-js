@@ -1,31 +1,3 @@
-/*
-	Hebcal - A Jewish Calendar Generator
-	Copyright (C) 1994-2004  Danny Sadinoff
-	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
-
-	https://github.com/hebcal/hebcal
-
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
-
-	Michael Radwin has made significant contributions as a result of
-	maintaining hebcal.com.
-
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
- */
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
@@ -188,21 +160,24 @@ exports.nearest = function nearest(lat, lon) {
  */
 window.Hebcal = require('./hebcal');
 
-var readyFunc, finished = false;
+var finished = false, warn = (typeof console != 'undefined' && (console.warn || console.log)) || function(){};
+
+Hebcal.events.on('newListener', function(e){
+	if (e === 'ready' && !finished && Hebcal.ready) {
+		ready();
+	}
+});
 
 Object.defineProperty(Hebcal, 'onready', {
-	enumberable: true,
 	configurable: true,
 
 	get: function() {
-		return readyFunc;
+		warn('Getting deprecated property Hebcal.onready');
+		return Hebcal.events.listeners('ready')[0];
 	},
 	set: function(func) {
-		readyFunc = func;
-		if (!finished) {
-			finished = true;
-			Hebcal.onready();
-		}
+		warn('Setting deprecated property Hebcal.onready; use Hebcal.events.on(\'ready\', func) instead');
+		Hebcal.events.on('ready', func);
 	}
 });
 
@@ -218,9 +193,7 @@ if (navigator.geolocation) {
 
 function ready() {
 	Hebcal.ready = true;
-	if (typeof Hebcal.onready === 'function') {
-		Hebcal.onready();
-	}
+	finished = Hebcal.events.emit('ready');
 }
 },{"./hebcal":7}],3:[function(require,module,exports){
 /*
@@ -548,6 +521,74 @@ function map(self, fun, thisp, sameprops) {
 	return res;
 }
 exports.map = map;
+
+function filter(self, fun, thisp) {
+	if (self === null) {
+		throw new TypeError('self is null');
+	}
+	switch (typeof fun) {
+		case 'function':
+			break; // do nothing
+		case 'string':
+		case 'number':
+			return self[fun]; // str/num is just the property
+		case 'boolean':
+			// boolean shortcuts to filter only truthy/falsy values
+			if (fun) {
+				fun = function (v) {
+					return v;
+				};
+			} else {
+				fun = function (v) {
+					return !v;
+				};
+			}
+			break;
+		case 'object':
+			var funOrig = fun; // save it
+			if (fun instanceof RegExp) { // test the val against the regex
+				fun = function (v) {
+					return funOrig.test(v);
+				};
+				break;
+			} else if (Array.isArray(fun)) { // keep these keys
+				fun = function (v, k) {
+					return funOrig.indexOf(k) > -1;
+				};
+				break;
+			}
+		default:
+			throw new TypeError('fun is not a supported type');
+	}
+	var res = {};
+	var t = Object(self);
+	for (var i in t) {
+		if (t.hasOwnProperty(i)) {
+			var val = t[i]; // in case fun mutates it
+			if (fun.call(thisp, val, i, t)) {
+				// define property on res in the same manner as it was originally defined
+				var props = Object.getOwnPropertyDescriptor(t, i);
+				props.value = val;
+				Object.defineProperty(res, i, props);
+			}
+		}
+	}
+	if (Array.isArray(self) || typeof self == 'string') { // came as an array, return an array
+		var arr = [];
+		for (i in res) {
+			arr[Number(i)] = res[i];
+		}
+		res = arr.filter(function (v) {
+			return v;
+		}); // for...in isn't guaranteed to give any meaningful order
+		// can't use obj.filter(arr,true) here because that would infitely recurse
+		if (typeof self == 'string') {
+			res = res.join('');
+		}
+	}
+	return res;
+}
+exports.filter = filter;
 
 function gematriya(num, limit) {
 	if (typeof num !== 'number' && typeof num !== 'string') {
@@ -1347,7 +1388,7 @@ var zemanim = {
 	mincha_ketana: function mincha_ketana(hdate) {
 		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 9.5));
 	},
-	plag_hamincha: function plag_hamincha(hdate) {
+	plag_hamincha: function plag(hdate) {
 		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 10.75));
 	},
 	tzeit: function tzeit(hdate) {
@@ -1355,6 +1396,12 @@ var zemanim = {
 		g.setHours(d.getHours());
 		g.setMinutes(d.getMinutes());
 		return suncalc.getTimes(g, hdate.lat, hdate.long).tzeit;
+	},
+	neitz_hachama: function neitz(hdate) {
+		return hdate.sunrise();
+	},
+	shkiah: function shkiah(hdate) {
+		return hdate.sunset();
 	}
 };
 
@@ -1446,7 +1493,10 @@ var c = require('./common'),
 	HDate = require('./hdate'),
 	holidays = require('./holidays'),
 	dafyomi = require('./dafyomi'),
-	cities = require('./cities');
+	cities = require('./cities'),
+	EventEmitter = require('events').EventEmitter;
+
+// Main Hebcal function
 
 function Hebcal(year, month) {
 	if (!year) {
@@ -1656,6 +1706,8 @@ Hebcal.prototype.find.strings.rosh_hashana = function rosh_hashana() {
 };
 Hebcal.prototype.find.strings.rosh_hashanah = Hebcal.prototype.find.strings.rosh_hashana;
 
+// Hebcal properties
+
 Hebcal.addZeman = HDate.addZeman;
 
 Hebcal.cities = cities;
@@ -1674,10 +1726,22 @@ Object.defineProperty(Hebcal, 'defaultLocation', {
 		return HDate.defaultLocation;
 	},
 	set: function(loc) {
+		Hebcal.events.emit('locationChange', HDate.defaultLocation);
 		HDate.defaultLocation = loc;
 	}
 });
-Object.defineProperty(Hebcal, 'defaultCity', Object.getOwnPropertyDescriptor(HDate, 'defaultCity'));
+Object.defineProperty(Hebcal, 'defaultCity', {
+	enumerable: true,
+	configurable: true,
+
+	get: function() {
+		return HDate.defaultCity;
+	},
+	set: function(city) {
+		var loc = cities.getLocation(cities.getCity(city));
+		Hebcal.defaultLocation = [loc.lat, loc.long]; // call the event
+	}
+});
 
 Object.defineProperty(Hebcal, 'candleLighting', {
 	enumerable: true,
@@ -1702,6 +1766,8 @@ Object.defineProperty(Hebcal, 'havdalah', {
 		holidays.Event.havdalah = mins;
 	}
 });
+
+// Months
 
 Hebcal.Month = function Month(month, year) {
 	if (typeof month == 'string') {
@@ -1869,6 +1935,8 @@ Hebcal.Month.prototype.find.strings.shabbat_mevarchim = function shabbat_mevarch
 };
 Hebcal.Month.prototype.find.strings.shabbos_mevarchim = Hebcal.Month.prototype.find.strings.shabbat_mevarchim;
 
+// HDate days
+
 Hebcal.HDate = HDate;
 
 HDate.prototype.getMonthObject = function getMonthObject() {
@@ -1928,8 +1996,68 @@ HDate.prototype.dafyomi = function daf(o) {
 	return dafyomi.dafname(dafyomi.dafyomi(this.greg()), o);
 };
 
+// Events
+
+(function(events){
+	var refreshInterval, refresh, today = new HDate();
+
+	Object.defineProperty(events, 'refreshInterval', {
+		configurable: true,
+		enumerable: true,
+
+		get: function() {
+			return refreshInterval;
+		},
+		set: function(ms) {
+			if (refresh) {
+				refresh = clearInterval(refresh);
+			}
+			refreshInterval = ms;
+			if (ms) {
+				refresh = setInterval(checkTimes, ms);
+			}
+		}
+	});
+
+	events.beforeZeman = 1000 * 60 * 10; // 10 minutes
+
+	function checkTimes() {
+		var now = new HDate();
+
+		if (!today.isSameDate(now)) {
+			events.emit('dayChange');
+			today = now;
+		}
+
+		var nowGreg = new Date(), almostTime = c.filter(c.map(now.getZemanim(), function(time){
+			return time - nowGreg;
+		}), function(time) {
+			return time > 0 && time - events.beforeZeman < 0;
+		}), customTimes = c.filter(c.map(events.customs, function(time){
+			return time - nowGreg;
+		}), function(time) {
+			return time > 0 && time - events.refreshInterval < 0;
+		});
+		for (var zeman in almostTime) {
+			events.emit('almostZeman', zeman, almostTime[zeman]);
+			if (almostTime[zeman] < events.refreshInterval) {
+				events.emit('atZeman', zeman);
+			}
+		}
+		for (var custom in customTimes) {
+			events.emit('custom', custom);
+		}
+	}
+	checkTimes();
+
+	events.refreshInterval = 1000 * 60 * 5; // 5 minutes
+	// set the interval
+
+	events.customs = {};
+})(Hebcal.events = new EventEmitter());
+
 module.exports = Hebcal;
-},{"./cities":1,"./common":3,"./dafyomi":4,"./hdate":6,"./holidays":8}],8:[function(require,module,exports){
+},{"./cities":1,"./common":3,"./dafyomi":4,"./hdate":6,"./holidays":8,"events":11}],8:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -3250,4 +3378,309 @@ module.exports = function(HDate) {
 
 	return Sedra;
 };
-},{"./common":3}]},{},[2])
+},{"./common":3}],11:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        throw TypeError('Uncaught, unspecified "error" event.');
+      }
+      return false;
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      console.trace();
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}]},{},[2])
+
+
+//# sourceMappingURL=client.browser.js.map

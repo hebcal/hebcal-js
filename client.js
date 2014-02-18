@@ -28,21 +28,24 @@
  */
 window.Hebcal = require('./hebcal');
 
-var readyFunc, finished = false;
+var finished = false, warn = (typeof console != 'undefined' && (console.warn || console.log)) || function(){};
+
+Hebcal.events.on('newListener', function(e){
+	if (e === 'ready' && !finished && Hebcal.ready) {
+		ready();
+	}
+});
 
 Object.defineProperty(Hebcal, 'onready', {
-	enumberable: true,
 	configurable: true,
 
 	get: function() {
-		return readyFunc;
+		warn('Getting deprecated property Hebcal.onready');
+		return Hebcal.events.listeners('ready')[0];
 	},
 	set: function(func) {
-		readyFunc = func;
-		if (!finished) {
-			finished = true;
-			Hebcal.onready();
-		}
+		warn('Setting deprecated property Hebcal.onready; use Hebcal.events.on(\'ready\', func) instead');
+		Hebcal.events.on('ready', func);
 	}
 });
 
@@ -58,7 +61,5 @@ if (navigator.geolocation) {
 
 function ready() {
 	Hebcal.ready = true;
-	if (typeof Hebcal.onready === 'function') {
-		Hebcal.onready();
-	}
+	finished = Hebcal.events.emit('ready');
 }
