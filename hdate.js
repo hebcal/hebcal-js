@@ -62,10 +62,16 @@ function HDate(day, month, year) {
 					return new HDate(s[0], s[1]);
 				} else if (s.length === 3) {
 					return new HDate(s[0], s[1], s[2]);
+				} else if (s.length === 4) { // should only be if s[1] is Adar
+					if (/i/i.test(s[2])) { // Using I[I] syntax
+						s[2] = s[2].length;
+					} // otherwise using 1|2 syntax
+					return new HDate(s[0], s[1] + s[2], s[3]);
 				}
 			} else if (typeof day === 'number') { // absolute date
 				return abs2hebrew(day);
 			}
+			throw new TypeError('HDate called with bad argument');
 		case 2:
 			return new HDate(day, month, (new HDate()).getFullYear());
 		case 3:

@@ -235,10 +235,10 @@ function lookup_hebrew_month(c) {
 				case 'v':
 					return months.AV;
 				case 'd':
-					if (c.indexOf('1') > -1) {
-						return months.ADAR_I;
+					if (c.indexOf('2') > -1 || /ii/i.test(c)) {
+						return months.ADAR_II;
 					}
-					return months.ADAR_II;	/* else assume sheni */
+					return months.ADAR_I;	/* else assume rishon */
 				default:
 					return 0;
 			}

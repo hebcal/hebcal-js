@@ -483,7 +483,7 @@ HDate.prototype.getMonthObject = function getMonthObject() {
 };
 
 HDate.prototype.getYearObject = function getYearObject() {
-	return this.getMonthObject().getYearObject();
+	return (this.getMonthObject() && this.getMonthObject().getYearObject()) || undefined;
 };
 
 var HDatePrev = HDate.prototype.prev;
@@ -513,6 +513,7 @@ HDate.prototype.next = function next() {
 		return this.getYearObject().find(g)[0];
 	}
 };
+console.log(HDateNext.toString());
 
 HDate.prototype.holidays = function holidays() {
 	return this.getYearObject().holidays.filter(function(h){
@@ -560,7 +561,7 @@ HDate.prototype.tachanun = function tachanun() {
 		year.find(c.range(1, 13), c.months.SIVAN), // Until 14 Sivan
 		year.find(c.range(20, 31), c.months.TISHREI), // Until after Rosh Chodesh Cheshvan
 		year.find(14, c.months.IYYAR), // Pesach Sheini
-		year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut
+		year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
 		year.find(29, c.months.IYYAR) // Yom Yerushalayim
 	));
 	tachanun.__cache.il[year.year] = this.il;
@@ -587,6 +588,44 @@ Object.defineProperty(HDate.prototype.tachanun, '__cache', {
 	value: {
 		all: {},
 		some: {},
+		il: {}
+	}
+});
+
+HDate.prototype.hallel = function hallel() {
+	var NONE  = hallel.NONE  = 0,
+		HALF  = hallel.HALF  = 1,
+		WHOLE = hallel.WHOLE = 2;
+
+	var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+
+	var whole = hallel.__cache.il[year.year] === this.il && hallel.__cache.whole[year.year] || (hallel.__cache.whole[year.year] = [].concat(
+		year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
+		year.find([15, this.il ? null : 16], c.months.NISAN), // First day(s) of Pesach
+		year.find('Shavuot'),
+		year.find('Sukkot'),
+		year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
+		year.find(29, c.months.IYYAR) // Yom Yerushalayim
+	));
+	var half = hallel.__cache.il[year.year] === this.il && hallel.__cache.half[year.year] || (hallel.__cache.half[year.year] = [].concat(
+		year.find('Rosh Chodesh').filter(function(rc){return rc.getMonth() !== c.months.TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
+		year.find(c.range(17 - this.il, 23 - this.il), c.months.NISAN) // Last six days of Pesach
+	));
+	hallel.__cache.il[year.year] = this.il;
+
+	return (c.filter(whole.map(function(d){
+		return this.isSameDate(d);
+	}, this), true).length && WHOLE) || (c.filter(half.map(function(d){
+		return this.isSameDate(d);
+	}, this), true).length && HALF) || NONE;
+};
+
+Object.defineProperty(HDate.prototype.hallel, '__cache', {
+	configurable: true,
+	writable: true,
+	value: {
+		whole: {},
+		half: {},
 		il: {}
 	}
 });

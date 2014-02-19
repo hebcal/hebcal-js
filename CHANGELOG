@@ -1,2 +1,14 @@
-version 2.0
+version 2.1 (2014-02-19 alpha)
+	Add Hebcal.GregYear and Hebcal.GregMonth constructors
+	Fix issue with passing a string day to new HDate(day, month[, year])
+	Fix broken Adar 1/2 to new HDate(string)
+	Default unspecified Adar to be 1, not 2
+	Change behavior of Hebcal.prototype.map to map over individual days
+	Add hallel and tachanun to HDate()s
+	Explicitly return undefined in HDate().getYearObject() in case of failure
+	Check for failure in HDate().getYearObject()
+	Add Hebcal.events property
+	Setting Hebcal.defaultLocation or Hebcal.defaultCity calls an event
+
+version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code
