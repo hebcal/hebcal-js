@@ -42,10 +42,18 @@ exports.monthNames = [
 	'December'
 ];
 
+exports.lookupMonthNum = function lookupMonthNum(month) {
+	return new Date(month + ' 1').getMonth() + 1;
+};
+
 exports.monthLengths = [
 	[0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	[0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 ];
+
+exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
+	return exports.monthLengths[+LEAP(year)][month];
+};
 
 exports.shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -65,8 +73,9 @@ function dayOfYear (date) {
 exports.dayOfYear = dayOfYear;
 
 function LEAP (year) {
-	return (year % 4) > 0 && ( (year % 100) === 0 || (year % 400) > 0 );
+	return !(year % 4) && ( !!(year % 100) || !(year % 400) );
 }
+exports.LEAP = LEAP;
 
 exports.greg2abs = function greg2abs(date) { // "absolute date"
 	return (dayOfYear(date) + // days this year
