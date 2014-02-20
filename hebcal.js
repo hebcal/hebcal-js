@@ -551,99 +551,97 @@ HDate.prototype.dafyomi = function daf(o) {
 	return dafyomi.dafname(dafyomi.dafyomi(this.greg()), o);
 };
 
-HDate.prototype.tachanun = function tachanun() {
+HDate.prototype.tachanun = (function() {
 	var NONE      = tachanun.NONE      = 0,
 		MINCHA    = tachanun.MINCHA    = 1,
 		SHACHARIT = tachanun.SHACHARIT = 2,
 		ALL_CONGS = tachanun.ALL_CONGS = 4;
 
-	var checkPrev = !arguments[0];
-
-	var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
-
-	var all = tachanun.__cache.il[year.year] === this.il && tachanun.__cache.all[year.year] || (tachanun.__cache.all[year.year] = year.find('Rosh Chodesh').concat(
-		year.find(c.range(1, c.max_days_in_heb_month(c.months.NISAN, this.getFullYear())), c.months.NISAN), // all of Nisan
-		year.find(15 + 33, c.months.NISAN), // Lag Baomer
-		year.find(c.range(1, 8 - this.il), c.months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
-		year.find([9, 15], c.months.AV), // Tisha B'av and Tu B'av
-		year.find(-1, c.months.ELUL), // Erev Rosh Hashanah
-		year.find([1, 2], c.months.TISHREI), // Rosh Hashanah
-		year.find(c.range(9, 24 - this.il), c.months.TISHREI), // Erev Yom Kippur thru Isru Chag
-		year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
-		year.find(15, c.months.SHVAT), // Tu B'shvat
-		year.find([14, 15], year.isLeapYear() ? [c.months.ADAR_I, c.months.ADAR_II] : c.months.ADAR_I) // Purim/Shushan Purim + Katan
-	)), some = tachanun.__cache.il[year.year] === this.il && tachanun.__cache.some[year.year] || (tachanun.__cache.some[year.year] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
-		year.find(c.range(1, 13), c.months.SIVAN), // Until 14 Sivan
-		year.find(c.range(20, 31), c.months.TISHREI), // Until after Rosh Chodesh Cheshvan
-		year.find(14, c.months.IYYAR), // Pesach Sheini
-		year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
-		year.find(29, c.months.IYYAR) // Yom Yerushalayim
-	));
-	tachanun.__cache.il[year.year] = this.il;
-
-	all = c.filter(all.map(function(d){
-		return this.isSameDate(d);
-	}, this), true).length;
-	some = c.filter(some.map(function(d){
-		return this.isSameDate(d);
-	}, this), true).length;
-
-	if (all) {
-		return NONE;
-	}
-	if (checkPrev) {
-		return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | ((this.next().tachanun(true) & SHACHARIT) && MINCHA);
-	}
-	return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | (this.getDay() != 5 && MINCHA);
-};
-
-Object.defineProperty(HDate.prototype.tachanun, '__cache', {
-	configurable: true,
-	writable: true,
-	value: {
+	var __cache = {
 		all: {},
 		some: {},
 		il: {}
-	}
-});
+	};
 
-HDate.prototype.hallel = function hallel() {
+	function tachanun() {
+		var checkPrev = !arguments[0];
+
+		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+
+		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year.find('Rosh Chodesh').concat(
+			year.find(c.range(1, c.max_days_in_heb_month(c.months.NISAN, this.getFullYear())), c.months.NISAN), // all of Nisan
+			year.find(15 + 33, c.months.NISAN), // Lag Baomer
+			year.find(c.range(1, 8 - this.il), c.months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+			year.find([9, 15], c.months.AV), // Tisha B'av and Tu B'av
+			year.find(-1, c.months.ELUL), // Erev Rosh Hashanah
+			year.find([1, 2], c.months.TISHREI), // Rosh Hashanah
+			year.find(c.range(9, 24 - this.il), c.months.TISHREI), // Erev Yom Kippur thru Isru Chag
+			year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
+			year.find(15, c.months.SHVAT), // Tu B'shvat
+			year.find([14, 15], year.isLeapYear() ? [c.months.ADAR_I, c.months.ADAR_II] : c.months.ADAR_I) // Purim/Shushan Purim + Katan
+		)), some = __cache.il[year.year] === this.il && __cache.some[year.year] || (__cache.some[year.year] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
+			year.find(c.range(1, 13), c.months.SIVAN), // Until 14 Sivan
+			year.find(c.range(20, 31), c.months.TISHREI), // Until after Rosh Chodesh Cheshvan
+			year.find(14, c.months.IYYAR), // Pesach Sheini
+			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
+			year.find(29, c.months.IYYAR) // Yom Yerushalayim
+		));
+		__cache.il[year.year] = this.il;
+
+		all = c.filter(all.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length;
+		some = c.filter(some.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length;
+
+		if (all) {
+			return NONE;
+		}
+		if (checkPrev) {
+			return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | ((this.next().tachanun(true) & SHACHARIT) && MINCHA);
+		}
+		return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | (this.getDay() != 5 && MINCHA);
+	}
+	return tachanun;
+})();
+
+HDate.prototype.hallel = (function() {
 	var NONE  = hallel.NONE  = 0,
 		HALF  = hallel.HALF  = 1,
 		WHOLE = hallel.WHOLE = 2;
 
-	var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
-
-	var whole = hallel.__cache.il[year.year] === this.il && hallel.__cache.whole[year.year] || (hallel.__cache.whole[year.year] = [].concat(
-		year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
-		year.find([15, this.il ? null : 16], c.months.NISAN), // First day(s) of Pesach
-		year.find('Shavuot'),
-		year.find('Sukkot'),
-		year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
-		year.find(29, c.months.IYYAR) // Yom Yerushalayim
-	));
-	var half = hallel.__cache.il[year.year] === this.il && hallel.__cache.half[year.year] || (hallel.__cache.half[year.year] = [].concat(
-		year.find('Rosh Chodesh').filter(function(rc){return rc.getMonth() !== c.months.TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
-		year.find(c.range(17 - this.il, 23 - this.il), c.months.NISAN) // Last six days of Pesach
-	));
-	hallel.__cache.il[year.year] = this.il;
-
-	return (c.filter(whole.map(function(d){
-		return this.isSameDate(d);
-	}, this), true).length && WHOLE) || (c.filter(half.map(function(d){
-		return this.isSameDate(d);
-	}, this), true).length && HALF) || NONE;
-};
-
-Object.defineProperty(HDate.prototype.hallel, '__cache', {
-	configurable: true,
-	writable: true,
-	value: {
+	var __cache = {
 		whole: {},
 		half: {},
 		il: {}
+	};
+
+	function hallel() {
+		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+
+		var whole = __cache.il[year.year] === this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
+			year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
+			year.find([15, this.il ? null : 16], c.months.NISAN), // First day(s) of Pesach
+			year.find('Shavuot'),
+			year.find('Sukkot'),
+			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
+			year.find(29, c.months.IYYAR) // Yom Yerushalayim
+		));
+		var half = __cache.il[year.year] === this.il && __cache.half[year.year] || (__cache.half[year.year] = [].concat(
+			year.find('Rosh Chodesh').filter(function(rc){return rc.getMonth() !== c.months.TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
+			year.find(c.range(17 - this.il, 23 - this.il), c.months.NISAN) // Last six days of Pesach
+		));
+		__cache.il[year.year] = this.il;
+
+		return (c.filter(whole.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length && WHOLE) || (c.filter(half.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length && HALF) || NONE;
 	}
-});
+	return hallel;
+})();
 
 // Events
 
