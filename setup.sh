@@ -1,5 +1,6 @@
 # generate client files
-# requires browserify, uglifyjs, exorcist, and node (of course)
+# requires browserify, uglifyjs, exorcist, marked, and node (of course)
+# also generates README.html and fixes the README in package.json
 HEADER="/*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -45,3 +46,6 @@ mv client.noloc.js~ client.noloc.js
 echo "f='client.noloc.src.js.map';$mapcode" | node > client.noloc.js.map
 mv client.noloc.src.js.map /tmp
 uglifyjs -m -v --preable "$HEADER" --in-source-map client.noloc.js.map --source-map client.noloc.min.js.map client.noloc.js > client.noloc.min.js
+echo "Creating README"
+marked --gfm --breaks README.md > README.html
+echo "fs=require('fs');p=JSON.parse(fs.readFileSync('package.json').toString());p.readme=fs.readFileSync('README.md').toString();fs.writeFileSync('package.json',JSON.stringify(p,null,'\t'))" | node

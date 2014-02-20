@@ -421,10 +421,10 @@ function lookup_hebrew_month(c) {
 				case 'v':
 					return months.AV;
 				case 'd':
-					if (c.indexOf('1') > -1) {
-						return months.ADAR_I;
+					if (c.indexOf('2') > -1 || /ii/i.test(c)) {
+						return months.ADAR_II;
 					}
-					return months.ADAR_II;	/* else assume sheni */
+					return months.ADAR_I;	/* else assume rishon */
 				default:
 					return 0;
 			}
@@ -890,10 +890,18 @@ exports.monthNames = [
 	'December'
 ];
 
+exports.lookupMonthNum = function lookupMonthNum(month) {
+	return new Date(month + ' 1').getMonth() + 1;
+};
+
 exports.monthLengths = [
 	[0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	[0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 ];
+
+exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
+	return exports.monthLengths[+LEAP(year)][month];
+};
 
 exports.shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -913,8 +921,9 @@ function dayOfYear (date) {
 exports.dayOfYear = dayOfYear;
 
 function LEAP (year) {
-	return (year % 4) > 0 && ( (year % 100) === 0 || (year % 400) > 0 );
+	return !(year % 4) && ( !!(year % 100) || !(year % 400) );
 }
+exports.LEAP = LEAP;
 
 exports.greg2abs = function greg2abs(date) { // "absolute date"
 	return (dayOfYear(date) + // days this year
@@ -1038,10 +1047,16 @@ function HDate(day, month, year) {
 					return new HDate(s[0], s[1]);
 				} else if (s.length === 3) {
 					return new HDate(s[0], s[1], s[2]);
+				} else if (s.length === 4) { // should only be if s[1] is Adar
+					if (/i/i.test(s[2])) { // Using I[I] syntax
+						s[2] = s[2].length;
+					} // otherwise using 1|2 syntax
+					return new HDate(s[0], s[1] + s[2], s[3]);
 				}
 			} else if (typeof day === 'number') { // absolute date
 				return abs2hebrew(day);
 			}
+			throw new TypeError('HDate called with bad argument');
 		case 2:
 			return new HDate(day, month, (new HDate()).getFullYear());
 		case 3:
@@ -1482,6 +1497,7 @@ var c = require('./common'),
 	holidays = require('./holidays'),
 	dafyomi = require('./dafyomi'),
 	cities = require('./cities'),
+	greg = require('./greg'),
 	EventEmitter = require('events').EventEmitter;
 
 // Main Hebcal function
@@ -1499,7 +1515,7 @@ function Hebcal(year, month) {
 			month = c.lookup_hebrew_month(month);
 		}
 		if (typeof month == 'number') {
-			return new Hebcal(year, [month]);
+			month = [month];
 		}
 
 		if (Array.isArray(month)) {
@@ -1513,9 +1529,9 @@ function Hebcal(year, month) {
 				return m;
 			}, this);
 
-			this.holidays = holidays.getHolidaysForYear(year).filter(function(h){
+			this.holidays = holidays.getHolidaysForYear(year < 1 ? (new HDate()).getFullYear() : year).filter(function(h){
 				return this.months.filter(function(m){ // don't keep ones that are out of bounds
-					return m.month===h.date.getMonth();
+					return m.month === h.date.getMonth();
 				}).length;
 			}, this);
 		} else {
@@ -1605,8 +1621,25 @@ Hebcal.prototype.getMonth = function getMonth(month) {
 	return this.months[month > 0 ? month - 1 : this.months.length + month];
 };
 
+Hebcal.prototype.getDay = function getDay(day) {
+	if (day > this.length) {
+		return null;
+	}
+	if (day < 0) {
+		return this.getDay(this.length - day);
+	}
+	var rosh = this.find(29, c.months.ELUL)[0].abs() + 1 - this.find(1, c.months.NISAN)[0].abs(); // number of days between Nisan and Tishrei
+	console.log(rosh);
+	if (day <= rosh) {
+		return this.getMonth(c.months.NISAN).getDay(day);
+	}
+	return this.getMonth(c.months.TISHREI).getDay(day - rosh);
+};
+
 Hebcal.prototype.map = function map() {
-	return [].map.apply(this.months, arguments);
+	return [].map.apply([].concat.apply([], this.months.map(function(m){
+		return m.days;
+	})), arguments);
 };
 
 Hebcal.prototype.addHoliday = function addHoliday(holiday) {
@@ -1850,8 +1883,7 @@ Hebcal.Month.prototype.next = function next() {
 
 Hebcal.Month.prototype.getDay = function getDay(day) {
 	day = typeof day === 'number' ? day :
-		day.charCodeAt(0) >= 1488 && day.charCodeAt(0) <= 1514 && /('|")/.test(day) ? c.gematriya(day) :
-			day.charCodeAt(0) >= 48 && day.charCodeAt(0) <= 57 /* number */ ? parseInt(day, 10) : c.lookup_hebrew_day(day);
+		day.charCodeAt(0) >= 1488 && day.charCodeAt(0) <= 1514 && /('|")/.test(day) ? c.gematriya(day) : parseInt(day, 10); // gematriya or number string
 	if (day > this.days.length) {
 		return this.next().getDay(day - this.days.length);
 	}
@@ -1932,7 +1964,7 @@ HDate.prototype.getMonthObject = function getMonthObject() {
 };
 
 HDate.prototype.getYearObject = function getYearObject() {
-	return this.getMonthObject().getYearObject();
+	return (this.getMonthObject() && this.getMonthObject().getYearObject()) || undefined;
 };
 
 var HDatePrev = HDate.prototype.prev;
@@ -1962,6 +1994,7 @@ HDate.prototype.next = function next() {
 		return this.getYearObject().find(g)[0];
 	}
 };
+console.log(HDateNext.toString());
 
 HDate.prototype.holidays = function holidays() {
 	return this.getYearObject().holidays.filter(function(h){
@@ -1983,6 +2016,98 @@ HDate.prototype.omer = function omer() {
 HDate.prototype.dafyomi = function daf(o) {
 	return dafyomi.dafname(dafyomi.dafyomi(this.greg()), o);
 };
+
+HDate.prototype.tachanun = (function() {
+	var NONE      = tachanun.NONE      = 0,
+		MINCHA    = tachanun.MINCHA    = 1,
+		SHACHARIT = tachanun.SHACHARIT = 2,
+		ALL_CONGS = tachanun.ALL_CONGS = 4;
+
+	var __cache = {
+		all: {},
+		some: {},
+		il: {}
+	};
+
+	function tachanun() {
+		var checkPrev = !arguments[0];
+
+		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+
+		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year.find('Rosh Chodesh').concat(
+			year.find(c.range(1, c.max_days_in_heb_month(c.months.NISAN, this.getFullYear())), c.months.NISAN), // all of Nisan
+			year.find(15 + 33, c.months.NISAN), // Lag Baomer
+			year.find(c.range(1, 8 - this.il), c.months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+			year.find([9, 15], c.months.AV), // Tisha B'av and Tu B'av
+			year.find(-1, c.months.ELUL), // Erev Rosh Hashanah
+			year.find([1, 2], c.months.TISHREI), // Rosh Hashanah
+			year.find(c.range(9, 24 - this.il), c.months.TISHREI), // Erev Yom Kippur thru Isru Chag
+			year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
+			year.find(15, c.months.SHVAT), // Tu B'shvat
+			year.find([14, 15], year.isLeapYear() ? [c.months.ADAR_I, c.months.ADAR_II] : c.months.ADAR_I) // Purim/Shushan Purim + Katan
+		)), some = __cache.il[year.year] === this.il && __cache.some[year.year] || (__cache.some[year.year] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
+			year.find(c.range(1, 13), c.months.SIVAN), // Until 14 Sivan
+			year.find(c.range(20, 31), c.months.TISHREI), // Until after Rosh Chodesh Cheshvan
+			year.find(14, c.months.IYYAR), // Pesach Sheini
+			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
+			year.find(29, c.months.IYYAR) // Yom Yerushalayim
+		));
+		__cache.il[year.year] = this.il;
+
+		all = c.filter(all.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length;
+		some = c.filter(some.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length;
+
+		if (all) {
+			return NONE;
+		}
+		if (checkPrev) {
+			return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | ((this.next().tachanun(true) & SHACHARIT) && MINCHA);
+		}
+		return (!some && ALL_CONGS) | (this.getDay() != 6 && SHACHARIT) | (this.getDay() != 5 && MINCHA);
+	}
+	return tachanun;
+})();
+
+HDate.prototype.hallel = (function() {
+	var NONE  = hallel.NONE  = 0,
+		HALF  = hallel.HALF  = 1,
+		WHOLE = hallel.WHOLE = 2;
+
+	var __cache = {
+		whole: {},
+		half: {},
+		il: {}
+	};
+
+	function hallel() {
+		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+
+		var whole = __cache.il[year.year] === this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
+			year.find(c.range(25, 33), c.months.KISLEV), // Chanukah
+			year.find([15, this.il ? null : 16], c.months.NISAN), // First day(s) of Pesach
+			year.find('Shavuot'),
+			year.find('Sukkot'),
+			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
+			year.find(29, c.months.IYYAR) // Yom Yerushalayim
+		));
+		var half = __cache.il[year.year] === this.il && __cache.half[year.year] || (__cache.half[year.year] = [].concat(
+			year.find('Rosh Chodesh').filter(function(rc){return rc.getMonth() !== c.months.TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
+			year.find(c.range(17 - this.il, 23 - this.il), c.months.NISAN) // Last six days of Pesach
+		));
+		__cache.il[year.year] = this.il;
+
+		return (c.filter(whole.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length && WHOLE) || (c.filter(half.map(function(d){
+			return this.isSameDate(d);
+		}, this), true).length && HALF) || NONE;
+	}
+	return hallel;
+})();
 
 // Events
 
@@ -2044,8 +2169,260 @@ HDate.prototype.dafyomi = function daf(o) {
 	events.customs = {};
 })(Hebcal.events = new EventEmitter());
 
+// Gregorian years
+
+Hebcal.GregYear = function GregYear(year, month) {
+	if (!year) {
+		year = (new Date).getFullYear();
+	}
+	if (typeof year === 'string') {
+		var d = new Date(year);
+		month = year.indexOf(' ') + 1 || year.indexOf('-') + 1 || year.indexOf('/') + 1 ? d.getMonth() + 1 : c.range(1, 12);
+		// Check if a month was passed in the string. Can't just check for default January, because a real January might have been passed.
+		return new Hebcal.GregYear(d.getFullYear(), month);
+	}
+	if (typeof year !== 'number') {
+		throw new TypeError('year to Hebcal.GregYear() is not a number');
+	}
+	this.year = year;
+
+	if (month) {
+		if (typeof month === 'string') { // month name
+			month = greg.lookupMonthName(month);
+		}
+		if (typeof month === 'number') {
+			month = [month];
+		}
+
+		if (Array.isArray(month)) {
+			this.months = month.map(function(i){
+				var m = new Hebcal.GregMonth(i, year);
+				Object.defineProperty(m, '__year', {
+					configurable: true,
+					writable: true,
+					value: this
+				});
+				return m;
+			}, this);
+		} else {
+			throw new TypeError('month to Hebcal.GregYear() is not a valid type');
+		}
+	} else {
+		return new Hebcal.GregYear(year, c.range(1, 12));
+	}
+
+	this.hebyears = [
+		new HDate(new Date(year, this.months[0].month - 1, 1)).getFullYear(),
+		new HDate(new Date(year, this.months[this.months.length - 1] - 1, greg.daysInMonth(this.months[this.months.length - 1]))).getFullYear()
+	].filter(function(val, i, arr){
+		return arr.indexOf(val) === i; // keep unique values only
+	});
+
+	this.holidays = holidays.getHolidaysForYear(this.hebyears[0]).filter(function(h){
+		return h.date.greg().getFullYear() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+			return m.month === h.date.greg().getMonth() + 1;
+		}).length;
+	}, this);
+	if (this.hebyears[1]) {
+		this.holidays = this.holidays.concat(holidays.getHolidaysForYear(this.hebyears[1]).filter(function(h){
+			return h.date.greg().getFullYear() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+				return m.month === h.date.greg().getMonth() + 1;
+			}).length;
+		}, this));
+	}
+
+	this.length = 365 + greg.LEAP(year);
+
+	Object.defineProperty(this, 'il', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getMonth(1).il;
+		},
+		set: function(il) {
+			this.months.forEach(function(m){
+				m.il = il;
+			});
+		}
+	});
+
+	Object.defineProperty(this, 'lat', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getMonth(1).lat;
+		},
+		set: function(lat) {
+			this.months.forEach(function(m){
+				m.lat = lat;
+			});
+		}
+	});
+	Object.defineProperty(this, 'long', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getMonth(1).long;
+		},
+		set: function(lon) {
+			this.months.forEach(function(m){
+				m.long = lon;
+			});
+		}
+	});
+};
+
+Hebcal.GregYear.prototype.isLeapYear = function isLeapYear() {
+	return this.length === 366;
+};
+
+Hebcal.GregYear.prototype.setCity = Hebcal.prototype.setCity;
+Hebcal.GregYear.prototype.setLocation = Hebcal.prototype.setLocation;
+
+Hebcal.GregYear.prototype.next = function next() {
+	return new Hebcal.GregYear(this.year + 1);
+};
+
+Hebcal.GregYear.prototype.prev = function prev() {
+	return new Hebcal.GregYear(this.year - 1);
+};
+
+Hebcal.GregYear.prototype.getMonth = function getMonth(month) {
+	month = typeof month === 'number' ? month : greg.lookupMonthNum(month);
+	if (month > this.months.length) {
+		return this.next().getMonth(month - this.months.length);
+	}
+	return this.months[month > 0 ? month - 1 : this.months.length + month];
+};
+
+Hebcal.GregYear.prototype.map = Hebcal.prototype.map;
+
+Hebcal.GregYear.prototype.addHoliday = Hebcal.prototype.addHoliday;
+
+Hebcal.GregMonth = function GregMonth(month, year) {
+	if (typeof month == 'string') {
+		month = greg.lookupMonthNum(month);
+	}
+	if (typeof month != 'number') {
+		throw new TypeError('month to Hebcal.GregMonth is not a valid type');
+	}
+	if (typeof year != 'number') {
+		throw new TypeError('year to Hebcal.GregMonth is not a number');
+	}
+
+	this.year = year;
+	this.month = month;
+
+	this.days = c.range(1, greg.daysInMonth(month, year)).map(function(i){
+		var d = new HDate(new Date(year, month - 1, i));
+		Object.defineProperty(d, '__gregmonth', {
+			configurable: true,
+			writable: true,
+			value: this
+		});
+		return d;
+	}, this);
+
+	this.length = this.days.length;
+
+	this.hebmonths = [
+		{month: this.getDay( 1).getMonth(), year: this.getDay( 1).getFullYear()},
+		{month: this.getDay(-1).getMonth(), year: this.getDay(-1).getFullYear()}
+	].filter(function(val, i, arr){
+		return i === 0 || val.month !== arr[0].month;
+	});
+
+	Object.defineProperty(this, 'il', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getDay(1).il;
+		},
+		set: function(il) {
+			this.days.forEach(function(d){
+				d.il = il;
+			});
+		}
+	});
+
+	Object.defineProperty(this, 'lat', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getDay(1).lat;
+		},
+		set: function(lat) {
+			this.days.forEach(function(d){
+				d.lat = lat;
+			});
+		}
+	});
+	Object.defineProperty(this, 'long', {
+		enumerable: true,
+		configurable: true,
+
+		get: function() {
+			return this.getDay(1).long;
+		},
+		set: function(lon) {
+			this.days.forEach(function(d){
+				d.long = lon;
+			});
+		}
+	});
+};
+
+Hebcal.GregMonth.prototype.isLeapYear = function isLeapYear() {
+	return greg.LEAP(this.year);
+};
+
+Hebcal.GregMonth.prototype.prev = function prev() {
+	if (this.month === 1) {
+		return this.getYearObject().prev().getMonth(-1);
+	} else {
+		return this.getYearObject().getMonth(this.month - 1);
+	}
+};
+
+Hebcal.GregMonth.prototype.next = function next() {
+	return this.getYearObject().getMonth(this.month + 1);
+};
+
+Hebcal.GregMonth.prototype.getDay = function getDay(day) {
+	if (day > this.days.length) {
+		return this.next().getDay(day - this.days.length);
+	}
+	return this.days[day > 0 ? day - 1 : this.days.length + day];
+};
+
+Hebcal.GregMonth.prototype.getYearObject = function getYearObject() {
+	return this.__year;
+};
+
+Hebcal.GregMonth.prototype.getName = function getName() {
+	return greg.monthNames[this.month];
+};
+
+Hebcal.GregMonth.prototype.setCity = Hebcal.Month.prototype.setCity;
+Hebcal.GregMonth.prototype.setLocation = Hebcal.Month.prototype.setLocation;
+
+Hebcal.GregMonth.prototype.map = Hebcal.Month.prototype.map;
+
+HDate.prototype.getGregMonthObject = function getGregMonthObject() {
+	return this.__gregmonth;
+};
+
+HDate.prototype.getGregYearObject = function getGregYearObject() {
+	return (this.getGregMonthObject() && this.getGregMonthObject().getYearObject()) || undefined;
+};
+
 module.exports = Hebcal;
-},{"./cities":1,"./common":3,"./dafyomi":4,"./hdate":6,"./holidays":8,"events":11}],8:[function(require,module,exports){
+},{"./cities":1,"./common":3,"./dafyomi":4,"./greg":5,"./hdate":6,"./holidays":8,"events":11}],8:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
