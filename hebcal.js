@@ -63,7 +63,7 @@ function Hebcal(year, month) {
 				return m;
 			}, this);
 
-			this.holidays = holidays.getHolidaysForYear(year).filter(function(h){
+			this.holidays = holidays.getHolidaysForYear(year < 1 ? (new HDate()).getFullYear() : year).filter(function(h){
 				return this.months.filter(function(m){ // don't keep ones that are out of bounds
 					return m.month === h.date.getMonth();
 				}).length;
@@ -153,6 +153,21 @@ Hebcal.prototype.getMonth = function getMonth(month) {
 		return this.next().getMonth(month - this.months.length);
 	}
 	return this.months[month > 0 ? month - 1 : this.months.length + month];
+};
+
+Hebcal.prototype.getDay = function getDay(day) {
+	if (day > this.length) {
+		return null;
+	}
+	if (day < 0) {
+		return this.getDay(this.length - day);
+	}
+	var rosh = this.find(29, c.months.ELUL)[0].abs() + 1 - this.find(1, c.months.NISAN)[0].abs(); // number of days between Nisan and Tishrei
+	console.log(rosh);
+	if (day <= rosh) {
+		return this.getMonth(c.months.NISAN).getDay(day);
+	}
+	return this.getMonth(c.months.TISHREI).getDay(day - rosh);
 };
 
 Hebcal.prototype.map = function map() {
@@ -936,6 +951,10 @@ Hebcal.GregMonth.prototype.map = Hebcal.Month.prototype.map;
 
 HDate.prototype.getGregMonthObject = function getGregMonthObject() {
 	return this.__gregmonth;
+};
+
+HDate.prototype.getGregYearObject = function getGregYearObject() {
+	return (this.getGregMonthObject() && this.getGregMonthObject().getYearObject()) || undefined;
 };
 
 module.exports = Hebcal;
