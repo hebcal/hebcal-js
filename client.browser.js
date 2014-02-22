@@ -4,7 +4,7 @@
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ exports.nearest = function nearest(lat, lon) {
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -202,7 +202,7 @@ function ready() {
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -718,7 +718,7 @@ exports.range = range;
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -864,7 +864,7 @@ exports.dafname = dafname;
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -1001,7 +1001,7 @@ exports.abs2greg = function abs2greg(theDate) {
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -1482,7 +1482,7 @@ module.exports = HDate;
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -2441,7 +2441,7 @@ module.exports = Hebcal;
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -3262,7 +3262,7 @@ if (typeof define === 'function' && define.amd) {
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

@@ -1103,6 +1103,10 @@ Number get/set. Latitude/Longitude of the location. Is usually set by the parent
 
 Internal, non-enumerable. A reference to the containing year. Only set if the month was created by a `Hebcal.GregYear()`. (Not actually a prototype value.)
 
+### `Hebcal.GregMonth.prototype.hebmonths`
+
+Array of Hebrew months in the Gregorian month. Each item of the array is an object with properties `month` and `year`. (Not actually a prototype value.)
+
 ### `Hebcal.GregMonth.prototype.isLeapYear()`
 
 Returns a Boolean, whether or not the year is a leap year.
