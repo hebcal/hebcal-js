@@ -1,0 +1,8 @@
+# Backup files
+*~
+
+# HTML README for local viewing
+README.html
+
+# Editor files
+*.sublime*
