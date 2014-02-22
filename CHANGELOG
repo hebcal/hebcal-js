@@ -11,6 +11,7 @@ version 2.1 (2014-02-20 alpha)
 	Setting Hebcal.defaultLocation or Hebcal.defaultCity calls an event
 	Add Hebcal().getDay() method
 	Fix issue with new Hebcal(-1)
+	Make city names case-insensitive
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

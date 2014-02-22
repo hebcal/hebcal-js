@@ -1,3 +1,4 @@
+#!/bin/sh
 # generate client files
 # requires browserify, uglifyjs, exorcist, marked, and node (of course)
 # also generates README.html and fixes the README in package.json
@@ -30,7 +31,7 @@ HEADER="/*
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
  */
 ;"
-mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/eyal\\/git\\/hebcal\\/javascript\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
+mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/eyal\\/git\\/hebcal\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
 srccode="console.log(';'+require('fs').readFileSync(f).toString().replace(map,f+'.map'))"
 echo "Starting client.js"
 browserify --debug client.js | exorcist client.js.map > client.browser.js

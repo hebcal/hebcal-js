@@ -20,7 +20,7 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.0. It is approximately equivalent to Hebcal C 3.14.
 I (Eyal) did not write Hebcal JS 1.0. 2.0 is a nearly-complete rewrite of it.
 
-The version documented here is 2.1.0 alpha.
+The version documented here is 2.1.0 beta.
 
 ## Contributors
 
@@ -28,7 +28,7 @@ Hebcal JS was ported from C by Eyal Schachter.
 
 The original C and JavaScript code was written by Danny Sadinoff, with contributions by Michael J. Radwin.
 
-## License
+## License / Distribution
 
 Copyright (C) 1994-2011 Danny Sadinoff
 Portions Copyright (c) 2011 Michael J. Radwin. All Rights Reserved.
@@ -38,6 +38,8 @@ Hebcal JavaScript is distributed under the GNU Public License version 3. The ori
 Remember, the GPL means you can't use this in a closed-source program!
 
 If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that i can adjust the program to meet users' needs.
+
+The original Hebcal is at [hebcal/hebcal](https://github.com/hebcal/hebcal).
 
 # API
 
@@ -69,6 +71,14 @@ Both scripts run on the exact same code, except for one thing. In the browser, H
 This will cause any webpages with the Hebcal script to request the user's permission to view their location. If they deny it, the default location will be `[0, 0]`.
 
 To turn off this feature, use the `client.noloc.min.js` script instead of the usual `client.min.js` script. The unminified version is `client.noloc.js`.
+
+### Source maps
+
+When using Hebcal JS in the browser, it may be helpful for debugging to include a sourcemap file for browsers that support it. Both minified and unminified, regular and noloc, have a sourcemap file. This is `<js filename>.map`.
+
+### Ordering in this documentation
+
+Be forewarned: the ordering of properties/methods in this documentation is nearly arbitrary. It mostly follows the order of the code, which is itself written in pretty much whatever order i decided i needed those methods. If you're looking for a specific thing, i highly recommend using your browser's find tool (ctrl+f, or cmd+f for you Mac types). If you just want to know everything about Hebcal JS, just start at the top and work your way down.
 
 ## `Hebcal`
 
