@@ -78,7 +78,7 @@ When using Hebcal JS in the browser, it may be helpful for debugging to include 
 
 ### Ordering in this documentation
 
-Be forewarned: the ordering of properties/methods in this documentation is nearly arbitrary. It mostly follows the order of the code, which is itself written in pretty much whatever order i decided i needed those methods. If you're looking for a specific thing, i highly recommend using your browser's find tool (ctrl+f, or cmd+f for you Mac types). If you just want to know everything about Hebcal JS, just start at the top and work your way down.
+Be forewarned: the ordering of properties/methods in this documentation is almost completely arbitrary. It mostly follows the order of the code, which is itself written in pretty much whatever order i decided i needed those methods. If you're looking for a specific thing, i highly recommend using your browser's find tool (ctrl+f, or cmd+f for you Mac types). If you just want to know everything about Hebcal JS, just start at the top and work your way down.
 
 ## `Hebcal`
 
@@ -95,6 +95,7 @@ new Hebcal([year[, month]]);
 * String -- The name of a single month.
 * Number -- The number of a single month (Nisan is 1, Tishrei 7).
 * Array -- An array of either of the above two, or mixed. Basically, anything that can be passed to `Hebcal.Month` (see below).
+
 If not provided, it defaults to all of the months in the given `year`.
 If it is a different type, Hebcal will throw an error.
 
@@ -505,6 +506,8 @@ Returns a `Hebcal.HDate` at a 1-based index in the month. Negative indices are f
 
 Returns `this.__year` internal value.
 
+As of v2.1, if it is "unaffiliated" (no `__year`), return a new `Hebcal` object.
+
 ### `Hebcal.Month.prototype.getName(o)`
 
 Returns a string with the name of the month. Takes a standard options string.
@@ -804,13 +807,15 @@ new Hebcal.HDate(new Date('Sunday February 23, 2014')).after(6).greg() // Sat Ma
 
 Return `this.__month` internal.
 
+As of v2.1, if it is "unaffiliated" (no `__month`), return a new `Hebcal.Month`.
+
 ### `Hebcal.HDate.prototype.getYearObject()`
 
 Call `getYearObject()` of `this.getMonthObject()`.
 
 ### `Hebcal.HDate.prototype.getGregMonthObject()`
 
-Return `this.__gregmonth` internal. This method was added in Hebcal JS 2.1.
+Return `this.__gregmonth` internal, or a new `Hebcal.GregMonth`. This method was added in Hebcal JS 2.1.
 
 ### `Hebcal.HDate.prototype.getGregYearObject()`
 
@@ -863,7 +868,7 @@ These bitmasks are also available as properties of the function:
 * `tachanun.SHACHARIT = 2`
 * `tachanun.ALL_CONGS = 4`
 
-However, due to the uncomfortableness of typing `Hebcal.HDate.prototype.tachanun.*BITMASK*`, it may be easier to just use the values directly.
+However, due to the lengthliness of typing `Hebcal.HDate.prototype.tachanun.*BITMASK*`, it may be easier to just use the values directly.
 
 ### `Hebcal.HDate.prototype.hallel()`
 
@@ -1008,6 +1013,7 @@ If it is not falsy, and not a number or string, Hebcal will throw an error.
 * String -- The name of a single month.
 * Number -- The number of a single month (January is 1)
 * Array -- An array of either of the above two, or mixed. Basically, anything that can be passed to `Hebcal.GregMonth` (see below).
+
 If not provided, it defaults to all of the months in the given `year`.
 If it is a different type, Hebcal will throw an error.
 
@@ -1082,9 +1088,17 @@ If the month is a positive number, it is a month index.
 If the month is a negative number, it is a month index from the end of the year.
 If the month is a string, it should be a month name in English.
 
+### `Hebcal.GregYear.prototype.days()`
+
+Functions exactly the same as `Hebcal.prototype.days()`.
+
 ### `Hebcal.GregYear.prototype.map(mapFunc[, thisArg])`
 
 Functions exactly the same as `Hebcal.prototype.map(mapFunc, thisArg)`.
+
+### `Hebcal.GregYear.prototype.filter(filterFunc[, thisArg])`
+
+Functions exactly the same as `Hebcal.prototype.filter(filterFunc, thisArg)`.
 
 ### `Hebcal.GregYear.prototype.addHoliday(event)`
 
@@ -1151,7 +1165,7 @@ Returns a `Hebcal.HDate` at a 1-based index in the month. Negative indices are f
 
 ### `Hebcal.GregMonth.prototype.getYearObject()`
 
-Returns `this.__year` internal value.
+Returns `this.__year` internal value. If it is "unaffiliated" (no `__year`), return a new `Hebcal.GregYear` object.
 
 ### `Hebcal.GregMonth.prototype.getName()`
 

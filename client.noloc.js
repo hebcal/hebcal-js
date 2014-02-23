@@ -1896,7 +1896,7 @@ Hebcal.Month.prototype.getDay = function getDay(day) {
 };
 
 Hebcal.Month.prototype.getYearObject = function getYearObject() {
-	return this.__year;
+	return this.__year || new Hebcal(this.year);
 };
 
 Hebcal.Month.prototype.getName = function getName(o) {
@@ -1966,16 +1966,16 @@ Hebcal.Month.prototype.find.strings.shabbos_mevarchim = Hebcal.Month.prototype.f
 Hebcal.HDate = HDate;
 
 HDate.prototype.getMonthObject = function getMonthObject() {
-	return this.__month;
+	return this.__month || new Hebcal.Month(this.getMonth(), this.getFullYear());
 };
 
 HDate.prototype.getYearObject = function getYearObject() {
-	return (this.getMonthObject() && this.getMonthObject().getYearObject()) || undefined;
+	return this.getMonthObject().getYearObject();
 };
 
-var HDatePrev = HDate.prototype.prev;
+var HDatePrev = HDate.prototype.prev; // slightly less overhead when using unaffiliated HDate()s
 HDate.prototype.prev = function prev() {
-	if (!this.getMonthObject()) {
+	if (!this.__month) {
 		return HDatePrev.call(this);
 	}
 	if (this.getMonth() === c.months.TISHREI && this.getDate() === 1) { // 1st day RH
@@ -1989,7 +1989,7 @@ HDate.prototype.prev = function prev() {
 
 var HDateNext = HDate.prototype.next;
 HDate.prototype.next = function next() {
-	if (!this.getMonthObject()) {
+	if (!this.__month) {
 		return HDateNext.call(this);
 	}
 	if (this.getMonth() === c.months.ELUL && this.getDate() === this.getMonthObject().length) { // last day
@@ -2222,10 +2222,11 @@ Hebcal.GregYear = function GregYear(year, month) {
 		return new Hebcal.GregYear(year, c.range(1, 12));
 	}
 
-	this.hebyears = [
-		new HDate(new Date(year, this.months[0].month - 1, 1)).getFullYear(),
-		new HDate(new Date(year, this.months[this.months.length - 1] - 1, greg.daysInMonth(this.months[this.months.length - 1]))).getFullYear()
-	].filter(function(val, i, arr){
+	this.hebyears = [].concat.apply([], this.months.map(function(m){
+		return m.hebmonths.map(function(hm){
+			return hm.year;
+		});
+	})).filter(function(val, i, arr){
 		return arr.indexOf(val) === i; // keep unique values only
 	});
 
@@ -2309,7 +2310,9 @@ Hebcal.GregYear.prototype.getMonth = function getMonth(month) {
 	return this.months[month > 0 ? month - 1 : this.months.length + month];
 };
 
+Hebcal.GregYear.prototype.days = Hebcal.prototype.days;
 Hebcal.GregYear.prototype.map = Hebcal.prototype.map;
+Hebcal.GregYear.prototype.filter = Hebcal.prototype.filter;
 
 Hebcal.GregYear.prototype.addHoliday = Hebcal.prototype.addHoliday;
 
@@ -2412,7 +2415,7 @@ Hebcal.GregMonth.prototype.getDay = function getDay(day) {
 };
 
 Hebcal.GregMonth.prototype.getYearObject = function getYearObject() {
-	return this.__year;
+	return this.__year || new Hebcal.GregYear(this.year);
 };
 
 Hebcal.GregMonth.prototype.getName = function getName() {
@@ -2425,11 +2428,11 @@ Hebcal.GregMonth.prototype.setLocation = Hebcal.Month.prototype.setLocation;
 Hebcal.GregMonth.prototype.map = Hebcal.Month.prototype.map;
 
 HDate.prototype.getGregMonthObject = function getGregMonthObject() {
-	return this.__gregmonth;
+	return this.__gregmonth || new Hebcal.GregMonth(this.greg().getMonth(), this.greg().getFullYear());
 };
 
 HDate.prototype.getGregYearObject = function getGregYearObject() {
-	return (this.getGregMonthObject() && this.getGregMonthObject().getYearObject()) || undefined;
+	return this.getGregMonthObject().getYearObject();
 };
 
 module.exports = Hebcal;
