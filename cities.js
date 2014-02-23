@@ -86,7 +86,12 @@ var cities = {
 };
 
 exports.getCity = function getCity(city) {
-	city = city.split(/\s+/).map(function(w){return w[0].toUpperCase() + w.slice(1).toLowerCase()}).join(' ');
+	city = city.split(/\s+/).map(function(w,i,c){
+		if (c.join(' ').toLowerCase() === 'washington dc' && i === 1) { // special case
+			return w.toUpperCase();
+		}
+		return w[0].toUpperCase() + w.slice(1).toLowerCase();
+	}).join(' ');
 	return cities[city] || [ 0, 0, 0, 0, false ];
 };
 
