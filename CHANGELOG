@@ -12,6 +12,11 @@ version 2.1 (2014-02-20 alpha)
 	Add Hebcal().getDay() method
 	Fix issue with new Hebcal(-1)
 	Make city names case-insensitive
+	Add Ashkenazis sedra names
+	Fix issue with Shabbat Mevarchim in Elul
+	Add Shabbat Mevarchim to holidays
+	Add HDate().onOrBefore()
+	Add Hebcal().days() and Hebcal().filter()
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

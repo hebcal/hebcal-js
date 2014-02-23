@@ -171,10 +171,18 @@ Hebcal.prototype.getDay = function getDay(day) {
 	return this.getMonth(c.months.TISHREI).getDay(day - rosh);
 };
 
-Hebcal.prototype.map = function map() {
-	return [].map.apply([].concat.apply([], this.months.map(function(m){
+Hebcal.prototype.days = function days() {
+	return [].concat.apply([], this.months.map(function(m){
 		return m.days;
-	})), arguments);
+	}));
+};
+
+Hebcal.prototype.map = function map() {
+	return [].map.apply(this.days(), arguments);
+};
+
+Hebcal.prototype.filter = function filter() {
+	return [].filter.apply(this.days(), arguments);
 };
 
 Hebcal.prototype.addHoliday = function addHoliday(holiday) {
@@ -486,9 +494,10 @@ Hebcal.Month.prototype.find.strings.rosh_chodesh = function rosh_chodesh() {
 	return this.rosh_chodesh();
 };
 Hebcal.Month.prototype.find.strings.shabbat_mevarchim = function shabbat_mevarchim() {
-	return this.find(new HDate(c.day_on_or_before(c.days.SAT, this.getDay(29).abs())));
+	return this.month === c.months.ELUL ? [] : // No birchat hachodesh in Elul
+		this.find(this.getDay(29).onOrBefore(c.days.SAT));
 };
-Hebcal.Month.prototype.find.strings.shabbos_mevarchim = Hebcal.Month.prototype.find.strings.shabbat_mevarchim;
+Hebcal.Month.prototype.find.strings.shabbos_mevarchim = Hebcal.Month.prototype.find.strings.shabbos_mevorchim = Hebcal.Month.prototype.find.strings.shabbat_mevarchim;
 
 // HDate days
 

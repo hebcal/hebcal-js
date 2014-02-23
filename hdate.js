@@ -458,6 +458,10 @@ HDate.prototype.before = function before(day) {
 	return new HDate(c.day_on_or_before(day, this.abs() - 1));
 };
 
+HDate.prototype.onOrBefore = function onOrBefore(day) {
+	return new HDate(c.day_on_or_before(day, this.abs()));
+};
+
 HDate.prototype.nearest = function nearest(day) {
 	return new HDate(c.day_on_or_before(day, this.abs() + 3));
 };

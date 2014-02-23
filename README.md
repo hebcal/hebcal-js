@@ -197,11 +197,19 @@ Takes a single argument, the day to get. `day` should be a number representing t
 If the day is a positive number, it is a day index.
 If the day is a negative number, it is a day index from the end of the year. So, 1 would be the 29th of Elul.
 
+#### `Hebcal.prototype.days()`
+
+Return an array of all the days in the year. This method was added in Hebcal JS 2.1.
+
 #### `Hebcal.prototype.map(mapFunc[, thisArg])`
 
 In 2.0: A shortcut for `year.months.map(mapFunc, [thisArg])`.
 
-In 2.1 and beyond: Map over each day in the year, calling `mapFunc` in context of `thisArg`.
+In 2.1 and beyond: Map over each day in the year, calling `mapFunc` in context of `thisArg`. Returns an array.
+
+#### `Hebcal.prototype.filter(filterFunc[, thisArg])`
+
+Only keep days in the year that pass the `filterFunc` tester function. Returns an array of `Hebcal.HDate`s. This method was added in Hebcal JS 2.1.
 
 #### `Hebcal.prototype.addHoliday(event)`
 
@@ -514,7 +522,7 @@ If `day` is a number, it is a 1-based index in the month. String, `Hebcal.HDate`
 Default strings are:
 
 * `rosh_chodesh`: Same as `Hebcal.Month.prototype.rosh_chodesh()`
-* `shabbat_mevarchim` (aliased as `shabbos_mevarchim`): The last Shabbat in the month.
+* `shabbat_mevarchim` (aliased as `shabbos_mevorchim`): The last Shabbat in the month.
 
 Strings are extensible in the same manner: Add a property of `Hebcal.Month.prototype.find.strings`. Name conversion rules and function context apply the same as with `Hebcal.prototype.find()`.
 
@@ -747,6 +755,16 @@ Returns an `HDate` representing the last day `dayNumber` before the current date
 
 ```js
 new Hebcal.HDate(new Date('Wednesday February 19, 2014')).before(6).greg() // Sat Feb 15 2014
+```
+
+### `Hebcal.HDate.prototype.onOrBefore(dayNumber)`
+
+Returns an `HDate` representing the a `dayNumber` on or before the current date. Sunday is 0, Saturday 6. This property was added in Hebcal JS 2.1.
+
+```js
+new Hebcal.HDate(new Date('Wednesday February 19, 2014')).onOrBefore(6).greg() // Sat Feb 15 2014
+new Hebcal.HDate(new Date('Saturday February 22, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
+new Hebcal.HDate(new Date('Sunday February 23, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
 ```
 
 ### `Hebcal.HDate.prototype.nearest(dayNumber)`

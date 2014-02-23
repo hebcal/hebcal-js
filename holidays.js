@@ -28,13 +28,14 @@
  */
 var c = require('./common'), HDate = require('./hdate');
 
-var masks = exports.masks = {};
-masks.USER_EVENT          = 1;
-masks.LIGHT_CANDLES       = 2;
-masks.YOM_TOV_ENDS        = 4;
-masks.CHUL_ONLY           = 8; // chutz l'aretz (Diaspora)
-masks.IL_ONLY             = 16; // b'aretz (Israel)
-masks.LIGHT_CANDLES_TZEIS = 32;
+var masks = exports.masks = {
+	USER_EVENT         : 1,
+	LIGHT_CANDLES      : 2,
+	YOM_TOV_ENDS       : 4,
+	CHUL_ONLY          : 8, // chutz l'aretz (Diaspora)
+	IL_ONLY            : 16, // b'aretz (Israel)
+	LIGHT_CANDLES_TZEIS: 32
+};
 
 var IGNORE_YEAR = exports.IGNORE_YEAR = -1;
 
@@ -536,8 +537,7 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 		0
 	));
 
-	var day = 6;
-	while (day < c.days_in_heb_year(year)) {
+	for (var day = 6; day < c.days_in_heb_year(year); day += 7) {
 		h.push(new Event(
 			new HDate(c.day_on_or_before(c.days.SAT, new HDate(1, c.months.TISHREI, year).abs() + day)),
 			['Shabbat', 'Shabbos', 'שבת'],
@@ -549,8 +549,18 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 			['Erev Shabbat', 'Erev Shabbos', 'ערב שבת'],
 			masks.LIGHT_CANDLES
 		));
+	}
 
-		day += 7;
+	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
+		if (month === c.months.ELUL) {
+			continue;
+		}
+
+		h.push(new Event(
+			new HDate(29, month, year).onOrBefore(c.days.SAT),
+			['Shabbat Mevarchim', 'Shabbos Mevorchim', 'שבת מברכים'],
+			0
+		));
 	}
 
 	return h;
