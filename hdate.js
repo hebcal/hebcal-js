@@ -228,7 +228,6 @@ function hebrew2abs(d) {
 	ret = c.hebrew_elapsed_days(d.getFullYear()) - 1373429 + tempabs;
 	return ret;
 }
-HDate.hebrew2abs = hebrew2abs;
 
 function abs2hebrew(d) {
 	var mmap = [
@@ -272,7 +271,6 @@ function abs2hebrew(d) {
 	
 	return hebdate;
 }
-HDate.abs2hebrew = abs2hebrew;
 
 HDate.prototype.greg = function toGreg() {
 	return greg.abs2greg(hebrew2abs(this));

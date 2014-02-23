@@ -402,9 +402,13 @@ The number of minutes after sunset to make havdalah. Defaults to 50.
 
 Array of standard holidays that do not change based on years. Is used internally, and exported only incidentally.
 
+This has been **removed** as of Hebcal JS 2.1.
+
 ### `Hebcal.holidays.getHolidaysForYear(year)`
 
 Returns an array of all holidays for the year, including variable ones. Is used internally, and exported only incidentally.
+
+This has been **removed** as of Hebcal JS 2.1.
 
 ## `Hebcal.candleLighting`
 
@@ -895,9 +899,13 @@ An alias of `Hebcal.defaultCity`.
 
 Return an absolute date from an `HDate`. Equivalent to `Hebcal.HDate.prototype.abs()`.
 
+**Obsolete** in 2.1. Use `HDate().abs()`.
+
 ### `Hebcal.HDate.abs2hebrew(absdate)`
 
 Return an `HDate` from absolute date. Equivalent to `new Hebcal.HDate(absdate)`.
+
+**Obsolete** in 2.1. Use `new HDate()`.
 
 ### `Hebcal.HDate.addZeman(zeman, func)`
 

@@ -280,7 +280,7 @@ Hebcal.range = c.range;
 
 Hebcal.gematriya = c.gematriya;
 
-Hebcal.holidays = holidays;
+Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not getHolidaysForYear()
 
 Object.defineProperty(Hebcal, 'defaultLocation', {
 	enumerable: true,
@@ -557,7 +557,7 @@ HDate.prototype.holidays = function holidays() {
 HDate.prototype.omer = function omer() {
 	if (this.greg().getTime() > new HDate(15, c.months.NISAN, this.getFullYear()).greg().getTime() &&
 		this.greg().getTime() < new HDate( 6, c.months.SIVAN, this.getFullYear()).greg().getTime()) {
-		return HDate.hebrew2abs(this) - HDate.hebrew2abs(new HDate(16, c.months.NISAN, this.getFullYear())) + 1;
+		return this.abs() - new HDate(16, c.months.NISAN, this.getFullYear()).abs() + 1;
 	}
 	return 0;
 };

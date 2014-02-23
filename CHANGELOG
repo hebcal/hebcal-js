@@ -17,6 +17,7 @@ version 2.1 (2014-02-20 alpha)
 	Add Shabbat Mevarchim to holidays
 	Add HDate().onOrBefore()
 	Add Hebcal().days() and Hebcal().filter()
+	Remove some internal methods from the export
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

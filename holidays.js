@@ -109,7 +109,7 @@ Event.havdalah = 50;
 
 exports.Event = Event;
 
-exports.standards = [ // standard holidays that don't shift based on year
+var standards = [ // standard holidays that don't shift based on year
 	// RH 1 is defined later, based on year, because other holidays depend on it
 	new Event(
 		new HDate(2, c.months.TISHREI, IGNORE_YEAR),
@@ -299,7 +299,7 @@ exports.standards = [ // standard holidays that don't shift based on year
 ];
 
 exports.getHolidaysForYear = function getHolidaysForYear(year) {
-	var h = exports.standards.slice(), // clone
+	var h = standards.slice(), // clone
 
 		RH = new HDate(1, c.months.TISHREI, year),
 		pesach = new HDate(15, c.months.NISAN, year),

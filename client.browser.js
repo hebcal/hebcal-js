@@ -1226,7 +1226,6 @@ function hebrew2abs(d) {
 	ret = c.hebrew_elapsed_days(d.getFullYear()) - 1373429 + tempabs;
 	return ret;
 }
-HDate.hebrew2abs = hebrew2abs;
 
 function abs2hebrew(d) {
 	var mmap = [
@@ -1270,7 +1269,6 @@ function abs2hebrew(d) {
 	
 	return hebdate;
 }
-HDate.abs2hebrew = abs2hebrew;
 
 HDate.prototype.greg = function toGreg() {
 	return greg.abs2greg(hebrew2abs(this));
@@ -1756,7 +1754,7 @@ Hebcal.range = c.range;
 
 Hebcal.gematriya = c.gematriya;
 
-Hebcal.holidays = holidays;
+Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not getHolidaysForYear()
 
 Object.defineProperty(Hebcal, 'defaultLocation', {
 	enumerable: true,
@@ -2033,7 +2031,7 @@ HDate.prototype.holidays = function holidays() {
 HDate.prototype.omer = function omer() {
 	if (this.greg().getTime() > new HDate(15, c.months.NISAN, this.getFullYear()).greg().getTime() &&
 		this.greg().getTime() < new HDate( 6, c.months.SIVAN, this.getFullYear()).greg().getTime()) {
-		return HDate.hebrew2abs(this) - HDate.hebrew2abs(new HDate(16, c.months.NISAN, this.getFullYear())) + 1;
+		return this.abs() - new HDate(16, c.months.NISAN, this.getFullYear()).abs() + 1;
 	}
 	return 0;
 };
@@ -2559,7 +2557,7 @@ Event.havdalah = 50;
 
 exports.Event = Event;
 
-exports.standards = [ // standard holidays that don't shift based on year
+var standards = [ // standard holidays that don't shift based on year
 	// RH 1 is defined later, based on year, because other holidays depend on it
 	new Event(
 		new HDate(2, c.months.TISHREI, IGNORE_YEAR),
@@ -2749,7 +2747,7 @@ exports.standards = [ // standard holidays that don't shift based on year
 ];
 
 exports.getHolidaysForYear = function getHolidaysForYear(year) {
-	var h = exports.standards.slice(), // clone
+	var h = standards.slice(), // clone
 
 		RH = new HDate(1, c.months.TISHREI, year),
 		pesach = new HDate(15, c.months.NISAN, year),
