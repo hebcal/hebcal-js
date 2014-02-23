@@ -29,6 +29,7 @@
 var c = require('./common'),
 	HDate = require('./hdate'),
 	holidays = require('./holidays'),
+	Sedra = require('./sedra'),
 	dafyomi = require('./dafyomi'),
 	cities = require('./cities'),
 	greg = require('./greg'),
@@ -528,7 +529,12 @@ HDate.prototype.next = function next() {
 		return this.getYearObject().find(g)[0];
 	}
 };
-console.log(HDateNext.toString());
+
+HDate.prototype.getSedra = function getSedra(o) {
+	return (new Sedra(this.getFullYear(), this.il)).getSedraFromHebcalDate(this).map(function(p){
+		return c.LANGUAGE(p, o);
+	});
+};
 
 HDate.prototype.holidays = function holidays() {
 	return this.getYearObject().holidays.filter(function(h){

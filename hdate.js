@@ -28,7 +28,6 @@
  */
 var c = require('./common'),
 	greg = require('./greg'),
-	Sedra = require('./sedra')(HDate),
 	suncalc = require('suncalc'),
 	cities = require('./cities');
 
@@ -295,12 +294,6 @@ HDate.prototype.toString = function toString(o) {
 
 HDate.prototype.getMonthName = function getMonthName(o) {
 	return c.LANGUAGE(c.monthNames[+this.isLeapYear()][this.getMonth()], o);
-};
-
-HDate.prototype.getSedra = function getSedra(o) {
-	return (new Sedra(this.getFullYear(), this.il)).getSedraFromHebcalDate(this).map(function(p){
-		return c.LANGUAGE(p, o);
-	});
 };
 
 HDate.prototype.setCity = function setCity(city) {
