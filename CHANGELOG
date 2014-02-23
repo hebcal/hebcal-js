@@ -14,7 +14,7 @@ version 2.1 (2014-02-20 alpha)
 	Make city names case-insensitive
 	Add Ashkenazis sedra names
 	Fix issue with Shabbat Mevarchim in Elul
-	Add Shabbat Mevarchim to holidays
+	Add Shabbat Mevarchim and Rosh Chodesh to holidays
 	Add HDate().onOrBefore()
 	Add Hebcal().days() and Hebcal().filter()
 	Remove some internal methods from the export

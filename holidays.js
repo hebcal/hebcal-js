@@ -552,6 +552,27 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 	}
 
 	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
+		if ((month === c.months.NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
+				c.max_days_in_heb_month(month - 1, year)) == 30) {
+			h.push(new Event(
+				new HDate(1, month, year),
+				['Rosh Chodesh 2', null, 'ראש חודש ב\''],
+				0
+			));
+
+			h.push(new Event(
+				new HDate(30, month - 1, year),
+				['Rosh Chodesh 1', null, 'ראש חודש א\''],
+				0
+			));
+		} else if (month !== c.months.TISHREI) {
+			h.push(new Event(
+				new HDate(1, month, year),
+				['Rosh Chodesh', null, 'ראש חודש'],
+				0
+			));
+		}
+
 		if (month === c.months.ELUL) {
 			continue;
 		}
