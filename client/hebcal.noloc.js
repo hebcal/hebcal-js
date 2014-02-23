@@ -159,13 +159,13 @@ exports.nearest = function nearest(lat, lon) {
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
  */
-window.Hebcal = require('./hebcal');
+window.Hebcal = require('..');
 
 var finished = false, warn = (typeof console != 'undefined' && (console.warn || console.log)) || function(){};
 
 Hebcal.events.on('newListener', function(e){
 	if (e === 'ready' && !finished && Hebcal.ready) {
-		ready();
+		finished = Hebcal.events.emit('ready');
 	}
 });
 
@@ -182,21 +182,9 @@ Object.defineProperty(Hebcal, 'onready', {
 	}
 });
 
-if (navigator.geolocation) {
-	Hebcal.ready = false;
-	navigator.geolocation.getCurrentPosition(function(p){
-		Hebcal.defaultLocation = [p.coords.latitude,p.coords.longitude];
-		ready();
-	}, ready);
-} else {
-	ready();
-}
-
-function ready() {
-	Hebcal.ready = true;
-	finished = Hebcal.events.emit('ready');
-}
-},{"./hebcal":7}],3:[function(require,module,exports){
+Hebcal.ready = true;
+finished = Hebcal.events.emit('ready');
+},{"..":7}],3:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -4103,4 +4091,4 @@ function isUndefined(arg) {
 },{}]},{},[2])
 
 
-//# sourceMappingURL=client.browser.js.map
+//# sourceMappingURL=hebcal.noloc.js.map

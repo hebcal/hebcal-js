@@ -9,7 +9,7 @@ Hebcal JS is a JavaScript API to aid working with the Hebrew calendar. It is ava
 
 It can convert between Hebrew and Gregorian dates, get weekly sedra, holidays, and halachik times (_zemanim_).
 
-You can include it in a client-side (browser) script with the `client.min.js` script in this directory. It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
+You can include it in a client-side (browser) script with the `hebcal.min.js` script in the `client` subfolder. It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
 
 ```sh
 $ npm install hebcal
@@ -70,7 +70,7 @@ Both scripts run on the exact same code, except for one thing. In the browser, H
 
 This will cause any webpages with the Hebcal script to request the user's permission to view their location. If they deny it, the default location will be `[0, 0]`.
 
-To turn off this feature, use the `client.noloc.min.js` script instead of the usual `client.min.js` script. The unminified version is `client.noloc.js`.
+To turn off this feature, use the `hebcal.noloc.min.js` script instead of the usual `hebcal.min.js` script. The unminified version is `hebcal.noloc.js`. All of these files are in the `client` folder.
 
 ### Source maps
 

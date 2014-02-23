@@ -18,6 +18,7 @@ version 2.1 (2014-02-23 beta)
 	Remove some internal methods from the export
 	Fix small bug in Hebcal.GregYear().hebyears
 	Have HDate().getMonthObject(), getYearObject(), getGregMonthObject(), getGregYearObject() always return a value, even if unaffiliated
+	Move client files to new folder
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

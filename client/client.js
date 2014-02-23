@@ -26,7 +26,7 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
  */
-window.Hebcal = require('./hebcal');
+window.Hebcal = require('..');
 
 var finished = false, warn = (typeof console != 'undefined' && (console.warn || console.log)) || function(){};
 

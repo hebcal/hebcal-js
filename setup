@@ -2,6 +2,11 @@
 # generate client files
 # requires browserify, uglifyjs, exorcist, marked, and node (of course)
 # also generates README.html and fixes the README in package.json
+echo "Creating README"
+marked --gfm --breaks README.md > README.html
+echo "fs=require('fs');p=JSON.parse(fs.readFileSync('package.json').toString());p.readme=fs.readFileSync('README.md').toString();fs.writeFileSync('package.json',JSON.stringify(p,null,'\t'))" | node
+
+cd client
 HEADER="/*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -34,19 +39,16 @@ HEADER="/*
 mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/eyal\\/git\\/hebcal\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
 srccode="console.log(';'+require('fs').readFileSync(f).toString().replace(map,f+'.map'))"
 echo "Starting client.js"
-browserify --debug client.js | exorcist client.js.map > client.browser.js
-echo "f='client.browser.js',map='client.js.map';$srccode" | node > client.browser.js~
-mv client.browser.js~ client.browser.js
-echo "f='client.js.map';$mapcode" | node > client.browser.js.map
+browserify --debug client.js | exorcist client.js.map > hebcal.js
+echo "f='hebcal.js',map='client.js.map';$srccode" | node > hebcal.js~
+mv hebcal.js~ hebcal.js
+echo "f='client.js.map';$mapcode" | node > hebcal.js.map
 mv client.js.map /tmp
-uglifyjs -m -v --preable "$HEADER" --in-source-map client.browser.js.map --source-map client.min.js.map client.browser.js > client.min.js
-echo "Starting client.noloc.js"
-browserify --debug client.noloc.src.js | exorcist client.noloc.src.js.map > client.noloc.js
-echo "f='client.noloc.js',map='client.noloc.src.js.map';$srccode" | node > client.noloc.js~
-mv client.noloc.js~ client.noloc.js
-echo "f='client.noloc.src.js.map';$mapcode" | node > client.noloc.js.map
-mv client.noloc.src.js.map /tmp
-uglifyjs -m -v --preable "$HEADER" --in-source-map client.noloc.js.map --source-map client.noloc.min.js.map client.noloc.js > client.noloc.min.js
-echo "Creating README"
-marked --gfm --breaks README.md > README.html
-echo "fs=require('fs');p=JSON.parse(fs.readFileSync('package.json').toString());p.readme=fs.readFileSync('README.md').toString();fs.writeFileSync('package.json',JSON.stringify(p,null,'\t'))" | node
+uglifyjs -m -v --preable "$HEADER" --in-source-map hebcal.js.map --source-map hebcal.min.js.map hebcal.js > hebcal.min.js
+echo "Starting hebcal.noloc.js"
+browserify --debug hebcal.noloc.src.js | exorcist hebcal.noloc.src.js.map > hebcal.noloc.js
+echo "f='hebcal.noloc.js',map='hebcal.noloc.src.js.map';$srccode" | node > hebcal.noloc.js~
+mv hebcal.noloc.js~ hebcal.noloc.js
+echo "f='hebcal.noloc.src.js.map';$mapcode" | node > hebcal.noloc.js.map
+mv hebcal.noloc.src.js.map /tmp
+uglifyjs -m -v --preable "$HEADER" --in-source-map hebcal.noloc.js.map --source-map hebcal.noloc.min.js.map hebcal.noloc.js > hebcal.noloc.min.js
