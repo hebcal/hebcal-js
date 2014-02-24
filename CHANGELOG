@@ -19,6 +19,7 @@ version 2.1 (2014-02-23 beta)
 	Fix small bug in Hebcal.GregYear().hebyears
 	Have HDate().getMonthObject(), getYearObject(), getGregMonthObject(), getGregYearObject() always return a value, even if unaffiliated
 	Move client files to new folder
+	Change cities to use lat/long decimals
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

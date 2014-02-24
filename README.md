@@ -274,7 +274,11 @@ Get locations for several cities around the world.
 
 Returns an array describing the location of a city, or an array of `0`s if the city wasn't found. This array is intended to be passed to `Hebcal.cities.getLocation()`.
 
-`[latdeg, latmins, longdeg, longmins, Israel]`
+In v2.0: `[/* number */ latdeg, /* number */ latmins, /* number */ longdeg, /* number */ longmins, /* boolean */ Israel]`
+
+In v2.1+: `[/* number */ lat, /* number */ long, /* boolean */ Israel]`
+
+The old syntax also works.
 
 ### `Hebcal.cities.getLocation(cityInfo)`
 
@@ -295,7 +299,7 @@ This method does not return anything.
 
 Return the name of the city nearest to the given coordinates.
 
-The coordinates can be given either as numbers, or as arrays of `[deg, mins]`.
+The coordinates can be given either as numbers, or as arrays of `[deg, mins]`. The array format is deprecated as of v2.1.
 
 ## `Hebcal.defaultCity`
 

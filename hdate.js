@@ -296,7 +296,7 @@ HDate.prototype.getMonthName = function getMonthName(o) {
 
 HDate.prototype.setCity = function setCity(city) {
 	var c = cities.getCity(city);
-	this.il = c[5];
+	this.il = c[2];
 	return this.setLocation(cities.getLocation(c));
 };
 
@@ -321,7 +321,7 @@ HDate.prototype.setLocation = function setLocation(lat, lon) {
 	this.lat = lat;
 	this.long = lon;
 
-	this.il = cities.getCity(cities.nearest(this.lat, this.long))[4];
+	this.il = cities.getCity(cities.nearest(this.lat, this.long))[2];
 
 	return this;
 };
