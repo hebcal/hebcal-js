@@ -3391,7 +3391,7 @@ var INCOMPLETE = 0,
 	REGULAR = 1,
 	COMPLETE = 2;
 
-function Sedra (hebYr, israel_sw) { /* the hebrew year */
+function Sedra(hebYr, israel_sw) { /* the hebrew year */
 	israel_sw = !!israel_sw;
 	var long_c = c.long_cheshvan(hebYr);
 	var short_k = c.short_kislev(hebYr);
@@ -3406,7 +3406,7 @@ function Sedra (hebYr, israel_sw) { /* the hebrew year */
 	}
 
 	var rosh_hashana = new HDate(1, c.months.TISHREI, hebYr).abs();
-	var rosh_hashana_day = rosh_hashana % 7;
+	var rosh_hashana_day = (rosh_hashana % 7) + 1;
 
 	/* find the first saturday on or after Rosh Hashana */
 	this.first_saturday = c.day_on_or_before(6, rosh_hashana + 6);
@@ -3416,18 +3416,18 @@ function Sedra (hebYr, israel_sw) { /* the hebrew year */
 	this.leap = leap;
 	this.israel_sw = israel_sw;
 
-	this.theSedraArray = sedra_years_array
-		[leap]
-		[ROSH_DAY_INDEX(rosh_hashana_day)]
-		[type]
-		[+israel_sw];
-	if (null === this.theSedraArray) {
+	var core = "" + leap + rosh_hashana_day + type;
+	if (types[core]) {
+		this.theSedraArray = types[core];
+	} else {
+		this.theSedraArray = types[core + (+israel_sw)]; // cast to num, then concat
+	}
+
+	if (!this.theSedraArray) {
 		console.log(this);
 		throw new TypeError("improper sedra year type calculated.");
 	}
 }
-
-
 
 var parshiot = [
 	[ 'Bereshit', 'Bereshis', 'בראשית' ],
@@ -3504,7 +3504,6 @@ var CHMPESACH = [ 'Chol hamoed Pesach', null, 'חול המועד פסח' ];  //2
 var PESACH7 = [ 'Second days of Pesach', null, 'שביעי של פסח' ]; //25
 
 var SHAVUOT = [ 'Shavuot', 'Shavuos', 'שבועות' ]; //33
-
 
 
 
@@ -3678,154 +3677,11 @@ types['1311'] = types['1221'];
 types['1721'] = types['170'];
 
 
-function ROSH_DAY_INDEX(x) {
-	return (x === 1) ? 0 : x / 2;
-}
-
-// sedra_years_array[leap][rosh_day][type][israel/diaspora]
-var sedra_years_array =  // [2][4][3][2]
-[
-	[                             // nonleap years
-		
-		[                           // monday
-			[                         // incomplete
-				types['020'],
-				types['020']
-			],
-			
-			[                         // regular
-				null, null
-			],
-			
-			[                         // complete
-				types['0220'],
-				types['0221']
-			]
-			
-		],
-		
-		[                           // tuesday
-			[                         // incomplete
-				null, null
-			],
-			
-			[                         // regular   //e.g. 5715
-				types['0310'],
-				types['0311'] 
-				
-			],
-			
-			[                         // complete
-				null, null
-			]
-		],
-		
-		[                           // thursday
-			[                         // incomplete
-				null, null
-			],
-			
-			[                         // regular  //e.g. 5745
-				types['0510'],
-				types['0511']
-			],
-			
-			[                         // complete
-				types['052'],
-				types['052']
-			]
-		],
-		
-		[                           // saturday
-			[                         // incomplete
-				types['070'],
-				types['070']
-			],
-			
-			[                         // regular
-				null, null
-			],
-			
-			[                         // complete
-				types['072'],
-				types['072']  //e.g. 5716
-			]
-		]
-	],
-	
-	
-	[                             // leap years
-		[                           // monday
-			[                         // incomplete //e.g. 5746
-				types['1200'],
-				types['1201']
-			],
-			
-			[                         // regular
-				null, null
-			],
-			
-			[                         // complete
-				types['1220'],
-				types['1221']
-			]
-		],
-		
-		[                           // tuesday
-			[                         // incomplete
-			 null, null
-			],
-			
-			[                         // regular
-				types['1310'],
-				types['1311']
-			],
-			
-			[                         // complete
-				null, null
-			]
-		],
-		
-	[                           // thursday
-		[                         // incomplete
-			types['150'],
-			types['150']
-		],
-		
-		[                         // regular
-			null, null
-		],
-		
-		[                         // complete
-			types['152'],
-			types['152']
-		]
-	],
-		
-		[                           // saturday
-			[                         // incomplete
-				types['170'],
-				types['170']
-			],
-			
-			[                         // regular
-				null, null
-			],
-			
-			[                         // complete
-				types['1720'],
-				types['1721']
-			]
-		]
-	]
-];
-
 Sedra.prototype.getFromHDate = function(hDate) {
 	return this.getFromDate(hDate.abs());
 };
 
-// returns an array describing the parsha on the first saturday on or after absdate
-//FIX: ignores holidays on the birthday thru friday.
+// returns an array describing the parsha on the first Saturday on or after absdate
 Sedra.prototype.getFromDate = function(absDate) {
 
 	// find the first saturday on or after today's date
