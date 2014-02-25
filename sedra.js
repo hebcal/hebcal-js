@@ -39,12 +39,14 @@
  */
 var c = require('./common'), HDate = require('./hdate');
 
+var concat = 'concat', range = c.range; // for client optimization
+
 var INCOMPLETE = 0,
 	REGULAR = 1,
 	COMPLETE = 2;
 
-function Sedra(hebYr, israel_sw) { // the Hebrew year
-	israel_sw = !!israel_sw;
+function Sedra(hebYr, il) { // the Hebrew year
+	il = !!il;
 	var long_c = c.long_cheshvan(hebYr);
 	var short_k = c.short_kislev(hebYr);
 	var type;
@@ -66,13 +68,13 @@ function Sedra(hebYr, israel_sw) { // the Hebrew year
 	this.type = type;
 	this.rosh_hashana_day = rosh_hashana_day;
 	this.leap = leap;
-	this.israel_sw = israel_sw;
+	this.il = il;
 
 	var core = "" + leap + rosh_hashana_day + type;
 	if (types[core]) {
 		this.theSedraArray = types[core];
 	} else {
-		this.theSedraArray = types[core + (+israel_sw)]; // cast to num, then concat
+		this.theSedraArray = types[core + (+il)]; // cast to num, then concat
 	}
 
 	if (!this.theSedraArray) {
@@ -82,7 +84,7 @@ function Sedra(hebYr, israel_sw) { // the Hebrew year
 }
 
 var parshiot = [
-	[ 'Bereshit', 'Bereshis', 'בראשית' ],
+	[ 'Bereshit', 'Bereshis', 'בראשית' ], // 0
 	[ 'Noach', 0, 'נח' ],
 	[ 'Lech-Lecha', 0, 'לך-לך' ],
 	[ 'Vayera', 0, 'וירא' ],
@@ -92,7 +94,7 @@ var parshiot = [
 	[ 'Vayishlach', 0, 'וישלח' ],
 	[ 'Vayeshev', 0, 'וישב' ],
 	[ 'Miketz', 0, 'מקץ' ],
-	[ 'Vayigash', 0, 'ויגש' ],
+	[ 'Vayigash', 0, 'ויגש' ], // 10
 	[ 'Vayechi', 0, 'ויחי' ],
 	[ 'Shemot', 'Shemos', 'שמות' ],
 	[ 'Vaera', 0, 'וארא' ],
@@ -102,7 +104,7 @@ var parshiot = [
 	[ 'Mishpatim', 0, 'משפטים' ],
 	[ 'Terumah', 0, 'תרומה' ],
 	[ 'Tetzaveh', 0, 'תצוה' ],
-	[ 'Ki Tisa', 'Ki Sisa', 'כי תשא' ],
+	[ 'Ki Tisa', 'Ki Sisa', 'כי תשא' ], // 20
 	[ 'Vayakhel', 0, 'ויקהל' ],
 	[ 'Pekudei', 0, 'פקודי' ],
 	[ 'Vayikra', 0, 'ויקרא' ],
@@ -112,7 +114,7 @@ var parshiot = [
 	[ 'Metzora', 0, 'מצרע' ],
 	[ 'Achrei Mot', 'Achrei Mos', 'אחרי מות' ],
 	[ 'Kedoshim', 0, 'קדשים' ],
-	[ 'Emor', 0, 'אמור' ],
+	[ 'Emor', 0, 'אמור' ], // 30
 	[ 'Behar', 0, 'בהר' ],
 	[ 'Bechukotai', 'Bechukosai', 'בחקתי' ],
 	[ 'Bamidbar', 0, 'במדבר' ],
@@ -122,7 +124,7 @@ var parshiot = [
 	[ 'Korach', 0, 'קורח' ],
 	[ 'Chukat', 'Chukas', 'חקת' ],
 	[ 'Balak', 0, 'בלק' ],
-	[ 'Pinchas', 0, 'פינחס' ],
+	[ 'Pinchas', 0, 'פינחס' ], // 40
 	[ 'Matot', 'Matos', 'מטות' ],
 	[ 'Masei', 0, 'מסעי' ],
 	[ 'Devarim', 0, 'דברים' ],
@@ -132,7 +134,7 @@ var parshiot = [
 	[ 'Shoftim', 0, 'שופטים' ],
 	[ 'Ki Teitzei', 'Ki Seitzei', 'כי תצא' ],
 	[ 'Ki Tavo', 'Ki Savo', 'כי תבוא' ],
-	[ 'Nitzavim', 0, 'נצבים' ],
+	[ 'Nitzavim', 0, 'נצבים' ], // 50
 	[ 'Vayeilech', 0, 'וילך' ],
 	[ 'Ha\'Azinu', 0, 'האזינו' ]
 ];
@@ -143,19 +145,20 @@ function D(p) {
 	return -p;
 }
 
-var RH = [ 'Rosh Hashana', 0, 'ראש השנה' ]; //0
-var YK = [ 'Yom Kippur', 0, 'יום כיפור' ];  //1
+// these are wrapped to protect them from [].concat()
+var RH = [[ 'Rosh Hashana', 0, 'ראש השנה' ]]; //0
+var YK = [[ 'Yom Kippur', 0, 'יום כיפור' ]];  //1
 
-var SUKKOT = [ 'Sukkot', 'Succos', 'סוכות' ];  //0
-var CHMSUKOT = [ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ];  //0
-var SHMINI = [ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ];  //0
-var EOY = [ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות וסמחת תורה' ];  //0
+var SUKKOT = [[ 'Sukkot', 'Succos', 'סוכות' ]];  //0
+var CHMSUKOT = [[ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ]];  //0
+var SHMINI = [[ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ]];  //0
+var EOY = [[ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות וסמחת תורה' ]];  //0
 
-var PESACH = [ 'Pesach', 0, 'פסח' ]; //25
-var CHMPESACH = [ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ];  //25
-var PESACH7 = [ 'Second days of Pesach', 0, 'שביעי של פסח' ]; //25
+var PESACH = [[ 'Pesach', 0, 'פסח' ]]; //25
+var CHMPESACH = [[ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ]];  //25
+var PESACH7 = [[ 'Second days of Pesach', 0, 'שביעי של פסח' ]]; //25
 
-var SHAVUOT = [ 'Shavuot', 'Shavuos', 'שבועות' ]; //33
+var SHAVUOT = [[ 'Shavuot', 'Shavuos', 'שבועות' ]]; //33
 
 
 
@@ -168,139 +171,103 @@ var types = {
 	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
 	 * Kislev each have 29 days), and has Passover start on Tuesday. */
 	//e.g. 5753
-	'020' : [
-		51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33, 34,
-		35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'020' : [51, 52][concat](EOY, range(0, 20), D(21), 23, 24, PESACH, 25,
+		D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 49), D(50)
+	),
 
 	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Thursday. */
 	//e.g. 5756
-	'0220' : [
-		51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33,
-		SHAVUOT, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'0220' : [51, 52][concat](EOY, range(0, 20), D(21), 23, 24, PESACH, 25, D(26), D(28),
+		30, D(31), 33, SHAVUOT, range(34, 37), D(38), 40, D(41), range(43, 49), D(50)
+	),
 
 	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
 	 * days and Kislev has 30 days), and has Passover start on Saturday. */
 	//e.g. 5701
-	'0510' : [
-		52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, D(21), 23, 24, PESACH, PESACH, 25, D(26), D(28), 30, D(31),
-		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'0510' : [52][concat](YK, EOY, range(0, 20), D(21), 23, 24, PESACH, PESACH,
+		25, D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 50)
+	),
 
 	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
 	 * days and Kislev has 30 days), and has Passover start on Saturday. */
 	// e.g. 5745
-	'0511' : [
-		52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, 31, 32, 33,
-		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'0511' : [52][concat](YK, EOY, range(0, 20), D(21), 23, 24, PESACH,
+		25, D(26), D(28), range(30, 40), D(41), range(43, 50)
+	),
 
 	/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Sunday. */
 	//e.g. 5754
-	'052' : [
-		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, PESACH7, 25, D(26), D(28), 30, D(31), 33,
-		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'052' : [52][concat](YK, CHMSUKOT, range(0, 24), PESACH7, 25, D(26),
+		D(28), 30, D(31), range(33, 40), D(41), range(43, 50)
+	),
 
 	/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and Kislev
 	 * each have 29 days), and has Passover start on Sunday. */
 	//e.g. 5761
-	'070' : [
-		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-		15, 16, 17, 18, 19, 20, D(21), 23, 24, PESACH7, 25, D(26), D(28), 30, D(31),
-		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'070' : [][concat](RH, 52, SUKKOT, SHMINI, range(0, 20), D(21), 23, 24, PESACH7,
+		25, D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 50)
+	),
 
 
 	/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Tuesday. */
 	//e.g. 5716
-	'072' : [
-		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, D(21), 23, 24, CHMPESACH, 25, D(26), D(28), 30, D(31),
-		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'072' : [][concat](RH, 52, SUKKOT, SHMINI, range(0, 20), D(21), 23, 24, CHMPESACH, 25,
+		D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 49), D(50)
+	),
 
 
 	/* --  The leap year types (keviot) -- */
 	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
 	 * Kislev each have 29 days), and has Passover start on Thursday. */
 	//e.g. 5746
-	'1200' : [
-		51, 52, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32, 33,
-		null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'1200' : [51, 52][concat](CHMSUKOT, range(0, 27), CHMPESACH, range(28, 33),
+		SHAVUOT, range(34, 37), D(38), 40, D(41), range(43, 49), D(50)
+	),
 
 	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
 	 * Kislev each have 29 days), and has Passover start on Thursday. */
 	//e.g. 5746
-	'1201' : [
-		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32, 33,
-		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'1201' : [51, 52][concat](CHMSUKOT, range(0, 27), CHMPESACH,
+		range(28, 40), D(41), range(43, 49), D(50)
+	),
 
 	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Saturday. */
 	//e.g.5752
-	'1220' : [
-		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, PESACH, 28, 29, 30, 31, 32,
-		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'1220' : [51, 52][concat](CHMSUKOT, range(0, 27), PESACH,
+		PESACH, range(28, 40), D(41), range(43, 50)
+	),
 
 	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Saturday. */
 	//e.g.5752
-	'1221' : [
-		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, 28, 29, 30, 31, 32, 33,
-		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'1221' : [51, 52][concat](CHMSUKOT, range(0, 27), PESACH, range(28, 50)),
 
 	/* Hebrew year that starts on Thursday, is `incomplete' (Heshvan and
 	 * Kislev both have 29 days), and has Passover start on Sunday. */
 	//e.g. 5768
-	'150' : [
-		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, PESACH7, 29, 30, 31, 32, 33,
-		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
-	],
+	'150' : [52][concat](YK, CHMSUKOT, range(0, 28), PESACH7, range(29, 50)),
 
 	/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
 	 * Kislev both have 30 days), and has Passover start on Tuesday. */
 	//eg. 5771
-	'152' : [
-		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, CHMPESACH, 29, 30, 31, 32, 33,
-		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'152' : [52][concat](YK, CHMSUKOT, range(0, 28), CHMPESACH, range(29, 49), D(50)),
 
 	/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and
 	 * Kislev each have 29 days), and has Passover start on Tuesday. */
 	//e.g.5757
-	'170' : [
-		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32,
-		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	],
+	'170' : [][concat](RH, 52, SUKKOT, SHMINI, range(0, 27), CHMPESACH,
+		range(28, 40), D(41), range(43, 49), D(50)
+	),
 
 	/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Thursday. */
-	'1720' : [
-		RH, 52, null, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32,
-		33, null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
-	]
+	'1720' : [][concat](RH, 52, SUKKOT, SHMINI, range(0, 27), CHMPESACH, range(28, 33),
+		SHAVUOT, range(34, 37), D(38), 40, D(41), range(43, 49), D(50)
+	)
 };
 
 /* Hebrew year that starts on Monday, is `complete' (Heshvan and
@@ -342,17 +309,19 @@ Sedra.prototype.getFromDate = function(absDate) {
 	var weekNum = (absDate - this.first_saturday) / 7;
 	var index = this.theSedraArray[weekNum];
 	
-	if (null === index)
-		return null;
-	if (typeof index == 'object'){
-		// Shabbat has a chag.  return a description
+	if (undefined == index) {
+		return (new Sedra(this.year + 1, this.il)).getFromDate(absDate); // must be next year
+	}
+	if (typeof index == 'object') {
+		// Shabbat has a chag. Return a description
 		return [index];
 	}
-	if (index >= 0)
+	if (index >= 0) {
 		return [parshiot[index]];
+	}
 	
-	var i = D(index);      // undouble the parsha
-	return [parshiot[i], parshiot[i + 1]];
+	index = D(index); // undouble the parsha
+	return [parshiot[index], parshiot[index + 1]];
 };
 
 module.exports = Sedra;
