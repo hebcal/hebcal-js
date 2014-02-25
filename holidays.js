@@ -28,13 +28,20 @@
  */
 var c = require('./common'), HDate = require('./hdate');
 
-var masks = exports.masks = {
-	USER_EVENT         : 1,
-	LIGHT_CANDLES      : 2,
-	YOM_TOV_ENDS       : 4,
-	CHUL_ONLY          : 8, // chutz l'aretz (Diaspora)
-	IL_ONLY            : 16, // b'aretz (Israel)
-	LIGHT_CANDLES_TZEIS: 32
+var	USER_EVENT          = 1,
+	LIGHT_CANDLES       = 2,
+	YOM_TOV_ENDS        = 4,
+	CHUL_ONLY           = 8, // chutz l'aretz (Diaspora)
+	IL_ONLY             = 16, // b'aretz (Israel)
+	LIGHT_CANDLES_TZEIS = 32;
+
+exports.masks = {
+	USER_EVENT         : USER_EVENT,
+	LIGHT_CANDLES      : LIGHT_CANDLES,
+	YOM_TOV_ENDS       : YOM_TOV_ENDS,
+	CHUL_ONLY          : CHUL_ONLY,
+	IL_ONLY            : IL_ONLY,
+	LIGHT_CANDLES_TZEIS: LIGHT_CANDLES_TZEIS
 };
 
 var IGNORE_YEAR = exports.IGNORE_YEAR = -1;
@@ -47,12 +54,12 @@ function Event(date, desc, mask) {
 	this.desc = typeof desc === 'string' ? [desc] : desc;
 
 	this.IGNORE_YEAR = date.getFullYear() === IGNORE_YEAR;
-	this.USER_EVENT = !!(mask & masks.USER_EVENT);
-	this.LIGHT_CANDLES = !!(mask & masks.LIGHT_CANDLES);
-	this.YOM_TOV_ENDS = !!(mask & masks.YOM_TOV_ENDS);
-	this.CHUL_ONLY = !!(mask & masks.CHUL_ONLY);
-	this.IL_ONLY = !!(mask & masks.IL_ONLY);
-	this.LIGHT_CANDLES_TZEIS = !!(mask & masks.LIGHT_CANDLES_TZEIS);
+	this.USER_EVENT = !!(mask & USER_EVENT);
+	this.LIGHT_CANDLES = !!(mask & LIGHT_CANDLES);
+	this.YOM_TOV_ENDS = !!(mask & YOM_TOV_ENDS);
+	this.CHUL_ONLY = !!(mask & CHUL_ONLY);
+	this.IL_ONLY = !!(mask & IL_ONLY);
+	this.LIGHT_CANDLES_TZEIS = !!(mask & LIGHT_CANDLES_TZEIS);
 }
 
 Event.prototype.is = function is(date, il) {
@@ -73,12 +80,12 @@ Event.prototype.is = function is(date, il) {
 };
 
 Event.prototype.masks = function mask() {
-	return +(this.USER_EVENT          && masks.USER_EVENT) |
-		   +(this.LIGHT_CANDLES       && masks.LIGHT_CANDLES) |
-		   +(this.YOM_TOV_ENDS        && masks.YOM_TOV_ENDS) |
-		   +(this.CHUL_ONLY           && masks.CHUL_ONLY) |
-		   +(this.IL_ONLY             && masks.IL_ONLY) |
-		   +(this.LIGHT_CANDLES_TZEIS && masks.LIGHT_CANDLES_TZEIS)
+	return +(this.USER_EVENT          && USER_EVENT) |
+		   +(this.LIGHT_CANDLES       && LIGHT_CANDLES) |
+		   +(this.YOM_TOV_ENDS        && YOM_TOV_ENDS) |
+		   +(this.CHUL_ONLY           && CHUL_ONLY) |
+		   +(this.IL_ONLY             && IL_ONLY) |
+		   +(this.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS)
 };
 
 Event.prototype.getDesc = function getDesc(o) {
@@ -114,35 +121,35 @@ var standards = [ // standard holidays that don't shift based on year
 	new Event(
 		new HDate(2, c.months.TISHREI, IGNORE_YEAR),
 		['Rosh Hashana 2', null, 'ראש השנה ב\''],
-		masks.YOM_TOV_ENDS
+		YOM_TOV_ENDS
 	), new Event(
 		new HDate(9, c.months.TISHREI, IGNORE_YEAR),
 		['Erev Yom Kippur', null, 'ערב יום כיפור'],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(10, c.months.TISHREI, IGNORE_YEAR),
 		['Yom Kippur', null, 'יום כיפור'],
-		masks.YOM_TOV_ENDS
+		YOM_TOV_ENDS
 	), new Event(
 		new HDate(14, c.months.TISHREI, IGNORE_YEAR),
 		['Erev Sukkot', 'Erev Sukkos', 'ערב סוכות'],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(15, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 1', 'Sukkos 1', 'סוכות יום א\''],
-		masks.LIGHT_CANDLES_TZEIS | masks.CHUL_ONLY
+		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
 		new HDate(15, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 1', 'Sukkos 1', 'סוכות יום א\''],
-		masks.YOM_TOV_ENDS | masks.IL_ONLY
+		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
 		new HDate(16, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 2', 'Sukkos 2', 'סוכות יום ב\''],
-		masks.YOM_TOV_ENDS | masks.CHUL_ONLY
+		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(16, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 2 (CH"M)', 'Sukkos 2 (CH"M)', 'סוכות יום ב\' )חה"ם('],
-		masks.IL_ONLY
+		IL_ONLY
 	), new Event(
 		new HDate(17, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 3 (CH"M)', 'Sukkos 3 (CH"M)', 'סוכות יום ג\' )חה"ם('],
@@ -162,19 +169,19 @@ var standards = [ // standard holidays that don't shift based on year
 	), new Event(
 		new HDate(21, c.months.TISHREI, IGNORE_YEAR),
 		['Sukkot 7 (Hoshana Raba)', 'Sukkos 7 (Hoshana Raba)', 'סוכות יום ז\' )הושנע רבה('],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(22, c.months.TISHREI, IGNORE_YEAR),
 		['Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת'],
-		masks.LIGHT_CANDLES_TZEIS | masks.CHUL_ONLY
+		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
 		new HDate(22, c.months.TISHREI, IGNORE_YEAR),
 		['Shmini Atzeret / Simchat Torah', 'Shmini Atzeres / Simchas Torah', 'שמיני עצרת / שמחת תורה'],
-		masks.YOM_TOV_ENDS | masks.IL_ONLY
+		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
 		new HDate(23, c.months.TISHREI, IGNORE_YEAR),
 		['Simchat Torah', 'Simchas Torah', 'שמחת תורה'],
-		masks.YOM_TOV_ENDS | masks.CHUL_ONLY
+		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(24, c.months.KISLEV, IGNORE_YEAR),
 		['Erev Chanukah', null, 'ערב חנוכה'],
@@ -218,23 +225,23 @@ var standards = [ // standard holidays that don't shift based on year
 	), new Event(
 		new HDate(14, c.months.NISAN, IGNORE_YEAR),
 		['Erev Pesach', null, 'ערב פסח'],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(15, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 1', null, 'פסח יום א\''],
-		masks.LIGHT_CANDLES_TZEIS | masks.CHUL_ONLY
+		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
 		new HDate(15, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 1', null, 'פסח יום א\''],
-		masks.YOM_TOV_ENDS | masks.IL_ONLY
+		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
 		new HDate(16, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 2', null, 'פסח יום ב\''],
-		masks.YOM_TOV_ENDS | masks.CHUL_ONLY
+		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(16, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 2 (CH"M)', null, 'פסח יום ב\' )חה"ם('],
-		masks.IL_ONLY
+		IL_ONLY
 	), new Event(
 		new HDate(16, c.months.NISAN, IGNORE_YEAR),
 		['Start counting Omer', null, 'התחלת ספירת העומר'],
@@ -254,19 +261,19 @@ var standards = [ // standard holidays that don't shift based on year
 	), new Event(
 		new HDate(20, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 6 (CH"M)', null, 'פסח יום ו\' )חה"ם('],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(21, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 7', null, 'פסח יום ז\''],
-		masks.LIGHT_CANDLES_TZEIS | masks.CHUL_ONLY
+		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
 		new HDate(21, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 7', null, 'פסח יום ז\''],
-		masks.YOM_TOV_ENDS | masks.IL_ONLY
+		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
 		new HDate(22, c.months.NISAN, IGNORE_YEAR),
 		['Pesach 8', null, 'פסח יום ח\''],
-		masks.YOM_TOV_ENDS | masks.CHUL_ONLY
+		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(14, c.months.IYYAR, IGNORE_YEAR),
 		['Pesach Sheni', null, 'פסח שני'],
@@ -278,23 +285,23 @@ var standards = [ // standard holidays that don't shift based on year
 	), new Event(
 		new HDate(5, c.months.SIVAN, IGNORE_YEAR),
 		['Erev Shavuot', 'Erev Shavuos', 'ערב שבועות'],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	), new Event(
 		new HDate(6, c.months.SIVAN, IGNORE_YEAR),
 		['Shavuot 1', 'Shavuos 1', 'שבועות א\''],
-		masks.LIGHT_CANDLES_TZEIS | masks.CHUL_ONLY
+		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
 		new HDate(6, c.months.SIVAN, IGNORE_YEAR),
 		['Shavuot', 'Shavuos', 'שבועות'],
-		masks.YOM_TOV_ENDS | masks.IL_ONLY
+		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
 		new HDate(7, c.months.SIVAN, IGNORE_YEAR),
 		['Shavuot 2', 'Shavuos 2', 'שבועות ב\''],
-		masks.YOM_TOV_ENDS | masks.CHUL_ONLY
+		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(29, c.months.ELUL, IGNORE_YEAR),
 		['Erev Rosh Hashana', null, 'ערב ראש השנה'],
-		masks.LIGHT_CANDLES
+		LIGHT_CANDLES
 	)
 ];
 
@@ -308,7 +315,7 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 	h.push(new Event(
 		RH,
 		['Rosh Hashana 1', null, 'ראש השנה א\''],
-		masks.LIGHT_CANDLES_TZEIS
+		LIGHT_CANDLES_TZEIS
 	));
 
 	h.push(new Event(
@@ -541,13 +548,13 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 		h.push(new Event(
 			new HDate(c.day_on_or_before(c.days.SAT, new HDate(1, c.months.TISHREI, year).abs() + day)),
 			['Shabbat', 'Shabbos', 'שבת'],
-			masks.YOM_TOV_ENDS
+			YOM_TOV_ENDS
 		));
 
 		h.push(new Event(
 			new HDate(c.day_on_or_before(c.days.FRI, new HDate(1, c.months.TISHREI, year).abs() + day)),
 			['Erev Shabbat', 'Erev Shabbos', 'ערב שבת'],
-			masks.LIGHT_CANDLES
+			LIGHT_CANDLES
 		));
 	}
 

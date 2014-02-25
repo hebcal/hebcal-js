@@ -118,7 +118,7 @@ exports.abs2greg = function abs2greg(theDate) {
 	d.setFullYear(year);
 	return d;
 
-
+/*
 	console.log(year)
 	var month = 1, mlen;
 	console.log(month)
@@ -133,4 +133,5 @@ exports.abs2greg = function abs2greg(theDate) {
 	d.setFullYear(year);
 	console.log(d)
 	return d;
+*/
 };

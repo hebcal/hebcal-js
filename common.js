@@ -42,7 +42,7 @@ var months = exports.months = {
 	ADAR_II : 13
 };
 
-var monthNames = exports.monthNames = [
+exports.monthNames = [
 	[
 		["VOID",null,"VOID"],
 		["Nisan",null,"ניסן"],
@@ -77,7 +77,7 @@ var monthNames = exports.monthNames = [
 	]
 ];
 
-var days = exports.days = {
+exports.days = {
 	SUN: 0,
 	MON: 1,
 	TUE: 2,

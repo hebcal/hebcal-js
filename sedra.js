@@ -39,12 +39,7 @@
  */
 var c = require('./common'), HDate = require('./hdate');
 
-var TYPE_NAMES = [
-	'INCOMPLETE',
-	'REGULAR ',
-	'COMPLETE'
-],
-	INCOMPLETE = 0,
+var INCOMPLETE = 0,
 	REGULAR = 1,
 	COMPLETE = 2;
 
@@ -167,162 +162,172 @@ var SHAVUOT = [ 'Shavuot', 'Shavuos', 'שבועות' ]; //33
 
 // The ordinary year types (keviot)
 
-var types = {};
+// names are leap/nonleap - day - incomplete/regular/complete - diaspora/Israel
 
-/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
- * Kislev each have 29 days), and has Passover start on Tuesday. */
-//e.g. 5753
-types.nonleap_monday_incomplete =
-[51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33, 34,
- 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)];
+var types = {
+
+	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
+	 * Kislev each have 29 days), and has Passover start on Tuesday. */
+	//e.g. 5753
+	'020' : [
+		51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33, 34,
+		35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Thursday. */
+	//e.g. 5756
+	'0220' : [
+		51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33,
+		SHAVUOT, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
+	 * days and Kislev has 30 days), and has Passover start on Saturday. */
+	//e.g. 5701
+	'0510' : [
+		52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, D(21), 23, 24, PESACH, PESACH, 25, D(26), D(28), 30, D(31),
+		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
+	 * days and Kislev has 30 days), and has Passover start on Saturday. */
+	// e.g. 5745
+	'0511' : [
+		52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, 31, 32, 33,
+		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Sunday. */
+	//e.g. 5754
+	'052' : [
+		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, PESACH7, 25, D(26), D(28), 30, D(31), 33,
+		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and Kislev
+	 * each have 29 days), and has Passover start on Sunday. */
+	//e.g. 5761
+	'070' : [
+		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+		15, 16, 17, 18, 19, 20, D(21), 23, 24, PESACH7, 25, D(26), D(28), 30, D(31),
+		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+
+	/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Tuesday. */
+	//e.g. 5716
+	'072' : [
+		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		16, 17, 18, 19, 20, D(21), 23, 24, CHMPESACH, 25, D(26), D(28), 30, D(31),
+		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+
+	/* --  The leap year types (keviot) -- */
+	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
+	 * Kislev each have 29 days), and has Passover start on Thursday. */
+	//e.g. 5746
+	'1200' : [
+		51, 52, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32, 33,
+		null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
+	 * Kislev each have 29 days), and has Passover start on Thursday. */
+	//e.g. 5746
+	'1201' : [
+		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32, 33,
+		34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Saturday. */
+	//e.g.5752
+	'1220' : [
+		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, PESACH, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Saturday. */
+	//e.g.5752
+	'1221' : [
+		51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, 28, 29, 30, 31, 32, 33,
+		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Thursday, is `incomplete' (Heshvan and
+	 * Kislev both have 29 days), and has Passover start on Sunday. */
+	//e.g. 5768
+	'150' : [
+		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, PESACH7, 29, 30, 31, 32, 33,
+		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50
+	],
+
+	/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
+	 * Kislev both have 30 days), and has Passover start on Tuesday. */
+	//eg. 5771
+	'152' : [
+		52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, CHMPESACH, 29, 30, 31, 32, 33,
+		34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and
+	 * Kislev each have 29 days), and has Passover start on Tuesday. */
+	//e.g.5757
+	'170' : [
+		RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32,
+		33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	],
+
+	/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
+	 * Kislev each have 30 days), and has Passover start on Thursday. */
+	'1720' : [
+		RH, 52, null, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32,
+		33, null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)
+	]
+};
 
 /* Hebrew year that starts on Monday, is `complete' (Heshvan and
  * Kislev each have 30 days), and has Passover start on Thursday. */
-//e.g. 5756
-types.nonleap_monday_complete_diaspora =
-[51, 52, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, D(31), 33,
- SHAVUOT, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49,
- D(50)];
-
-/* Hebrew year that starts on Monday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Thursday. */
-types.nonleap_monday_complete_israel = types.nonleap_monday_incomplete
+types['0221'] = types['020'];
 
 /* Hebrew year that starts on Tuesday, is `regular' (Heshvan has 29
  * days and Kislev has 30 days), and has Passover start on Thursday. */
 //e.g. 5715
-types.nonleap_tuesday_regular_diaspora = types.nonleap_monday_complete_diaspora
+types['0310'] = types['0220'];
 
 /* Hebrew year that starts on Tuesday, is `regular' (Heshvan has 29
  * days and Kislev has 30 days), and has Passover start on Thursday. */
-types.nonleap_tuesday_regular_israel = types.nonleap_monday_incomplete
-
-/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
- * days and Kislev has 30 days), and has Passover start on Saturday. */
-//e.g. 5701
-types.nonleap_thursday_regular_diaspora =
-[52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, D(21), 23, 24, PESACH, PESACH, 25, D(26), D(28), 30, D(31),
- 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50];
-
-/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
- * days and Kislev has 30 days), and has Passover start on Saturday. */
-// e.g. 5745
-types.nonleap_thursday_regular_israel =
-[52, YK, EOY, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, D(21), 23, 24, PESACH, 25, D(26), D(28), 30, 31, 32, 33,
- 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50];
-
-/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Sunday. */
-//e.g. 5754
-types.nonleap_thursday_complete =
-[52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, PESACH7, 25, D(26), D(28), 30, D(31), 33,
- 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50];
-
-/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and Kislev
- * each have 29 days), and has Passover start on Sunday. */
-//e.g. 5761
-types.nonleap_saturday_incomplete =
-[RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
- 15, 16, 17, 18, 19, 20, D(21), 23, 24, PESACH7, 25, D(26), D(28), 30, D(31),
- 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49,
- 50];
-
-
-/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Tuesday. */
-//e.g. 5716
-types.nonleap_saturday_complete =
-[RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
- 16, 17, 18, 19, 20, D(21), 23, 24, CHMPESACH, 25, D(26), D(28), 30,
- D(31), 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47,
- 48, 49, D(50)];
-
-
-/* --  The leap year types (keviot) -- */
-/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
- * Kislev each have 29 days), and has Passover start on Thursday. */
-//e.g. 5746
-types.leap_monday_incomplete_diaspora =
-[51, 52, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32, 33,
- null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49,
- D(50)];
-
-/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
- * Kislev each have 29 days), and has Passover start on Thursday. */
-//e.g. 5746
-types.leap_monday_incomplete_israel =
-[51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32, 33,
- 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, D(50)];
-
-/* Hebrew year that starts on Monday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Saturday. */
-//e.g.5752
-types.leap_monday_complete_diaspora =
-[51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, PESACH, 28, 29, 30, 31, 32,
- 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49, 50];
-
-/* Hebrew year that starts on Monday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Saturday. */
-//e.g.5752
-types.leap_monday_complete_israel =
-[51, 52, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, PESACH, 28, 29, 30, 31, 32, 33,
- 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50];
+types['0311'] = types['020'];
 
 /* Hebrew year that starts on Tuesday, is `regular' (Heshvan has 29
  * days and Kislev has 30 days), and has Passover start on Saturday. */
 // e.g. 5715
-types.leap_tuesday_regular_diaspora = types.leap_monday_complete_diaspora
-
+types['1310'] = types['1220'];
 /* Hebrew year that starts on Tuesday, is `regular' (Heshvan has 29
  * days and Kislev has 30 days), and has Passover start on Saturday. */
-types.leap_tuesday_regular_israel= types.leap_monday_complete_israel;
-
-/* Hebrew year that starts on Thursday, is `incomplete' (Heshvan and
- * Kislev both have 29 days), and has Passover start on Sunday. */
-//e.g. 5768
-types.leap_thursday_incomplete =
-[52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, PESACH7, 29, 30, 31, 32, 33,
- 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50];
-
-/* Hebrew year that starts on Thursday, is `complete' (Heshvan and
- * Kislev both have 30 days), and has Passover start on Tuesday. */
-//eg. 5771
-types.leap_thursday_complete =
-[52, YK, CHMSUKOT, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
- 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, CHMPESACH, 29, 30, 31, 32, 33,
- 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, D(50)];
-
-/* Hebrew year that starts on Saturday, is `incomplete' (Heshvan and
- * Kislev each have 29 days), and has Passover start on Tuesday. */
-//e.g.5757
-types.leap_saturday_incomplete =
-[RH, 52, SUKKOT, SHMINI, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
- 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, CHMPESACH, 28, 29, 30, 31, 32,
- 33, 34, 35, 36, 37, 38, 39, 40, D(41), 43, 44, 45, 46, 47, 48, 49,
- D(50)];
+types['1311'] = types['1221'];
 
 /* Hebrew year that starts on Saturday, is `complete' (Heshvan and
  * Kislev each have 30 days), and has Passover start on Thursday. */
-types.leap_saturday_complete_diaspora =
-[RH, 52, null, null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
- 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, null, 28, 29, 30, 31, 32,
- 33, null, 34, 35, 36, 37, D(38), 40, D(41), 43, 44, 45, 46, 47, 48, 49,
- D(50)];
-
-/* Hebrew year that starts on Saturday, is `complete' (Heshvan and
- * Kislev each have 30 days), and has Passover start on Thursday. */
-types.leap_saturday_complete_israel = types.leap_saturday_incomplete;
-
+types['1721'] = types['170'];
 
 
 function ROSH_DAY_INDEX(x) {
@@ -336,8 +341,8 @@ var sedra_years_array =  // [2][4][3][2]
 		
 		[                           // monday
 			[                         // incomplete
-				types.nonleap_monday_incomplete,
-				types.nonleap_monday_incomplete
+				types['020'],
+				types['020']
 			],
 			
 			[                         // regular
@@ -345,8 +350,8 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // complete
-				types.nonleap_monday_complete_diaspora,
-				types.nonleap_monday_complete_israel
+				types['0220'],
+				types['0221']
 			]
 			
 		],
@@ -357,8 +362,8 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // regular   //e.g. 5715
-				types.nonleap_tuesday_regular_diaspora,
-				types.nonleap_tuesday_regular_israel 
+				types['0310'],
+				types['0311'] 
 				
 			],
 			
@@ -373,20 +378,20 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // regular  //e.g. 5745
-				types.nonleap_thursday_regular_diaspora,
-				types.nonleap_thursday_regular_israel
+				types['0510'],
+				types['0511']
 			],
 			
 			[                         // complete
-				types.nonleap_thursday_complete,
-				types.nonleap_thursday_complete
+				types['052'],
+				types['052']
 			]
 		],
 		
 		[                           // saturday
 			[                         // incomplete
-				types.nonleap_saturday_incomplete,
-				types.nonleap_saturday_incomplete
+				types['070'],
+				types['070']
 			],
 			
 			[                         // regular
@@ -394,8 +399,8 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // complete
-				types.nonleap_saturday_complete,
-				types.nonleap_saturday_complete  //e.g. 5716
+				types['072'],
+				types['072']  //e.g. 5716
 			]
 		]
 	],
@@ -404,8 +409,8 @@ var sedra_years_array =  // [2][4][3][2]
 	[                             // leap years
 		[                           // monday
 			[                         // incomplete //e.g. 5746
-				types.leap_monday_incomplete_diaspora,
-				types.leap_monday_incomplete_israel
+				types['1200'],
+				types['1201']
 			],
 			
 			[                         // regular
@@ -413,8 +418,8 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // complete
-				types.leap_monday_complete_diaspora,
-				types.leap_monday_complete_israel
+				types['1220'],
+				types['1221']
 			]
 		],
 		
@@ -424,8 +429,8 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // regular
-				types.leap_tuesday_regular_diaspora,
-				types.leap_tuesday_regular_israel
+				types['1310'],
+				types['1311']
 			],
 			
 			[                         // complete
@@ -435,8 +440,8 @@ var sedra_years_array =  // [2][4][3][2]
 		
 	[                           // thursday
 		[                         // incomplete
-			types.leap_thursday_incomplete,
-			types.leap_thursday_incomplete
+			types['150'],
+			types['150']
 		],
 		
 		[                         // regular
@@ -444,15 +449,15 @@ var sedra_years_array =  // [2][4][3][2]
 		],
 		
 		[                         // complete
-			types.leap_thursday_complete,
-			types.leap_thursday_complete
+			types['152'],
+			types['152']
 		]
 	],
 		
 		[                           // saturday
 			[                         // incomplete
-				types.leap_saturday_incomplete,
-				types.leap_saturday_incomplete
+				types['170'],
+				types['170']
 			],
 			
 			[                         // regular
@@ -460,20 +465,20 @@ var sedra_years_array =  // [2][4][3][2]
 			],
 			
 			[                         // complete
-				types.leap_saturday_complete_diaspora,
-				types.leap_saturday_complete_israel
+				types['1720'],
+				types['1721']
 			]
 		]
 	]
 ];
 
-Sedra.prototype.getSedraFromHebcalDate = function(hDate) {
-	return this.getSedraFromAbsDate(hDate.abs());
+Sedra.prototype.getFromHDate = function(hDate) {
+	return this.getFromDate(hDate.abs());
 };
 
 // returns an array describing the parsha on the first saturday on or after absdate
 //FIX: ignores holidays on the birthday thru friday.
-Sedra.prototype.getSedraFromAbsDate = function(absDate) {
+Sedra.prototype.getFromDate = function(absDate) {
 
 	// find the first saturday on or after today's date
 	var absDate = c.day_on_or_before(6, absDate + 6);
