@@ -83,58 +83,58 @@ function Sedra(hebYr, israel_sw) { // the Hebrew year
 
 var parshiot = [
 	[ 'Bereshit', 'Bereshis', 'בראשית' ],
-	[ 'Noach', null, 'נח' ],
-	[ 'Lech-Lecha', null, 'לך-לך' ],
-	[ 'Vayera', null, 'וירא' ],
-	[ 'Chayei Sara', null, 'חי שרה' ],
+	[ 'Noach', 0, 'נח' ],
+	[ 'Lech-Lecha', 0, 'לך-לך' ],
+	[ 'Vayera', 0, 'וירא' ],
+	[ 'Chayei Sara', 0, 'חי שרה' ],
 	[ 'Toldot', 'Toldos', 'תולדות' ],
-	[ 'Vayetzei', null, 'ויצא' ],
-	[ 'Vayishlach', null, 'וישלח' ],
-	[ 'Vayeshev', null, 'וישב' ],
-	[ 'Miketz', null, 'מקץ' ],
-	[ 'Vayigash', null, 'ויגש' ],
-	[ 'Vayechi', null, 'ויחי' ],
+	[ 'Vayetzei', 0, 'ויצא' ],
+	[ 'Vayishlach', 0, 'וישלח' ],
+	[ 'Vayeshev', 0, 'וישב' ],
+	[ 'Miketz', 0, 'מקץ' ],
+	[ 'Vayigash', 0, 'ויגש' ],
+	[ 'Vayechi', 0, 'ויחי' ],
 	[ 'Shemot', 'Shemos', 'שמות' ],
-	[ 'Vaera', null, 'וארא' ],
-	[ 'Bo', null, 'בא' ],
-	[ 'Beshalach', null, 'בשלח' ],
+	[ 'Vaera', 0, 'וארא' ],
+	[ 'Bo', 0, 'בא' ],
+	[ 'Beshalach', 0, 'בשלח' ],
 	[ 'Yitro', 'Yisro', 'יתרו' ],
-	[ 'Mishpatim', null, 'משפטים' ],
-	[ 'Terumah', null, 'תרומה' ],
-	[ 'Tetzaveh', null, 'תצוה' ],
+	[ 'Mishpatim', 0, 'משפטים' ],
+	[ 'Terumah', 0, 'תרומה' ],
+	[ 'Tetzaveh', 0, 'תצוה' ],
 	[ 'Ki Tisa', 'Ki Sisa', 'כי תשא' ],
-	[ 'Vayakhel', null, 'ויקהל' ],
-	[ 'Pekudei', null, 'פקודי' ],
-	[ 'Vayikra', null, 'ויקרא' ],
-	[ 'Tzav', null, 'צו' ],
-	[ 'Shmini', null, 'שמיני' ],
-	[ 'Tazria', null, 'תזריע' ],
-	[ 'Metzora', null, 'מצרע' ],
+	[ 'Vayakhel', 0, 'ויקהל' ],
+	[ 'Pekudei', 0, 'פקודי' ],
+	[ 'Vayikra', 0, 'ויקרא' ],
+	[ 'Tzav', 0, 'צו' ],
+	[ 'Shmini', 0, 'שמיני' ],
+	[ 'Tazria', 0, 'תזריע' ],
+	[ 'Metzora', 0, 'מצרע' ],
 	[ 'Achrei Mot', 'Achrei Mos', 'אחרי מות' ],
-	[ 'Kedoshim', null, 'קדשים' ],
-	[ 'Emor', null, 'אמור' ],
-	[ 'Behar', null, 'בהר' ],
+	[ 'Kedoshim', 0, 'קדשים' ],
+	[ 'Emor', 0, 'אמור' ],
+	[ 'Behar', 0, 'בהר' ],
 	[ 'Bechukotai', 'Bechukosai', 'בחקתי' ],
-	[ 'Bamidbar', null, 'במדבר' ],
-	[ 'Nasso', null, 'נשא' ],
+	[ 'Bamidbar', 0, 'במדבר' ],
+	[ 'Nasso', 0, 'נשא' ],
 	[ 'Beha\'alotcha', 'Beha\'aloscha', 'בהעלתך' ],
-	[ 'Sh\'lach', null, 'שלח לך' ],
-	[ 'Korach', null, 'קורח' ],
+	[ 'Sh\'lach', 0, 'שלח לך' ],
+	[ 'Korach', 0, 'קורח' ],
 	[ 'Chukat', 'Chukas', 'חקת' ],
-	[ 'Balak', null, 'בלק' ],
-	[ 'Pinchas', null, 'פינחס' ],
+	[ 'Balak', 0, 'בלק' ],
+	[ 'Pinchas', 0, 'פינחס' ],
 	[ 'Matot', 'Matos', 'מטות' ],
-	[ 'Masei', null, 'מסעי' ],
-	[ 'Devarim', null, 'דברים' ],
+	[ 'Masei', 0, 'מסעי' ],
+	[ 'Devarim', 0, 'דברים' ],
 	[ 'Vaetchanan', 'V\'eschanan', 'ואתחנן' ],
-	[ 'Eikev', null, 'עקב' ],
-	[ 'Re\'eh', null, 'ראה' ],
-	[ 'Shoftim', null, 'שופטים' ],
+	[ 'Eikev', 0, 'עקב' ],
+	[ 'Re\'eh', 0, 'ראה' ],
+	[ 'Shoftim', 0, 'שופטים' ],
 	[ 'Ki Teitzei', 'Ki Seitzei', 'כי תצא' ],
 	[ 'Ki Tavo', 'Ki Savo', 'כי תבוא' ],
-	[ 'Nitzavim', null, 'נצבים' ],
-	[ 'Vayeilech', null, 'וילך' ],
-	[ 'Ha\'Azinu', null, 'האזינו' ]
+	[ 'Nitzavim', 0, 'נצבים' ],
+	[ 'Vayeilech', 0, 'וילך' ],
+	[ 'Ha\'Azinu', 0, 'האזינו' ]
 ];
 
 
@@ -143,17 +143,17 @@ function D(p) {
 	return -p;
 }
 
-var RH = [ 'Rosh Hashana', null, 'ראש השנה' ]; //0
-var YK = [ 'Yom Kippur', null, 'יום כיפור' ];  //1
+var RH = [ 'Rosh Hashana', 0, 'ראש השנה' ]; //0
+var YK = [ 'Yom Kippur', 0, 'יום כיפור' ];  //1
 
 var SUKKOT = [ 'Sukkot', 'Succos', 'סוכות' ];  //0
 var CHMSUKOT = [ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ];  //0
 var SHMINI = [ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ];  //0
 var EOY = [ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות וסמחת תורה' ];  //0
 
-var PESACH = [ 'Pesach', null, 'פסח' ]; //25
-var CHMPESACH = [ 'Chol hamoed Pesach', null, 'חול המועד פסח' ];  //25
-var PESACH7 = [ 'Second days of Pesach', null, 'שביעי של פסח' ]; //25
+var PESACH = [ 'Pesach', 0, 'פסח' ]; //25
+var CHMPESACH = [ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ];  //25
+var PESACH7 = [ 'Second days of Pesach', 0, 'שביעי של פסח' ]; //25
 
 var SHAVUOT = [ 'Shavuot', 'Shavuos', 'שבועות' ]; //33
 

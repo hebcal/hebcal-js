@@ -250,36 +250,36 @@ var months = exports.months = {
 
 exports.monthNames = [
 	[
-		["VOID",null,"VOID"],
-		["Nisan",null,"ניסן"],
-		["Iyyar",null,"אייר"],
-		["Sivan",null,"סיון"],
-		["Tamuz",null,"תמוז"],
-		["Av",null,"אב"],
-		["Elul",null,"אלול"],
-		["Tishrei",null,"תשרי"],
-		["Cheshvan",null,"חשון"],
-		["Kislev",null,"כסלו"],
-		["Tevet",null,"טבת"],
-		["Sh'vat",null,"שבט"],
-		["Adar",null,"אדר"],
-		["Nisan",null,"ניסן"]
+		["", 0, ""],
+		["Nisan", 0, "ניסן"],
+		["Iyyar", 0, "אייר"],
+		["Sivan", 0, "סיון"],
+		["Tamuz", 0, "תמוז"],
+		["Av", 0, "אב"],
+		["Elul", 0, "אלול"],
+		["Tishrei", 0, "תשרי"],
+		["Cheshvan", 0, "חשון"],
+		["Kislev", 0, "כסלו"],
+		["Tevet", 0, "טבת"],
+		["Sh'vat", 0, "שבט"],
+		["Adar", 0, "אדר"],
+		["Nisan", 0, "ניסן"]
 	], [
-		["VOID",null,"VOID"],
-		["Nisan",null,"ניסן"],
-		["Iyyar",null,"אייר"],
-		["Sivan",null,"סיון"],
-		["Tamuz",null,"תמוז"],
-		["Av",null,"אב"],
-		["Elul",null,"אלול"],
-		["Tishrei",null,"תשרי"],
-		["Cheshvan",null,"חשון"],
-		["Kislev",null,"כסלו"],
-		["Tevet",null,"טבת"],
-		["Sh'vat",null,"שבט"],
-		["Adar I",null,"אדר א'"],
-		["Adar II",null,"אדר ב'"],
-		["Nisan",null,"ניסן"]
+		["", 0, ""],
+		["Nisan", 0, "ניסן"],
+		["Iyyar", 0, "אייר"],
+		["Sivan", 0, "סיון"],
+		["Tamuz", 0, "תמוז"],
+		["Av", 0, "אב"],
+		["Elul", 0, "אלול"],
+		["Tishrei", 0, "תשרי"],
+		["Cheshvan", 0, "חשון"],
+		["Kislev", 0, "כסלו"],
+		["Tevet", 0, "טבת"],
+		["Sh'vat", 0, "שבט"],
+		["Adar I", 0, "אדר א'"],
+		["Adar II", 0, "אדר ב'"],
+		["Nisan", 0, "ניסן"]
 	]
 ];
 
@@ -293,22 +293,20 @@ exports.days = {
 	SAT: 6
 };
 
-function LANGUAGE(str, opts){
+exports.LANGUAGE = function LANGUAGE(str, opts){
 	return (opts === 'h' && str[2] ? str[2] : (opts === 'a' && str[1] ? str[1] : str[0]));
-}
-exports.LANGUAGE = LANGUAGE;
+};
 
 function LEAP_YR_HEB(x) {
 	return (1 + x * 7) % 19 < 7 ? true : false;
 }
 exports.LEAP_YR_HEB = LEAP_YR_HEB;
 
-function MONTHS_IN_HEB(x) {
+exports.MONTHS_IN_HEB = function MONTHS_IN_HEB(x) {
 	return 12 + LEAP_YR_HEB(x); // boolean is cast to 1 or 0
-}
-exports.MONTHS_IN_HEB = MONTHS_IN_HEB;
+};
 
-function max_days_in_heb_month(month, year) {
+exports.max_days_in_heb_month = function max_days_in_heb_month(month, year) {
 	return 30 - (month == months.IYYAR ||
 	month == months.TAMUZ || 
 	month == months.ELUL ||
@@ -317,8 +315,7 @@ function max_days_in_heb_month(month, year) {
 	(month == months.ADAR_I && !LEAP_YR_HEB(year)) ||
 	(month == months.CHESHVAN && !long_cheshvan(year)) ||
 	(month == months.KISLEV && short_kislev(year)));
-}
-exports.max_days_in_heb_month = max_days_in_heb_month;
+};
 
 
 /* Days from sunday prior to start of hebrew calendar to mean
@@ -378,7 +375,7 @@ function short_kislev(year) {
 }
 exports.short_kislev = short_kislev;
 
-function lookup_hebrew_month(c) {
+exports.lookup_hebrew_month = function lookup_hebrew_month(c) {
   /* the Hebrew months are unique to their second letter
 	 N         nisan  (november?)
 	 I         iyyar
@@ -480,8 +477,7 @@ function lookup_hebrew_month(c) {
 		default:
 			return 0;
 	}
-}
-exports.lookup_hebrew_month = lookup_hebrew_month;
+};
 
 /* Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d.  Similarly, applying it to d+3 gives the DAYNAME nearest to
@@ -489,12 +485,11 @@ exports.lookup_hebrew_month = lookup_hebrew_month;
  * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
 
 **/
-function day_on_or_before(day_of_week, absdate) {
+exports.day_on_or_before = function day_on_or_before(day_of_week, absdate) {
 	return absdate - ((absdate - day_of_week) % 7);
-}
-exports.day_on_or_before = day_on_or_before;
+};
 
-function map(self, fun, thisp, sameprops) {
+exports.map = function map(self, fun, thisp, sameprops) {
 	// originally written for http://github.com/Scimonster/localbrowse
 	if (self === null || typeof fun != 'function') {
 		throw new TypeError();
@@ -519,16 +514,13 @@ function map(self, fun, thisp, sameprops) {
 		for (i in res) {
 			arr[Number(i)] = res[i];
 		}
-		res = arr.filter(function (v) {
-			return v;
-		}); // for...in isn't guaranteed to give any meaningful order
+		res = filter(arr, true); // for...in isn't guaranteed to give any meaningful order
 		if (typeof self == 'string') {
 			res = res.join('');
 		}
 	}
 	return res;
-}
-exports.map = map;
+};
 
 function filter(self, fun, thisp) {
 	if (self === null) {
@@ -589,7 +581,7 @@ function filter(self, fun, thisp) {
 		res = arr.filter(function (v) {
 			return v;
 		}); // for...in isn't guaranteed to give any meaningful order
-		// can't use obj.filter(arr,true) here because that would infitely recurse
+		// can't use c.filter(arr,true) here because that would infitely recurse
 		if (typeof self == 'string') {
 			res = res.join('');
 		}
@@ -598,7 +590,7 @@ function filter(self, fun, thisp) {
 }
 exports.filter = filter;
 
-function gematriya(num, limit) {
+exports.gematriya = function gematriya(num, limit) {
 	if (typeof num !== 'number' && typeof num !== 'string') {
 		throw new TypeError('non-number or string given to gematriya()');
 	}
@@ -697,10 +689,9 @@ function gematriya(num, limit) {
 
 		return num.join('');
 	}
-}
-exports.gematriya = gematriya;
+};
 
-function range(start, end, step) {
+exports.range = function range(start, end, step) {
 	step = step || 1;
 	if (step < 0) {
 		step = 0 - step;
@@ -717,8 +708,7 @@ function range(start, end, step) {
 		}
 	}
 	return arr;
-}
-exports.range = range;
+};
 },{}],4:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
@@ -755,43 +745,43 @@ var shas = [
 	[ "Berachot",       "Berachos",         "ברכות",         64  ],
 	[ "Shabbat",        "Shabbos",          "שבת",          157 ],
 	[ "Eruvin",         "Eruvin",           "ערובין",         105 ],
-	[ "Pesachim",       null,               "פסחים",         121 ],
-	[ "Shekalim",       null,               "שקלים",         22  ],
-	[ "Yoma",           null,               "יומא",           88  ],
-	[ "Sukkah",         null,               "סוכה",          56  ],
-	[ "Beitzah",        null,               "ביצה",          40  ],
-	[ "Rosh Hashana",   null,               "ראש השנה",      35  ],
+	[ "Pesachim",       0,                  "פסחים",         121 ],
+	[ "Shekalim",       0,                  "שקלים",         22  ],
+	[ "Yoma",           0,                  "יומא",           88  ],
+	[ "Sukkah",         0,                  "סוכה",          56  ],
+	[ "Beitzah",        0,                  "ביצה",          40  ],
+	[ "Rosh Hashana",   0,                  "ראש השנה",      35  ],
 	[ "Taanit",         "Taanis",           "תענית",          31  ],
-	[ "Megillah",       null,               "מגילה",          32  ],
-	[ "Moed Katan",     null,               "מועד קטן",       29  ],
-	[ "Chagigah",       null,               "חגיגה",          27  ],
+	[ "Megillah",       0,                  "מגילה",          32  ],
+	[ "Moed Katan",     0,                  "מועד קטן",       29  ],
+	[ "Chagigah",       0,                  "חגיגה",          27  ],
 	[ "Yevamot",        "Yevamos",          "יבמות",          122 ],
 	[ "Ketubot",        "Kesubos",          "כתובות",         112 ],
-	[ "Nedarim",        null,               "נדרים",          91  ],
-	[ "Nazir",          null,               "נזיר",           66  ],
-	[ "Sotah",          null,               "סוטה",          49  ],
-	[ "Gitin",          null,               "גיטין",           90  ],
-	[ "Kiddushin",      null,               "קידושין",         82  ],
-	[ "Baba Kamma",     null,               "בבא קמא",      119 ],
-	[ "Baba Metzia",    null,               "בבא מציעא",     119 ],
+	[ "Nedarim",        0,                  "נדרים",          91  ],
+	[ "Nazir",          0,                  "נזיר",           66  ],
+	[ "Sotah",          0,                  "סוטה",          49  ],
+	[ "Gitin",          0,                  "גיטין",           90  ],
+	[ "Kiddushin",      0,                  "קידושין",         82  ],
+	[ "Baba Kamma",     0,                  "בבא קמא",      119 ],
+	[ "Baba Metzia",    0,                  "בבא מציעא",     119 ],
 	[ "Baba Batra",     "Baba Basra",       "בבא בתרא",     176 ],
-	[ "Sanhedrin",      null,               "סנהדרין",        113 ],
+	[ "Sanhedrin",      0,                  "סנהדרין",        113 ],
 	[ "Makkot",         "Makkos",           "מכות",          24  ],
 	[ "Shevuot",        "Shevuos",          "שבועות",        49  ],
-	[ "Avodah Zarah",   null,               "עבודה זרה",     76  ],
+	[ "Avodah Zarah",   0,                  "עבודה זרה",     76  ],
 	[ "Horayot",        "Horayos",          "הוריות",         14  ],
-	[ "Zevachim",       null,               "זבכים",         120 ],
+	[ "Zevachim",       0,                  "זבכים",         120 ],
 	[ "Menachot",       "Menachos",         "מנחות",         110 ],
-	[ "Chullin",        null,               "חולין",          142 ],
+	[ "Chullin",        0,                  "חולין",          142 ],
 	[ "Bechorot",       "Bechoros",         "בכורות",         61  ],
-	[ "Arachin",        null,               "ערכין",          34  ],
-	[ "Temurah",        null,               "תמורה",         34  ],
+	[ "Arachin",        0,                  "ערכין",          34  ],
+	[ "Temurah",        0,                  "תמורה",         34  ],
 	[ "Keritot",        "Kerisos",          "כריתות",         28  ],
-	[ "Meilah",         null,               "מעילה",         22  ],
-	[ "Kinnim",         null,               "כינים",          4   ],
-	[ "Tamid",          null,               "תמיד",          10  ],
+	[ "Meilah",         0,                  "מעילה",         22  ],
+	[ "Kinnim",         0,                  "כינים",          4   ],
+	[ "Tamid",          0,                  "תמיד",          10  ],
 	[ "Midot",          "Midos",            "מידות",          4   ],
-	[ "Niddah",         null,               "נידה",           73  ]
+	[ "Niddah",         0,                  "נידה",           73  ]
 ].map(function(m){
 	return {name: m.slice(0,3), blatt: m[3]};
 });
@@ -1528,7 +1518,8 @@ var prototype = 'prototype',
 	defProp = Object.defineProperty,
 	find = 'find',
 	strings = 'strings',
-	Month = 'Month';
+	Month = 'Month',
+	TE = TypeError;
 
 // Main Hebcal function
 
@@ -1537,7 +1528,7 @@ function Hebcal(year, month) {
 		year = (new HDate()).getFullYear(); // this year;
 	}
 	if (typeof year !== 'number') {
-		throw new TypeError('year to Hebcal() is not a number');
+		throw new TE('year to Hebcal() is not a number');
 	}
 	this.year = year;
 	if (month) {
@@ -1565,7 +1556,7 @@ function Hebcal(year, month) {
 				}).length;
 			}, this);
 		} else {
-			throw new TypeError('month to Hebcal is not a valid type');
+			throw new TE('month to Hebcal is not a valid type');
 		}
 	} else {
 		return new Hebcal(year, c.range(1, c.MONTHS_IN_HEB(year)));
@@ -1681,7 +1672,7 @@ Hebcal[prototype].filter = function filter() {
 
 Hebcal[prototype].addHoliday = function addHoliday(holiday) {
 	if (!(holiday instanceof holidays.Event)) {
-		throw new TypeError('non-Event passed to addHoliday()');
+		throw new TE('non-Event passed to addHoliday()');
 	}
 	this.holidays.push(holiday);
 	return this;
@@ -1832,10 +1823,10 @@ Hebcal[Month] = function Month(month, year) {
 		month = c.lookup_hebrew_month(month);
 	}
 	if (typeof month != 'number') {
-		throw new TypeError('month to Hebcal.Month is not a valid type');
+		throw new TE('month to Hebcal.Month is not a valid type');
 	}
 	if (typeof year != 'number') {
-		throw new TypeError('year to Hebcal.Month is not a number');
+		throw new TE('year to Hebcal.Month is not a number');
 	}
 	this.month = month;
 	this.year = year;
@@ -2227,7 +2218,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 		return new Hebcal.GregYear(d.getFullYear(), month);
 	}
 	if (typeof year !== 'number') {
-		throw new TypeError('year to Hebcal.GregYear() is not a number');
+		throw new TE('year to Hebcal.GregYear() is not a number');
 	}
 	this.year = year;
 
@@ -2250,7 +2241,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 				return m;
 			}, this);
 		} else {
-			throw new TypeError('month to Hebcal.GregYear() is not a valid type');
+			throw new TE('month to Hebcal.GregYear() is not a valid type');
 		}
 	} else {
 		return new Hebcal.GregYear(year, c.range(1, 12));
@@ -2357,10 +2348,10 @@ Hebcal.GregMonth = function GregMonth(month, year) {
 		month = greg.lookupMonthNum(month);
 	}
 	if (typeof month != 'number') {
-		throw new TypeError('month to Hebcal.GregMonth is not a valid type');
+		throw new TE('month to Hebcal.GregMonth is not a valid type');
 	}
 	if (typeof year != 'number') {
-		throw new TypeError('year to Hebcal.GregMonth is not a number');
+		throw new TE('year to Hebcal.GregMonth is not a number');
 	}
 
 	this.year = year;
@@ -2505,6 +2496,35 @@ module.exports = Hebcal;
  */
 var c = require('./common'), HDate = require('./hdate');
 
+// for optimizations
+
+var day_on_or_before = c.day_on_or_before,
+	TISHREI = c.months.TISHREI,
+	KISLEV = c.months.KISLEV,
+	NISAN = c.months.NISAN,
+	SAT = c.days.SAT,
+	getDay = 'getDay',
+	abs = 'abs',
+	push = 'push',
+	Shabbat = 'Shabbat',
+	Shabbos = 'Shabbos';
+
+function Chanukah(day) {
+	return ['Chanukah: Candle ' + day, 0, 'חנוכה: נר ' + c.gematriya(day)];
+}
+
+function CHM(desc) {
+	return [desc[0] + ' (CH"M)', desc[1] ? desc[1] + ' (CH"M)' : desc[1], desc[2] ? desc[2] + ' )חה"ם(' : desc[2]];
+}
+
+function Sukkot(day) {
+	return ['Sukkot: ' + day, 'Succos: ' + day, 'סוכות יום ' + c.gematriya(day)];
+}
+
+function Pesach(day) {
+	return ['Pesach: ' + day, 0, 'פסח יום ' + c.gematriya(day)];
+}
+
 var	USER_EVENT          = 1,
 	LIGHT_CANDLES       = 2,
 	YOM_TOV_ENDS        = 4,
@@ -2557,12 +2577,12 @@ Event.prototype.is = function is(date, il) {
 };
 
 Event.prototype.masks = function mask() {
-	return +(this.USER_EVENT          && USER_EVENT) |
-		   +(this.LIGHT_CANDLES       && LIGHT_CANDLES) |
-		   +(this.YOM_TOV_ENDS        && YOM_TOV_ENDS) |
-		   +(this.CHUL_ONLY           && CHUL_ONLY) |
-		   +(this.IL_ONLY             && IL_ONLY) |
-		   +(this.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS)
+	return (this.USER_EVENT          && USER_EVENT) |
+		   (this.LIGHT_CANDLES       && LIGHT_CANDLES) |
+		   (this.YOM_TOV_ENDS        && YOM_TOV_ENDS) |
+		   (this.CHUL_ONLY           && CHUL_ONLY) |
+		   (this.IL_ONLY             && IL_ONLY) |
+		   (this.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS);
 };
 
 Event.prototype.getDesc = function getDesc(o) {
@@ -2596,168 +2616,168 @@ exports.Event = Event;
 var standards = [ // standard holidays that don't shift based on year
 	// RH 1 is defined later, based on year, because other holidays depend on it
 	new Event(
-		new HDate(2, c.months.TISHREI, IGNORE_YEAR),
-		['Rosh Hashana 2', null, 'ראש השנה ב\''],
+		new HDate(2, TISHREI, IGNORE_YEAR),
+		['Rosh Hashana 2', 0, 'ראש השנה ב\''],
 		YOM_TOV_ENDS
 	), new Event(
-		new HDate(9, c.months.TISHREI, IGNORE_YEAR),
-		['Erev Yom Kippur', null, 'ערב יום כיפור'],
+		new HDate(9, TISHREI, IGNORE_YEAR),
+		['Erev Yom Kippur', 0, 'ערב יום כיפור'],
 		LIGHT_CANDLES
 	), new Event(
-		new HDate(10, c.months.TISHREI, IGNORE_YEAR),
-		['Yom Kippur', null, 'יום כיפור'],
+		new HDate(10, TISHREI, IGNORE_YEAR),
+		['Yom Kippur', 0, 'יום כיפור'],
 		YOM_TOV_ENDS
 	), new Event(
-		new HDate(14, c.months.TISHREI, IGNORE_YEAR),
-		['Erev Sukkot', 'Erev Sukkos', 'ערב סוכות'],
+		new HDate(14, TISHREI, IGNORE_YEAR),
+		['Erev Sukkot', 'Erev Succos', 'ערב סוכות'],
 		LIGHT_CANDLES
 	), new Event(
-		new HDate(15, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 1', 'Sukkos 1', 'סוכות יום א\''],
+		new HDate(15, TISHREI, IGNORE_YEAR),
+		Sukkot(1),
 		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
-		new HDate(15, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 1', 'Sukkos 1', 'סוכות יום א\''],
+		new HDate(15, TISHREI, IGNORE_YEAR),
+		Sukkot(1),
 		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
-		new HDate(16, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 2', 'Sukkos 2', 'סוכות יום ב\''],
+		new HDate(16, TISHREI, IGNORE_YEAR),
+		Sukkot(2),
 		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
-		new HDate(16, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 2 (CH"M)', 'Sukkos 2 (CH"M)', 'סוכות יום ב\' )חה"ם('],
+		new HDate(16, TISHREI, IGNORE_YEAR),
+		CHM(Sukkot(2)),
 		IL_ONLY
 	), new Event(
-		new HDate(17, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 3 (CH"M)', 'Sukkos 3 (CH"M)', 'סוכות יום ג\' )חה"ם('],
+		new HDate(17, TISHREI, IGNORE_YEAR),
+		CHM(Sukkot(3)),
 		0
 	), new Event(
-		new HDate(18, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 4 (CH"M)', 'Sukkos 4 (CH"M)', 'סוכות יום ד\' )חה"ם('],
+		new HDate(18, TISHREI, IGNORE_YEAR),
+		CHM(Sukkot(4)),
 		0
 	), new Event(
-		new HDate(19, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 5 (CH"M)', 'Sukkos 5 (CH"M)', 'סוכות יום ה\' )חה"ם('],
+		new HDate(19, TISHREI, IGNORE_YEAR),
+		CHM(Sukkot(5)),
 		0
 	), new Event(
-		new HDate(20, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 6 (CH"M)', 'Sukkos 6 (CH"M)', 'סוכות יום ו\' )חה"ם('],
+		new HDate(20, TISHREI, IGNORE_YEAR),
+		CHM(Sukkot(6)),
 		0
 	), new Event(
-		new HDate(21, c.months.TISHREI, IGNORE_YEAR),
-		['Sukkot 7 (Hoshana Raba)', 'Sukkos 7 (Hoshana Raba)', 'סוכות יום ז\' )הושנע רבה('],
+		new HDate(21, TISHREI, IGNORE_YEAR),
+		['Sukkot: 7 (Hoshana Raba)', 'Succos: 7 (Hoshana Raba)', 'סוכות יום ז\' )הושנע רבה('],
 		LIGHT_CANDLES
 	), new Event(
-		new HDate(22, c.months.TISHREI, IGNORE_YEAR),
+		new HDate(22, TISHREI, IGNORE_YEAR),
 		['Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת'],
 		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
-		new HDate(22, c.months.TISHREI, IGNORE_YEAR),
+		new HDate(22, TISHREI, IGNORE_YEAR),
 		['Shmini Atzeret / Simchat Torah', 'Shmini Atzeres / Simchas Torah', 'שמיני עצרת / שמחת תורה'],
 		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
-		new HDate(23, c.months.TISHREI, IGNORE_YEAR),
+		new HDate(23, TISHREI, IGNORE_YEAR),
 		['Simchat Torah', 'Simchas Torah', 'שמחת תורה'],
 		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
-		new HDate(24, c.months.KISLEV, IGNORE_YEAR),
-		['Erev Chanukah', null, 'ערב חנוכה'],
+		new HDate(24, KISLEV, IGNORE_YEAR),
+		['Erev Chanukah', 0, 'ערב חנוכה'],
 		0
 	), new Event(
-		new HDate(25, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 1st Candle', null, 'חנוכה: נר א\''],
+		new HDate(25, KISLEV, IGNORE_YEAR),
+		Chanukah(1),
 		0
 	), new Event(
-		new HDate(26, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 2nd Candle', null, 'חנוכה: נר ב\''],
+		new HDate(26, KISLEV, IGNORE_YEAR),
+		Chanukah(2),
 		0
 	), new Event(
-		new HDate(27, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 3rd Candle', null, 'חנוכה: נר ג\''],
+		new HDate(27, KISLEV, IGNORE_YEAR),
+		Chanukah(3),
 		0
 	), new Event(
-		new HDate(28, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 4th Candle', null, 'חנוכה: נר ד\''],
+		new HDate(28, KISLEV, IGNORE_YEAR),
+		Chanukah(4),
 		0
 	), new Event(
-		new HDate(29, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 5th Candle', null, 'חנוכה: נר ה\''],
+		new HDate(29, KISLEV, IGNORE_YEAR),
+		Chanukah(5),
 		0
 	), new Event(
-		new HDate(30, c.months.KISLEV, IGNORE_YEAR), // yes, i know these are wrong
-		['Chanukah: 6th Candle', null, 'חנוכה: נר ו\''],
+		new HDate(30, KISLEV, IGNORE_YEAR), // yes, i know these are wrong
+		Chanukah(6),
 		0
 	), new Event(
-		new HDate(31, c.months.KISLEV, IGNORE_YEAR), // HDate() corrects the month automatically
-		['Chanukah: 7th Candle', null, 'חנוכה: נר ז\''],
+		new HDate(31, KISLEV, IGNORE_YEAR), // HDate() corrects the month automatically
+		Chanukah(7),
 		0
 	), new Event(
-		new HDate(32, c.months.KISLEV, IGNORE_YEAR),
-		['Chanukah: 8th Candle', null, 'חנוכה: נר ח\''],
+		new HDate(32, KISLEV, IGNORE_YEAR),
+		Chanukah(8),
 		0
 	), new Event(
 		new HDate(15, c.months.SHVAT, IGNORE_YEAR),
-		['Tu B\'Shvat', null, 'ט"ו בשבט'],
+		['Tu B\'Shvat', 0, 'ט"ו בשבט'],
 		0
 	), new Event(
-		new HDate(14, c.months.NISAN, IGNORE_YEAR),
-		['Erev Pesach', null, 'ערב פסח'],
+		new HDate(14, NISAN, IGNORE_YEAR),
+		['Erev Pesach', 0, 'ערב פסח'],
 		LIGHT_CANDLES
 	), new Event(
-		new HDate(15, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 1', null, 'פסח יום א\''],
+		new HDate(15, NISAN, IGNORE_YEAR),
+		Pesach(1),
 		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
-		new HDate(15, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 1', null, 'פסח יום א\''],
+		new HDate(15, NISAN, IGNORE_YEAR),
+		Pesach(1),
 		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
-		new HDate(16, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 2', null, 'פסח יום ב\''],
+		new HDate(16, NISAN, IGNORE_YEAR),
+		Pesach(2),
 		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
-		new HDate(16, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 2 (CH"M)', null, 'פסח יום ב\' )חה"ם('],
+		new HDate(16, NISAN, IGNORE_YEAR),
+		CHM(Pesach(2)),
 		IL_ONLY
 	), new Event(
-		new HDate(16, c.months.NISAN, IGNORE_YEAR),
-		['Start counting Omer', null, 'התחלת ספירת העומר'],
+		new HDate(16, NISAN, IGNORE_YEAR),
+		['Start counting Omer', 0, 'התחלת ספירת העומר'],
 		0
 	), new Event(
-		new HDate(17, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 3 (CH"M)', null, 'פסח יום ג\' )חה"ם('],
+		new HDate(17, NISAN, IGNORE_YEAR),
+		CHM(Pesach(3)),
 		0
 	), new Event(
-		new HDate(18, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 4 (CH"M)', null, 'פסח יום ד\' )חה"ם('],
+		new HDate(18, NISAN, IGNORE_YEAR),
+		CHM(Pesach(4)),
 		0
 	), new Event(
-		new HDate(19, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 5 (CH"M)', null, 'פסח יום ה\' )חה"ם('],
+		new HDate(19, NISAN, IGNORE_YEAR),
+		CHM(Pesach(5)),
 		0
 	), new Event(
-		new HDate(20, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 6 (CH"M)', null, 'פסח יום ו\' )חה"ם('],
+		new HDate(20, NISAN, IGNORE_YEAR),
+		CHM(Pesach(6)),
 		LIGHT_CANDLES
 	), new Event(
-		new HDate(21, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 7', null, 'פסח יום ז\''],
+		new HDate(21, NISAN, IGNORE_YEAR),
+		Pesach(7),
 		LIGHT_CANDLES_TZEIS | CHUL_ONLY
 	), new Event(
-		new HDate(21, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 7', null, 'פסח יום ז\''],
+		new HDate(21, NISAN, IGNORE_YEAR),
+		Pesach(7),
 		YOM_TOV_ENDS | IL_ONLY
 	), new Event(
-		new HDate(22, c.months.NISAN, IGNORE_YEAR),
-		['Pesach 8', null, 'פסח יום ח\''],
+		new HDate(22, NISAN, IGNORE_YEAR),
+		Pesach(8),
 		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(14, c.months.IYYAR, IGNORE_YEAR),
-		['Pesach Sheni', null, 'פסח שני'],
+		['Pesach Sheni', 0, 'פסח שני'],
 		0
 	), new Event(
 		new HDate(18, c.months.IYYAR, IGNORE_YEAR),
-		['Lag B\'Omer', null, 'ל"ג בעומר'],
+		['Lag B\'Omer', 0, 'ל"ג בעומר'],
 		0
 	), new Event(
 		new HDate(5, c.months.SIVAN, IGNORE_YEAR),
@@ -2777,7 +2797,7 @@ var standards = [ // standard holidays that don't shift based on year
 		YOM_TOV_ENDS | CHUL_ONLY
 	), new Event(
 		new HDate(29, c.months.ELUL, IGNORE_YEAR),
-		['Erev Rosh Hashana', null, 'ערב ראש השנה'],
+		['Erev Rosh Hashana', 0, 'ערב ראש השנה'],
 		LIGHT_CANDLES
 	)
 ];
@@ -2785,141 +2805,141 @@ var standards = [ // standard holidays that don't shift based on year
 exports.getHolidaysForYear = function getHolidaysForYear(year) {
 	var h = standards.slice(), // clone
 
-		RH = new HDate(1, c.months.TISHREI, year),
-		pesach = new HDate(15, c.months.NISAN, year),
+		RH = new HDate(1, TISHREI, year),
+		pesach = new HDate(15, NISAN, year),
 		tmpDate;
 
-	h.push(new Event(
+	h[push](new Event(
 		RH,
-		['Rosh Hashana 1', null, 'ראש השנה א\''],
+		['Rosh Hashana 1', 0, 'ראש השנה א\''],
 		LIGHT_CANDLES_TZEIS
 	));
 
-	h.push(new Event(
-		new HDate(3 + (RH.getDay() == c.days.THU), c.months.TISHREI, year), // push off to SUN if RH is THU
-		['Tzom Gedaliah', null, 'צום גדליה'],
+	h[push](new Event(
+		new HDate(3 + (RH[getDay]() == c.days.THU), TISHREI, year), // push off to SUN if RH is THU
+		['Tzom Gedaliah', 0, 'צום גדליה'],
 		0
 	));
 
-	h.push(new Event( // first SAT after RH
-		new HDate(c.day_on_or_before(c.days.SAT, 7 + RH.abs())),
-		['Shabbat Shuva', 'Shabbos Shuvah', 'שבת שובה'],
+	h[push](new Event( // first SAT after RH
+		new HDate(day_on_or_before(SAT, 7 + RH[abs]())),
+		[Shabbat + ' Shuva', Shabbos + ' Shuvah', 'שבת שובה'],
 		0
 	));
 
 	tmpDate = new HDate(10, c.months.TEVET, year);
-	if (tmpDate.getDay() === c.days.SAT) {
+	if (tmpDate[getDay]() === SAT) {
 		tmpDate = tmpDate.next();
 	}
-	h.push(new Event(
+	h[push](new Event(
 		tmpDate,
-		['Asara B\'Tevet', null, 'עשרה בטבת'],
+		['Asara B\'Tevet', 0, 'עשרה בטבת'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, pesach.abs() - 43)),
-		['Shabbat Shekalim', 'Shabbos Shekalim', 'שבת שקלים'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, pesach[abs]() - 43)),
+		[Shabbat + ' Shekalim', Shabbos + ' Shekalim', 'שבת שקלים'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, pesach.abs() - 30)),
-		['Shabbat Zachor', 'Shabbos Zachor', 'שבת זכור'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, pesach[abs]() - 30)),
+		[Shabbat + ' Zachor', Shabbos + ' Zachor', 'שבת זכור'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(pesach.abs() - (pesach.getDay() == c.days.TUE ? 33 : 31)),
+	h[push](new Event(
+		new HDate(pesach[abs]() - (pesach[getDay]() == c.days.TUE ? 33 : 31)),
 		['Ta\'anit Esther', 'Ta\'anis Esther', 'תענית אסתר'],
 		0
 	));
 
 	if (c.LEAP_YR_HEB(year)) {
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(14, c.months.ADAR_I, year),
-			['Purim Katan', null, 'פורים קטן'],
+			['Purim Katan', 0, 'פורים קטן'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(15, c.months.ADAR_I, year),
-			['Shushan Purim Katan', null, 'שושן פורים קטן'],
+			['Shushan Purim Katan', 0, 'שושן פורים קטן'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(13, c.months.ADAR_II, year),
-			['Erev Purim', null, 'ערב פורים'],
+			['Erev Purim', 0, 'ערב פורים'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(14, c.months.ADAR_II, year),
-			['Purim', null, 'פורים'],
+			['Purim', 0, 'פורים'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(15, c.months.ADAR_II, year),
-			['Shushan Purim', null, 'שושן פורים'],
+			['Shushan Purim', 0, 'שושן פורים'],
 			0
 		));
 	} else {
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(13, c.months.ADAR_I, year),
-			['Erev Purim', null, 'ערב פורים'],
+			['Erev Purim', 0, 'ערב פורים'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(14, c.months.ADAR_I, year),
-			['Purim', null, 'פורים'],
+			['Purim', 0, 'פורים'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(15, c.months.ADAR_I, year),
-			['Shushan Purim', null, 'שושן פורים'],
+			['Shushan Purim', 0, 'שושן פורים'],
 			0
 		));
 	}
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, pesach.abs() - 14) - 7),
-		['Shabbat Parah', 'Shabbos Parah', 'שבת פרה'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, pesach[abs]() - 14) - 7),
+		[Shabbat + ' Parah', Shabbos + ' Parah', 'שבת פרה'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, pesach.abs() - 14)),
-		['Shabbat Hachodesh', 'Shabbos Hachodesh', 'שבת החודש'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, pesach[abs]() - 14)),
+		[Shabbat + ' Hachodesh', Shabbos + ' Hachodesh', 'שבת החודש'],
 		0
 	));
 
-	if (pesach.prev().getDay() == c.days.SAT) {
+	if (pesach.prev()[getDay]() == SAT) {
 		// if the fast falls on Shabbat, move to Thursday
-		h.push(new Event(
-			new HDate(c.day_on_or_before(c.days.THU, pesach.abs())),
+		h[push](new Event(
+			new HDate(day_on_or_before(c.days.THU, pesach[abs]())),
 			['Ta\'anit Bechorot', 'Ta\'anis Bechoros', 'תענית בכורות'],
 			0
 		));
 	} else {
-		h.push(new Event(
-			new HDate(14, c.months.NISAN, year),
+		h[push](new Event(
+			new HDate(14, NISAN, year),
 			['Ta\'anit Bechorot', 'Ta\'anis Bechoros', 'תענית בכורות'],
 			0
 		));
 	}
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, pesach.abs() - 1)),
-		['Shabbat HaGadol', 'Shabbos HaGadol', 'שבת הגדול'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, pesach[abs]() - 1)),
+		[Shabbat + ' HaGadol', Shabbos + ' HaGadol', 'שבת הגדול'],
 		0
 	));
 
 	if (year >= 5711) { // Yom HaShoah first observed in 1951
-		tmpDate = new HDate(27, c.months.NISAN, year);
+		tmpDate = new HDate(27, NISAN, year);
 		/* When the actual date of Yom Hashoah falls on a Friday, the
 		 * state of Israel observes Yom Hashoah on the preceding
 		 * Thursday. When it falls on a Sunday, Yom Hashoah is observed
@@ -2927,15 +2947,15 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 		 * http://www.ushmm.org/remembrance/dor/calendar/
 		 */
 
-		if (tmpDate.getDay() === c.days.FRI) {
+		if (tmpDate[getDay]() === c.days.FRI) {
 			tmpDate = tmpDate.prev();
-		} else if (tmpDate.getDay() === c.days.SUN) {
+		} else if (tmpDate[getDay]() === c.days.SUN) {
 			tmpDate = tmpDate.next();
 		}
 
-		h.push(new Event(
+		h[push](new Event(
 			tmpDate,
-			['Yom HaShoah', null, 'יום השואה'],
+			['Yom HaShoah', 0, 'יום השואה'],
 			0
 		));
 	}
@@ -2943,116 +2963,116 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 	if (year >= 5711) { // Yom HaAtzma'ut only celebrated after 1948
 		tmpDate = new HDate(1, c.months.IYYAR, year);
 
-		if (pesach.getDay() === c.days.SUN) {
+		if (pesach[getDay]() === c.days.SUN) {
 			tmpDate.setDate(2);
-		} else if (pesach.getDay() === c.days.SAT) {
+		} else if (pesach[getDay]() === SAT) {
 			tmpDate.setDate(3);
 		} else if (year < 5764) {
 			tmpDate.setDate(4);
-		} else if (pesach.getDay() === c.days.TUE) {
+		} else if (pesach[getDay]() === c.days.TUE) {
 			tmpDate.setDate(5);
 		} else {
 			tmpDate.setDate(4);
 		}
 
-		h.push(new Event(
+		h[push](new Event(
 			tmpDate,
-			['Yom HaZikaron', null, 'יום הזיכרון'],
+			['Yom HaZikaron', 0, 'יום הזיכרון'],
 			0
 		));
 
-		h.push(new Event(
+		h[push](new Event(
 			tmpDate.next(),
-			['Yom HaAtzma\'ut', null, 'יום העצמאות'],
+			['Yom HaAtzma\'ut', 0, 'יום העצמאות'],
 			0
 		));
 	}
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
-		h.push(new Event(
+		h[push](new Event(
 			new HDate(29, c.months.IYYAR, year),
-			['Yom Yerushalayim', null, 'יום ירושלים'],
+			['Yom Yerushalayim', 0, 'יום ירושלים'],
 			0
 		));
 	}
 
 	tmpDate = new HDate(17, c.months.TAMUZ, year);
-	if (tmpDate.getDay() === c.days.SAT) {
+	if (tmpDate[getDay]() === SAT) {
 		tmpDate = tmpDate.next();
 	}
-	h.push(new Event(
+	h[push](new Event(
 		tmpDate,
-		['Shiva-Asar B\'Tamuz', null, 'צום יז\' בתמוז'],
+		['Shiva-Asar B\'Tamuz', 0, 'צום יז\' בתמוז'],
 		0
 	));
 
 	tmpDate = new HDate(9, c.months.AV, year);
-	if (tmpDate.getDay() === c.days.SAT) {
+	if (tmpDate[getDay]() === SAT) {
 		tmpDate = tmpDate.next();
 	}
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, tmpDate.abs())),
-		['Shabbat Chazon', 'Shabbos Chazon', 'שבת חזון'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, tmpDate[abs]())),
+		[Shabbat + ' Chazon', Shabbos + ' Chazon', 'שבת חזון'],
 		0
 	));
 
-	h.push(new Event(
+	h[push](new Event(
 		tmpDate.prev(),
-		['Erev Tish\'a B\'Av', null, 'ערב תשעה באב'],
+		['Erev Tish\'a B\'Av', 0, 'ערב תשעה באב'],
 		0
 	));
 
-	h.push(new Event(
+	h[push](new Event(
 		tmpDate,
-		['Tish\'a B\'Av', null, 'תשעה באב'],
+		['Tish\'a B\'Av', 0, 'תשעה באב'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, tmpDate.abs() + 7)),
-		['Shabbat Nachamu', 'Shabbos Nachamu', 'שבת נחמו'],
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, tmpDate[abs]() + 7)),
+		[Shabbat + ' Nachamu', Shabbos + ' Nachamu', 'שבת נחמו'],
 		0
 	));
 
-	h.push(new Event(
-		new HDate(c.day_on_or_before(c.days.SAT, new HDate(1, c.months.TISHREI, year + 1).abs() - 4)),
+	h[push](new Event(
+		new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year + 1)[abs]() - 4)),
 		['Leil Selichot', 'Leil Selichos', 'ליל סליחות'],
 		0
 	));
 
 	for (var day = 6; day < c.days_in_heb_year(year); day += 7) {
-		h.push(new Event(
-			new HDate(c.day_on_or_before(c.days.SAT, new HDate(1, c.months.TISHREI, year).abs() + day)),
+		h[push](new Event(
+			new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
 			['Shabbat', 'Shabbos', 'שבת'],
 			YOM_TOV_ENDS
 		));
 
-		h.push(new Event(
-			new HDate(c.day_on_or_before(c.days.FRI, new HDate(1, c.months.TISHREI, year).abs() + day)),
+		h[push](new Event(
+			new HDate(day_on_or_before(c.days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
 			['Erev Shabbat', 'Erev Shabbos', 'ערב שבת'],
 			LIGHT_CANDLES
 		));
 	}
 
 	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
-		if ((month === c.months.NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
+		if ((month === NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
 				c.max_days_in_heb_month(month - 1, year)) == 30) {
-			h.push(new Event(
+			h[push](new Event(
 				new HDate(1, month, year),
-				['Rosh Chodesh 2', null, 'ראש חודש ב\''],
+				['Rosh Chodesh 2', 0, 'ראש חודש ב\''],
 				0
 			));
 
-			h.push(new Event(
+			h[push](new Event(
 				new HDate(30, month - 1, year),
-				['Rosh Chodesh 1', null, 'ראש חודש א\''],
+				['Rosh Chodesh 1', 0, 'ראש חודש א\''],
 				0
 			));
-		} else if (month !== c.months.TISHREI) {
-			h.push(new Event(
+		} else if (month !== TISHREI) {
+			h[push](new Event(
 				new HDate(1, month, year),
-				['Rosh Chodesh', null, 'ראש חודש'],
+				['Rosh Chodesh', 0, 'ראש חודש'],
 				0
 			));
 		}
@@ -3061,9 +3081,9 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 			continue;
 		}
 
-		h.push(new Event(
-			new HDate(29, month, year).onOrBefore(c.days.SAT),
-			['Shabbat Mevarchim', 'Shabbos Mevorchim', 'שבת מברכים'],
+		h[push](new Event(
+			new HDate(29, month, year).onOrBefore(SAT),
+			[Shabbat + ' Mevarchim', Shabbos + ' Mevorchim', 'שבת מברכים'],
 			0
 		));
 	}
@@ -3379,7 +3399,7 @@ var INCOMPLETE = 0,
 	REGULAR = 1,
 	COMPLETE = 2;
 
-function Sedra(hebYr, israel_sw) { /* the hebrew year */
+function Sedra(hebYr, israel_sw) { // the Hebrew year
 	israel_sw = !!israel_sw;
 	var long_c = c.long_cheshvan(hebYr);
 	var short_k = c.short_kislev(hebYr);
@@ -3396,7 +3416,7 @@ function Sedra(hebYr, israel_sw) { /* the hebrew year */
 	var rosh_hashana = new HDate(1, c.months.TISHREI, hebYr).abs();
 	var rosh_hashana_day = (rosh_hashana % 7) + 1;
 
-	/* find the first saturday on or after Rosh Hashana */
+	// find the first Saturday on or after Rosh Hashana
 	this.first_saturday = c.day_on_or_before(6, rosh_hashana + 6);
 	var leap = +c.LEAP_YR_HEB(hebYr);
 	this.type = type;
@@ -3419,58 +3439,58 @@ function Sedra(hebYr, israel_sw) { /* the hebrew year */
 
 var parshiot = [
 	[ 'Bereshit', 'Bereshis', 'בראשית' ],
-	[ 'Noach', null, 'נח' ],
-	[ 'Lech-Lecha', null, 'לך-לך' ],
-	[ 'Vayera', null, 'וירא' ],
-	[ 'Chayei Sara', null, 'חי שרה' ],
+	[ 'Noach', 0, 'נח' ],
+	[ 'Lech-Lecha', 0, 'לך-לך' ],
+	[ 'Vayera', 0, 'וירא' ],
+	[ 'Chayei Sara', 0, 'חי שרה' ],
 	[ 'Toldot', 'Toldos', 'תולדות' ],
-	[ 'Vayetzei', null, 'ויצא' ],
-	[ 'Vayishlach', null, 'וישלח' ],
-	[ 'Vayeshev', null, 'וישב' ],
-	[ 'Miketz', null, 'מקץ' ],
-	[ 'Vayigash', null, 'ויגש' ],
-	[ 'Vayechi', null, 'ויחי' ],
+	[ 'Vayetzei', 0, 'ויצא' ],
+	[ 'Vayishlach', 0, 'וישלח' ],
+	[ 'Vayeshev', 0, 'וישב' ],
+	[ 'Miketz', 0, 'מקץ' ],
+	[ 'Vayigash', 0, 'ויגש' ],
+	[ 'Vayechi', 0, 'ויחי' ],
 	[ 'Shemot', 'Shemos', 'שמות' ],
-	[ 'Vaera', null, 'וארא' ],
-	[ 'Bo', null, 'בא' ],
-	[ 'Beshalach', null, 'בשלח' ],
+	[ 'Vaera', 0, 'וארא' ],
+	[ 'Bo', 0, 'בא' ],
+	[ 'Beshalach', 0, 'בשלח' ],
 	[ 'Yitro', 'Yisro', 'יתרו' ],
-	[ 'Mishpatim', null, 'משפטים' ],
-	[ 'Terumah', null, 'תרומה' ],
-	[ 'Tetzaveh', null, 'תצוה' ],
+	[ 'Mishpatim', 0, 'משפטים' ],
+	[ 'Terumah', 0, 'תרומה' ],
+	[ 'Tetzaveh', 0, 'תצוה' ],
 	[ 'Ki Tisa', 'Ki Sisa', 'כי תשא' ],
-	[ 'Vayakhel', null, 'ויקהל' ],
-	[ 'Pekudei', null, 'פקודי' ],
-	[ 'Vayikra', null, 'ויקרא' ],
-	[ 'Tzav', null, 'צו' ],
-	[ 'Shmini', null, 'שמיני' ],
-	[ 'Tazria', null, 'תזריע' ],
-	[ 'Metzora', null, 'מצרע' ],
+	[ 'Vayakhel', 0, 'ויקהל' ],
+	[ 'Pekudei', 0, 'פקודי' ],
+	[ 'Vayikra', 0, 'ויקרא' ],
+	[ 'Tzav', 0, 'צו' ],
+	[ 'Shmini', 0, 'שמיני' ],
+	[ 'Tazria', 0, 'תזריע' ],
+	[ 'Metzora', 0, 'מצרע' ],
 	[ 'Achrei Mot', 'Achrei Mos', 'אחרי מות' ],
-	[ 'Kedoshim', null, 'קדשים' ],
-	[ 'Emor', null, 'אמור' ],
-	[ 'Behar', null, 'בהר' ],
+	[ 'Kedoshim', 0, 'קדשים' ],
+	[ 'Emor', 0, 'אמור' ],
+	[ 'Behar', 0, 'בהר' ],
 	[ 'Bechukotai', 'Bechukosai', 'בחקתי' ],
-	[ 'Bamidbar', null, 'במדבר' ],
-	[ 'Nasso', null, 'נשא' ],
+	[ 'Bamidbar', 0, 'במדבר' ],
+	[ 'Nasso', 0, 'נשא' ],
 	[ 'Beha\'alotcha', 'Beha\'aloscha', 'בהעלתך' ],
-	[ 'Sh\'lach', null, 'שלח לך' ],
-	[ 'Korach', null, 'קורח' ],
+	[ 'Sh\'lach', 0, 'שלח לך' ],
+	[ 'Korach', 0, 'קורח' ],
 	[ 'Chukat', 'Chukas', 'חקת' ],
-	[ 'Balak', null, 'בלק' ],
-	[ 'Pinchas', null, 'פינחס' ],
+	[ 'Balak', 0, 'בלק' ],
+	[ 'Pinchas', 0, 'פינחס' ],
 	[ 'Matot', 'Matos', 'מטות' ],
-	[ 'Masei', null, 'מסעי' ],
-	[ 'Devarim', null, 'דברים' ],
+	[ 'Masei', 0, 'מסעי' ],
+	[ 'Devarim', 0, 'דברים' ],
 	[ 'Vaetchanan', 'V\'eschanan', 'ואתחנן' ],
-	[ 'Eikev', null, 'עקב' ],
-	[ 'Re\'eh', null, 'ראה' ],
-	[ 'Shoftim', null, 'שופטים' ],
+	[ 'Eikev', 0, 'עקב' ],
+	[ 'Re\'eh', 0, 'ראה' ],
+	[ 'Shoftim', 0, 'שופטים' ],
 	[ 'Ki Teitzei', 'Ki Seitzei', 'כי תצא' ],
 	[ 'Ki Tavo', 'Ki Savo', 'כי תבוא' ],
-	[ 'Nitzavim', null, 'נצבים' ],
-	[ 'Vayeilech', null, 'וילך' ],
-	[ 'Ha\'Azinu', null, 'האזינו' ]
+	[ 'Nitzavim', 0, 'נצבים' ],
+	[ 'Vayeilech', 0, 'וילך' ],
+	[ 'Ha\'Azinu', 0, 'האזינו' ]
 ];
 
 
@@ -3479,17 +3499,17 @@ function D(p) {
 	return -p;
 }
 
-var RH = [ 'Rosh Hashana', null, 'ראש השנה' ]; //0
-var YK = [ 'Yom Kippur', null, 'יום כיפור' ];  //1
+var RH = [ 'Rosh Hashana', 0, 'ראש השנה' ]; //0
+var YK = [ 'Yom Kippur', 0, 'יום כיפור' ];  //1
 
 var SUKKOT = [ 'Sukkot', 'Succos', 'סוכות' ];  //0
 var CHMSUKOT = [ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ];  //0
 var SHMINI = [ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ];  //0
 var EOY = [ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות וסמחת תורה' ];  //0
 
-var PESACH = [ 'Pesach', null, 'פסח' ]; //25
-var CHMPESACH = [ 'Chol hamoed Pesach', null, 'חול המועד פסח' ];  //25
-var PESACH7 = [ 'Second days of Pesach', null, 'שביעי של פסח' ]; //25
+var PESACH = [ 'Pesach', 0, 'פסח' ]; //25
+var CHMPESACH = [ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ];  //25
+var PESACH7 = [ 'Second days of Pesach', 0, 'שביעי של פסח' ]; //25
 
 var SHAVUOT = [ 'Shavuot', 'Shavuos', 'שבועות' ]; //33
 

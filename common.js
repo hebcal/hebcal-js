@@ -44,36 +44,36 @@ var months = exports.months = {
 
 exports.monthNames = [
 	[
-		["VOID",null,"VOID"],
-		["Nisan",null,"ניסן"],
-		["Iyyar",null,"אייר"],
-		["Sivan",null,"סיון"],
-		["Tamuz",null,"תמוז"],
-		["Av",null,"אב"],
-		["Elul",null,"אלול"],
-		["Tishrei",null,"תשרי"],
-		["Cheshvan",null,"חשון"],
-		["Kislev",null,"כסלו"],
-		["Tevet",null,"טבת"],
-		["Sh'vat",null,"שבט"],
-		["Adar",null,"אדר"],
-		["Nisan",null,"ניסן"]
+		["", 0, ""],
+		["Nisan", 0, "ניסן"],
+		["Iyyar", 0, "אייר"],
+		["Sivan", 0, "סיון"],
+		["Tamuz", 0, "תמוז"],
+		["Av", 0, "אב"],
+		["Elul", 0, "אלול"],
+		["Tishrei", 0, "תשרי"],
+		["Cheshvan", 0, "חשון"],
+		["Kislev", 0, "כסלו"],
+		["Tevet", 0, "טבת"],
+		["Sh'vat", 0, "שבט"],
+		["Adar", 0, "אדר"],
+		["Nisan", 0, "ניסן"]
 	], [
-		["VOID",null,"VOID"],
-		["Nisan",null,"ניסן"],
-		["Iyyar",null,"אייר"],
-		["Sivan",null,"סיון"],
-		["Tamuz",null,"תמוז"],
-		["Av",null,"אב"],
-		["Elul",null,"אלול"],
-		["Tishrei",null,"תשרי"],
-		["Cheshvan",null,"חשון"],
-		["Kislev",null,"כסלו"],
-		["Tevet",null,"טבת"],
-		["Sh'vat",null,"שבט"],
-		["Adar I",null,"אדר א'"],
-		["Adar II",null,"אדר ב'"],
-		["Nisan",null,"ניסן"]
+		["", 0, ""],
+		["Nisan", 0, "ניסן"],
+		["Iyyar", 0, "אייר"],
+		["Sivan", 0, "סיון"],
+		["Tamuz", 0, "תמוז"],
+		["Av", 0, "אב"],
+		["Elul", 0, "אלול"],
+		["Tishrei", 0, "תשרי"],
+		["Cheshvan", 0, "חשון"],
+		["Kislev", 0, "כסלו"],
+		["Tevet", 0, "טבת"],
+		["Sh'vat", 0, "שבט"],
+		["Adar I", 0, "אדר א'"],
+		["Adar II", 0, "אדר ב'"],
+		["Nisan", 0, "ניסן"]
 	]
 ];
 
@@ -87,22 +87,20 @@ exports.days = {
 	SAT: 6
 };
 
-function LANGUAGE(str, opts){
+exports.LANGUAGE = function LANGUAGE(str, opts){
 	return (opts === 'h' && str[2] ? str[2] : (opts === 'a' && str[1] ? str[1] : str[0]));
-}
-exports.LANGUAGE = LANGUAGE;
+};
 
 function LEAP_YR_HEB(x) {
 	return (1 + x * 7) % 19 < 7 ? true : false;
 }
 exports.LEAP_YR_HEB = LEAP_YR_HEB;
 
-function MONTHS_IN_HEB(x) {
+exports.MONTHS_IN_HEB = function MONTHS_IN_HEB(x) {
 	return 12 + LEAP_YR_HEB(x); // boolean is cast to 1 or 0
-}
-exports.MONTHS_IN_HEB = MONTHS_IN_HEB;
+};
 
-function max_days_in_heb_month(month, year) {
+exports.max_days_in_heb_month = function max_days_in_heb_month(month, year) {
 	return 30 - (month == months.IYYAR ||
 	month == months.TAMUZ || 
 	month == months.ELUL ||
@@ -111,8 +109,7 @@ function max_days_in_heb_month(month, year) {
 	(month == months.ADAR_I && !LEAP_YR_HEB(year)) ||
 	(month == months.CHESHVAN && !long_cheshvan(year)) ||
 	(month == months.KISLEV && short_kislev(year)));
-}
-exports.max_days_in_heb_month = max_days_in_heb_month;
+};
 
 
 /* Days from sunday prior to start of hebrew calendar to mean
@@ -172,7 +169,7 @@ function short_kislev(year) {
 }
 exports.short_kislev = short_kislev;
 
-function lookup_hebrew_month(c) {
+exports.lookup_hebrew_month = function lookup_hebrew_month(c) {
   /* the Hebrew months are unique to their second letter
 	 N         nisan  (november?)
 	 I         iyyar
@@ -274,8 +271,7 @@ function lookup_hebrew_month(c) {
 		default:
 			return 0;
 	}
-}
-exports.lookup_hebrew_month = lookup_hebrew_month;
+};
 
 /* Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d.  Similarly, applying it to d+3 gives the DAYNAME nearest to
@@ -283,12 +279,11 @@ exports.lookup_hebrew_month = lookup_hebrew_month;
  * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
 
 **/
-function day_on_or_before(day_of_week, absdate) {
+exports.day_on_or_before = function day_on_or_before(day_of_week, absdate) {
 	return absdate - ((absdate - day_of_week) % 7);
-}
-exports.day_on_or_before = day_on_or_before;
+};
 
-function map(self, fun, thisp, sameprops) {
+exports.map = function map(self, fun, thisp, sameprops) {
 	// originally written for http://github.com/Scimonster/localbrowse
 	if (self === null || typeof fun != 'function') {
 		throw new TypeError();
@@ -313,16 +308,13 @@ function map(self, fun, thisp, sameprops) {
 		for (i in res) {
 			arr[Number(i)] = res[i];
 		}
-		res = arr.filter(function (v) {
-			return v;
-		}); // for...in isn't guaranteed to give any meaningful order
+		res = filter(arr, true); // for...in isn't guaranteed to give any meaningful order
 		if (typeof self == 'string') {
 			res = res.join('');
 		}
 	}
 	return res;
-}
-exports.map = map;
+};
 
 function filter(self, fun, thisp) {
 	if (self === null) {
@@ -383,7 +375,7 @@ function filter(self, fun, thisp) {
 		res = arr.filter(function (v) {
 			return v;
 		}); // for...in isn't guaranteed to give any meaningful order
-		// can't use obj.filter(arr,true) here because that would infitely recurse
+		// can't use c.filter(arr,true) here because that would infitely recurse
 		if (typeof self == 'string') {
 			res = res.join('');
 		}
@@ -392,7 +384,7 @@ function filter(self, fun, thisp) {
 }
 exports.filter = filter;
 
-function gematriya(num, limit) {
+exports.gematriya = function gematriya(num, limit) {
 	if (typeof num !== 'number' && typeof num !== 'string') {
 		throw new TypeError('non-number or string given to gematriya()');
 	}
@@ -491,10 +483,9 @@ function gematriya(num, limit) {
 
 		return num.join('');
 	}
-}
-exports.gematriya = gematriya;
+};
 
-function range(start, end, step) {
+exports.range = function range(start, end, step) {
 	step = step || 1;
 	if (step < 0) {
 		step = 0 - step;
@@ -511,5 +502,4 @@ function range(start, end, step) {
 		}
 	}
 	return arr;
-}
-exports.range = range;
+};

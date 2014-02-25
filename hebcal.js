@@ -40,7 +40,8 @@ var prototype = 'prototype',
 	defProp = Object.defineProperty,
 	find = 'find',
 	strings = 'strings',
-	Month = 'Month';
+	Month = 'Month',
+	TE = TypeError;
 
 // Main Hebcal function
 
@@ -49,7 +50,7 @@ function Hebcal(year, month) {
 		year = (new HDate()).getFullYear(); // this year;
 	}
 	if (typeof year !== 'number') {
-		throw new TypeError('year to Hebcal() is not a number');
+		throw new TE('year to Hebcal() is not a number');
 	}
 	this.year = year;
 	if (month) {
@@ -77,7 +78,7 @@ function Hebcal(year, month) {
 				}).length;
 			}, this);
 		} else {
-			throw new TypeError('month to Hebcal is not a valid type');
+			throw new TE('month to Hebcal is not a valid type');
 		}
 	} else {
 		return new Hebcal(year, c.range(1, c.MONTHS_IN_HEB(year)));
@@ -193,7 +194,7 @@ Hebcal[prototype].filter = function filter() {
 
 Hebcal[prototype].addHoliday = function addHoliday(holiday) {
 	if (!(holiday instanceof holidays.Event)) {
-		throw new TypeError('non-Event passed to addHoliday()');
+		throw new TE('non-Event passed to addHoliday()');
 	}
 	this.holidays.push(holiday);
 	return this;
@@ -344,10 +345,10 @@ Hebcal[Month] = function Month(month, year) {
 		month = c.lookup_hebrew_month(month);
 	}
 	if (typeof month != 'number') {
-		throw new TypeError('month to Hebcal.Month is not a valid type');
+		throw new TE('month to Hebcal.Month is not a valid type');
 	}
 	if (typeof year != 'number') {
-		throw new TypeError('year to Hebcal.Month is not a number');
+		throw new TE('year to Hebcal.Month is not a number');
 	}
 	this.month = month;
 	this.year = year;
@@ -739,7 +740,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 		return new Hebcal.GregYear(d.getFullYear(), month);
 	}
 	if (typeof year !== 'number') {
-		throw new TypeError('year to Hebcal.GregYear() is not a number');
+		throw new TE('year to Hebcal.GregYear() is not a number');
 	}
 	this.year = year;
 
@@ -762,7 +763,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 				return m;
 			}, this);
 		} else {
-			throw new TypeError('month to Hebcal.GregYear() is not a valid type');
+			throw new TE('month to Hebcal.GregYear() is not a valid type');
 		}
 	} else {
 		return new Hebcal.GregYear(year, c.range(1, 12));
@@ -869,10 +870,10 @@ Hebcal.GregMonth = function GregMonth(month, year) {
 		month = greg.lookupMonthNum(month);
 	}
 	if (typeof month != 'number') {
-		throw new TypeError('month to Hebcal.GregMonth is not a valid type');
+		throw new TE('month to Hebcal.GregMonth is not a valid type');
 	}
 	if (typeof year != 'number') {
-		throw new TypeError('year to Hebcal.GregMonth is not a number');
+		throw new TE('year to Hebcal.GregMonth is not a number');
 	}
 
 	this.year = year;
