@@ -2517,7 +2517,9 @@ module.exports = Hebcal;
  */
 var c = require('./common'), HDate = require('./hdate');
 
-// for optimizations
+var __cache = {};
+
+// for byte optimizations
 
 var day_on_or_before = c.day_on_or_before,
 	TISHREI = c.months.TISHREI,
@@ -2824,6 +2826,10 @@ var standards = [ // standard holidays that don't shift based on year
 ];
 
 exports.getHolidaysForYear = function getHolidaysForYear(year) {
+	if (__cache[year]) {
+		return __cache[year];
+	}
+
 	var h = standards.slice(), // clone
 
 		RH = new HDate(1, TISHREI, year),
@@ -3109,7 +3115,7 @@ exports.getHolidaysForYear = function getHolidaysForYear(year) {
 		));
 	}
 
-	return h;
+	return (__cache[year] = h);
 };
 },{"./common":3,"./hdate":6}],9:[function(require,module,exports){
 /*
