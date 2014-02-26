@@ -1678,6 +1678,14 @@ Hebcal[prototype].addHoliday = function addHoliday(holiday) {
 	return this;
 };
 
+Hebcal[prototype].findParsha = function findParsha(parsha, o) {
+	var days = this.filter(function(d){
+		return d.getSedra(o).indexOf(parsha) + 1;
+	});
+	return days[days.length - 1];
+};
+Hebcal[prototype].findSedra = Hebcal[prototype].findParsha;
+
 Hebcal[prototype][find] = function find_f(day, month) {
 	if (arguments.length === 1) {
 		if (typeof day === 'string') {
@@ -1766,6 +1774,10 @@ Hebcal.range = c.range;
 Hebcal.gematriya = c.gematriya;
 
 Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not getHolidaysForYear()
+
+Hebcal.parshiot = Sedra.parshiot;
+
+Hebcal.LANGUAGE = c.LANGUAGE;
 
 defProp(Hebcal, 'defaultLocation', {
 	enumerable: true,
@@ -2026,11 +2038,20 @@ HDate[prototype].next = function next() {
 	}
 };
 
-HDate[prototype].getSedra = function getSedra(o) {
-	return (new Sedra(this.getFullYear(), this.il)).getFromHDate(this).map(function(p){
-		return c.LANGUAGE(p, o);
-	});
-};
+HDate[prototype].getSedra = (function(){
+	var __cache = {};
+
+	return function getSedra(o) {
+		var sedraYear = __cache[this.getFullYear()];
+		if (!sedraYear || (sedraYear.il != this.il)) {
+			sedraYear = __cache[this.getFullYear()] = new Sedra(this.getFullYear(), this.il);
+		}
+		return sedraYear.getFromHDate(this).map(function(p){
+			return c.LANGUAGE(p, o);
+		});
+	}
+})();
+HDate[prototype].getParsha = HDate[prototype].getSedra;
 
 HDate[prototype].holidays = function holidays() {
 	return this.getYearObject().holidays.filter(function(h){
@@ -3439,7 +3460,7 @@ function Sedra(hebYr, il) { // the Hebrew year
 	}
 }
 
-var parshiot = [
+var parshiot = Sedra.parshiot = [
 	[ 'Bereshit', 'Bereshis', 'בראשית' ], // 0
 	[ 'Noach', 0, 'נח' ],
 	[ 'Lech-Lecha', 0, 'לך-לך' ],

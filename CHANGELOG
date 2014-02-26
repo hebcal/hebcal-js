@@ -20,6 +20,10 @@ version 2.1 (2014-02-23 beta)
 	Have HDate().getMonthObject(), getYearObject(), getGregMonthObject(), getGregYearObject() always return a value, even if unaffiliated
 	Move client files to new folder
 	Change cities to use lat/long decimals
+	Cache results of HDate().getSedra()
+	Add HDate().getParsha() alias of getSedra()
+	Add Hebcal.parshiot and Hebcal.LANGUAGE
+	Add Hebcal().findParsha()
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

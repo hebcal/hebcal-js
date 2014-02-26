@@ -83,7 +83,7 @@ function Sedra(hebYr, il) { // the Hebrew year
 	}
 }
 
-var parshiot = [
+var parshiot = Sedra.parshiot = [
 	[ 'Bereshit', 'Bereshis', 'בראשית' ], // 0
 	[ 'Noach', 0, 'נח' ],
 	[ 'Lech-Lecha', 0, 'לך-לך' ],

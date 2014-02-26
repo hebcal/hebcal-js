@@ -20,7 +20,7 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.0. It is approximately equivalent to Hebcal C 3.14.
 I (Eyal) did not write Hebcal JS 1.0. 2.0 is a nearly-complete rewrite of it.
 
-The version documented here is 2.1.0 beta.
+The version documented here is 2.1.0 ~~beta~~ alpha.
 
 ## Contributors
 
@@ -222,6 +222,16 @@ year.addHoliday(new Hebcal.holidays.Event(new Date(2014,0,1), 'New Years Day', H
 
 See `Hebcal.holidays` for more information on creating an event.
 
+#### `Hebcal.prototype.findSedra(parsha, o)`
+
+Find the Shabbat on which a given parsha is read. The parsha name (first argument) should correspond to the language string ('s', 'a', or 'h') in the second argument. If no second argument is provided, the parsha should be in Sfardit.
+
+This method was added in v2.1.
+
+#### `Hebcal.prototype.findParsha(parsha, o)`
+
+An alias of `findSedra()`. This method was added in v2.1.
+
 #### `Hebcal.prototype.find()`
 
 A "magical" method that allows finding dates in the year. It supports several types of arguments, and is extensible. Returns an array of `Hebcal.HDate`s.
@@ -422,6 +432,14 @@ An alias of `Hebcal.holidays.Event.candleLighting`.
 ## `Hebcal.havdalah`
 
 An alias of `Hebcal.holidays.Event.havdalah`.
+
+## `Hebcal.parshiot`
+
+An array of parsha names. Each item in the array is a description array (see intro). The second item is often null, so it is worthwhile to use `Hebcal.LANGUAGE()` to extract the names. This property was added in v2.1.
+
+## `Hebcal.LANGUAGE(str, o)`
+
+Return a language from a string. `o` should be a standard options string. This is mostly internal, but can be useful with regards to `Hebcal.parshiot` (above), for listing parsha names in a certain language. This property was added in v2.1.
 
 ## `Hebcal.gematriya(string | num[, limit])`
 
@@ -689,6 +707,10 @@ new Hebcal.HDate(19,12,5773).getSedra() // [ 'Ki Tisa' ]
 new Hebcal.HDate(19,12,5773).getSedra('a') // [ 'Ki Tisa' ]
 new Hebcal.HDate(8,8,5774).getSedra('h') // [ 'לך-לך' ]
 ```
+
+### `Hebcal.HDate.prototype.getParsha(o)`
+
+An alias of `getSedra()`. Added v2.1.
 
 ### `Hebcal.HDate.prototype.setCity(city)`
 
