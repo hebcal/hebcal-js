@@ -72,11 +72,7 @@ function Hebcal(year, month) {
 				return m;
 			}, this);
 
-			this.holidays = holidays.getHolidaysForYear(year < 1 ? (new HDate()).getFullYear() : year).filter(function(h){
-				return this.months.filter(function(m){ // don't keep ones that are out of bounds
-					return m.month === h.date.getMonth();
-				}).length;
-			}, this);
+			this.holidays = [].concat.apply([], this.months.map(function(m){return m.holidays}));
 		} else {
 			throw new TE('month to Hebcal is not a valid type');
 		}
