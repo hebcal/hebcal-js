@@ -41,6 +41,8 @@ var prototype = 'prototype',
 	find = 'find',
 	strings = 'strings',
 	Month = 'Month',
+	GregYear = 'GregYear',
+	GregMonth = 'GregMonth',
 	TE = TypeError;
 
 // Main Hebcal function
@@ -151,9 +153,7 @@ Hebcal[prototype].prev = function prev() {
 };
 
 Hebcal[prototype].getMonth = function getMonth(month) {
-	month = typeof month === 'number' ? month :
-		month.charCodeAt(0) >= 1488 && month.charCodeAt(0) <= 1514 && /('|")/.test(month) ? c.gematriya(month) :
-			month.charCodeAt(0) >= 48 && month.charCodeAt(0) <= 57 /* number */ ? parseInt(month, 10) : c.lookup_hebrew_month(month);
+	month = c.monthNum(month);
 	if (month > this.months.length) {
 		return this.next().getMonth(month - this.months.length);
 	}
@@ -225,10 +225,7 @@ Hebcal[prototype][find] = function find_f(day, month) {
 				return this[find](day, m);
 			}, this));
 		} else if (typeof month === 'string') {
-			return this[find](day,
-				month.charCodeAt(0) >= 1488 && month.charCodeAt(0) <= 1514 && /('|")/.test(month) ? c.gematriya(month) :
-					month.charCodeAt(0) >= 48 && month.charCodeAt(0) <= 57 /* number */ ? parseInt(month, 10) : c.lookup_hebrew_month(month)
-			);
+			return this[find](day, c.monthNum(month));
 		} else if (typeof month === 'number') {
 			return this[find](day, this.getMonth(month));
 		}
@@ -236,14 +233,17 @@ Hebcal[prototype][find] = function find_f(day, month) {
 	return [];
 };
 Hebcal[prototype][find][strings] = function strings(str) {
-	if (!str.split(/\s+/).join('')) {
+	var split = str.split(/\s+/);
+	if (!split.length) {
 		return [];
 	} else if (strings[str.replace(/\s/g, '_').toLowerCase()]) {
 		return strings[str.replace(/\s/g, '_').toLowerCase()].call(this);
-	} else if (new HDate(str).getDate()) {
-		return this[find](new HDate(str));
 	}
-	return this[find].apply(this, str.split(/\s+/));
+	try {
+		return this[find](new HDate(str));
+	} catch(e) {
+		return split.length - 1 ? this[find].apply(this, split) : [];
+	}
 };
 Hebcal[prototype][find][strings].rosh_chodesh = function rosh_chodesh() {
 	return this[find]('Rosh Chodesh', c.range(1, this.months.length));
@@ -349,9 +349,7 @@ defProp(Hebcal, 'havdalah', {
 // Months
 
 Hebcal[Month] = function Month(month, year) {
-	if (typeof month == 'string') {
-		month = c.lookup_hebrew_month(month);
-	}
+	month = c.monthNum(month);
 	if (typeof month != 'number') {
 		throw new TE('month to Hebcal.Month is not a valid type');
 	}
@@ -446,8 +444,7 @@ Hebcal[Month][prototype].next = function next() {
 };
 
 Hebcal[Month][prototype].getDay = function getDay(day) {
-	day = typeof day === 'number' ? day :
-		day.charCodeAt(0) >= 1488 && day.charCodeAt(0) <= 1514 && /('|")/.test(day) ? c.gematriya(day) : parseInt(day, 10); // gematriya or number string
+	day = c.dayYearNum(day);
 	if (day > this.days.length) {
 		return this.next().getDay(day - this.days.length);
 	}
@@ -504,12 +501,13 @@ Hebcal[Month][prototype][find] = function find_f(day) {
 Hebcal[Month][prototype][find][strings] = function strings(str) {
 	if (strings[str.replace(/\s/g, '_').toLowerCase()]) {
 		return strings[str.replace(/\s/g, '_').toLowerCase()].call(this);
-	} else if (new HDate(str).getDate()) {
-		return this[find](new HDate(str));
 	}
-	var num = str.charCodeAt(0) >= 1488 && str.charCodeAt(0) <= 1514 && /('|")/.test(str) ? c.gematriya(str) :
-		str.charCodeAt(0) >= 48 && str.charCodeAt(0) <= 57 /* number */ ? parseInt(str, 10) : null;
-	return num ? this[find](num) : [];
+	try {
+		return this[find](new HDate(str));
+	} catch(e) {
+		var num = c.dayYearNum(str);
+		return num ? this[find](num) : [];
+	}
 };
 Hebcal[Month][prototype][find][strings].rosh_chodesh = function rosh_chodesh() {
 	return this.rosh_chodesh();
@@ -534,30 +532,20 @@ HDate[prototype].getYearObject = function getYearObject() {
 
 var HDatePrev = HDate[prototype].prev; // slightly less overhead when using unaffiliated HDate()s
 HDate[prototype].prev = function prev() {
+	var n = HDatePrev.call(this);
 	if (!this.__month) {
-		return HDatePrev.call(this);
+		return n;
 	}
-	if (this.getMonth() === c.months.TISHREI && this.getDate() === 1) { // 1st day RH
-		return this.getMonthObject().prev().getDay(-1);
-	} else {
-		var g = this.greg();
-		g.setDate(g.getDate() - 1);
-		return this.getYearObject()[find](g)[0];
-	}
+	return this.getYearObject()[find](n)[0];
 };
 
 var HDateNext = HDate[prototype].next;
 HDate[prototype].next = function next() {
+	var n = HDateNext.call(this);
 	if (!this.__month) {
-		return HDateNext.call(this);
+		return n;
 	}
-	if (this.getMonth() === c.months.ELUL && this.getDate() === this.getMonthObject().length) { // last day
-		return this.getMonthObject().next().getDay(1);
-	} else {
-		var g = this.greg();
-		g.setDate(g.getDate() + 1);
-		return this.getYearObject()[find](g)[0];
-	}
+	return this.getYearObject()[find](n)[0];
 };
 
 HDate[prototype].getSedra = (function(){
@@ -750,7 +738,7 @@ HDate[prototype].hallel = (function() {
 
 // Gregorian years
 
-Hebcal.GregYear = function GregYear(year, month) {
+Hebcal[GregYear] = function GregYearConstructor(year, month) {
 	if (!year) {
 		year = (new Date).getFullYear();
 	}
@@ -758,7 +746,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 		var d = new Date(year);
 		month = year.indexOf(' ') + 1 || year.indexOf('-') + 1 || year.indexOf('/') + 1 ? d.getMonth() + 1 : c.range(1, 12);
 		// Check if a month was passed in the string. Can't just check for default January, because a real January might have been passed.
-		return new Hebcal.GregYear(d.getFullYear(), month);
+		return new Hebcal[GregYear](d.getFullYear(), month);
 	}
 	if (typeof year !== 'number') {
 		throw new TE('year to Hebcal.GregYear() is not a number');
@@ -775,7 +763,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 
 		if (Array.isArray(month)) {
 			this.months = month.map(function(i){
-				var m = new Hebcal.GregMonth(i, year);
+				var m = new Hebcal[GregMonth](i, year);
 				defProp(m, '__year', {
 					configurable: true,
 					writable: true,
@@ -787,7 +775,7 @@ Hebcal.GregYear = function GregYear(year, month) {
 			throw new TE('month to Hebcal.GregYear() is not a valid type');
 		}
 	} else {
-		return new Hebcal.GregYear(year, c.range(1, 12));
+		return new Hebcal[GregYear](year, c.range(1, 12));
 	}
 
 	this.hebyears = [].concat.apply([], this.months.map(function(m){
@@ -857,22 +845,22 @@ Hebcal.GregYear = function GregYear(year, month) {
 	return this;
 };
 
-Hebcal.GregYear[prototype].isLeapYear = function isLeapYear() {
+Hebcal[GregYear][prototype].isLeapYear = function isLeapYear() {
 	return this.length === 366;
 };
 
-Hebcal.GregYear[prototype].setCity = Hebcal[prototype].setCity;
-Hebcal.GregYear[prototype].setLocation = Hebcal[prototype].setLocation;
+Hebcal[GregYear][prototype].setCity = Hebcal[prototype].setCity;
+Hebcal[GregYear][prototype].setLocation = Hebcal[prototype].setLocation;
 
-Hebcal.GregYear[prototype].next = function next() {
-	return new Hebcal.GregYear(this.year + 1);
+Hebcal[GregYear][prototype].next = function next() {
+	return new Hebcal[GregYear](this.year + 1);
 };
 
-Hebcal.GregYear[prototype].prev = function prev() {
-	return new Hebcal.GregYear(this.year - 1);
+Hebcal[GregYear][prototype].prev = function prev() {
+	return new Hebcal[GregYear](this.year - 1);
 };
 
-Hebcal.GregYear[prototype].getMonth = function getMonth(month) {
+Hebcal[GregYear][prototype].getMonth = function getMonth(month) {
 	month = typeof month === 'number' ? month : greg.lookupMonthNum(month);
 	if (month > this.months.length) {
 		return this.next().getMonth(month - this.months.length);
@@ -880,13 +868,13 @@ Hebcal.GregYear[prototype].getMonth = function getMonth(month) {
 	return this.months[month > 0 ? month - 1 : this.months.length + month];
 };
 
-Hebcal.GregYear[prototype].days = Hebcal[prototype].days;
-Hebcal.GregYear[prototype].map = Hebcal[prototype].map;
-Hebcal.GregYear[prototype].filter = Hebcal[prototype].filter;
+Hebcal[GregYear][prototype].days = Hebcal[prototype].days;
+Hebcal[GregYear][prototype].map = Hebcal[prototype].map;
+Hebcal[GregYear][prototype].filter = Hebcal[prototype].filter;
 
-Hebcal.GregYear[prototype].addHoliday = Hebcal[prototype].addHoliday;
+Hebcal[GregYear][prototype].addHoliday = Hebcal[prototype].addHoliday;
 
-Hebcal.GregMonth = function GregMonth(month, year) {
+Hebcal[GregMonth] = function GregMonth(month, year) {
 	if (typeof month == 'string') {
 		month = greg.lookupMonthNum(month);
 	}
@@ -963,11 +951,11 @@ Hebcal.GregMonth = function GregMonth(month, year) {
 	return this;
 };
 
-Hebcal.GregMonth[prototype].isLeapYear = function isLeapYear() {
+Hebcal[GregMonth][prototype].isLeapYear = function isLeapYear() {
 	return greg.LEAP(this.year);
 };
 
-Hebcal.GregMonth[prototype].prev = function prev() {
+Hebcal[GregMonth][prototype].prev = function prev() {
 	if (this.month === 1) {
 		return this.getYearObject().prev().getMonth(-1);
 	} else {
@@ -975,32 +963,32 @@ Hebcal.GregMonth[prototype].prev = function prev() {
 	}
 };
 
-Hebcal.GregMonth[prototype].next = function next() {
+Hebcal[GregMonth][prototype].next = function next() {
 	return this.getYearObject().getMonth(this.month + 1);
 };
 
-Hebcal.GregMonth[prototype].getDay = function getDay(day) {
+Hebcal[GregMonth][prototype].getDay = function getDay(day) {
 	if (day > this.days.length) {
 		return this.next().getDay(day - this.days.length);
 	}
 	return this.days[day > 0 ? day - 1 : this.days.length + day];
 };
 
-Hebcal.GregMonth[prototype].getYearObject = function getYearObject() {
-	return this.__year || new Hebcal.GregYear(this.year);
+Hebcal[GregMonth][prototype].getYearObject = function getYearObject() {
+	return this.__year || new Hebcal[GregYear](this.year);
 };
 
-Hebcal.GregMonth[prototype].getName = function getName() {
+Hebcal[GregMonth][prototype].getName = function getName() {
 	return greg.monthNames[this.month];
 };
 
-Hebcal.GregMonth[prototype].setCity = Hebcal[Month][prototype].setCity;
-Hebcal.GregMonth[prototype].setLocation = Hebcal[Month][prototype].setLocation;
+Hebcal[GregMonth][prototype].setCity = Hebcal[Month][prototype].setCity;
+Hebcal[GregMonth][prototype].setLocation = Hebcal[Month][prototype].setLocation;
 
-Hebcal.GregMonth[prototype].map = Hebcal[Month][prototype].map;
+Hebcal[GregMonth][prototype].map = Hebcal[Month][prototype].map;
 
 HDate[prototype].getGregMonthObject = function getGregMonthObject() {
-	return this.__gregmonth || new Hebcal.GregMonth(this.greg().getMonth(), this.greg().getFullYear());
+	return this.__gregmonth || new Hebcal[GregMonth](this.greg().getMonth(), this.greg().getFullYear());
 };
 
 HDate[prototype].getGregYearObject = function getGregYearObject() {

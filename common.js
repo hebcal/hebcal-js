@@ -26,6 +26,8 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
  */
+var charCodeAt = 'charCodeAt';
+
 var months = exports.months = {
 	NISAN   : 1,
 	IYYAR   : 2,
@@ -42,39 +44,23 @@ var months = exports.months = {
 	ADAR_II : 13
 };
 
+var monthNames = [
+	["", 0, ""],
+	["Nisan", 0, "ניסן"],
+	["Iyyar", 0, "אייר"],
+	["Sivan", 0, "סיון"],
+	["Tamuz", 0, "תמוז"],
+	["Av", 0, "אב"],
+	["Elul", 0, "אלול"],
+	["Tishrei", 0, "תשרי"],
+	["Cheshvan", 0, "חשון"],
+	["Kislev", 0, "כסלו"],
+	["Tevet", 0, "טבת"],
+	["Sh'vat", 0, "שבט"]
+];
 exports.monthNames = [
-	[
-		["", 0, ""],
-		["Nisan", 0, "ניסן"],
-		["Iyyar", 0, "אייר"],
-		["Sivan", 0, "סיון"],
-		["Tamuz", 0, "תמוז"],
-		["Av", 0, "אב"],
-		["Elul", 0, "אלול"],
-		["Tishrei", 0, "תשרי"],
-		["Cheshvan", 0, "חשון"],
-		["Kislev", 0, "כסלו"],
-		["Tevet", 0, "טבת"],
-		["Sh'vat", 0, "שבט"],
-		["Adar", 0, "אדר"],
-		["Nisan", 0, "ניסן"]
-	], [
-		["", 0, ""],
-		["Nisan", 0, "ניסן"],
-		["Iyyar", 0, "אייר"],
-		["Sivan", 0, "סיון"],
-		["Tamuz", 0, "תמוז"],
-		["Av", 0, "אב"],
-		["Elul", 0, "אלול"],
-		["Tishrei", 0, "תשרי"],
-		["Cheshvan", 0, "חשון"],
-		["Kislev", 0, "כסלו"],
-		["Tevet", 0, "טבת"],
-		["Sh'vat", 0, "שבט"],
-		["Adar I", 0, "אדר א'"],
-		["Adar II", 0, "אדר ב'"],
-		["Nisan", 0, "ניסן"]
-	]
+	monthNames.concat([["Adar", 0, "אדר"],["Nisan", 0, "ניסן"]]),
+	monthNames.concat([["Adar I", 0, "אדר א'"],["Adar II", 0, "אדר ב'"],["Nisan", 0, "ניסן"]])
 ];
 
 exports.days = {
@@ -88,7 +74,7 @@ exports.days = {
 };
 
 exports.LANGUAGE = function LANGUAGE(str, opts){
-	return (opts === 'h' && str[2] ? str[2] : (opts === 'a' && str[1] ? str[1] : str[0]));
+	return opts == 'h' && str[2] || (opts == 'a' && str[1] || str[0]);
 };
 
 function LEAP_YR_HEB(x) {
@@ -111,6 +97,16 @@ exports.max_days_in_heb_month = function max_days_in_heb_month(month, year) {
 	(month == months.KISLEV && short_kislev(year)));
 };
 
+exports.monthNum = function monthNum(month) {
+	return typeof month === 'number' ? month :
+		month[charCodeAt](0) >= 1488 && month[charCodeAt](0) <= 1514 && /('|")/.test(month) ? gematriya(month) :
+			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : lookup_hebrew_month(month);
+};
+
+exports.dayYearNum = function dayYearNum(str) {
+	return typeof str === 'number' ? str :
+		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
+};
 
 /* Days from sunday prior to start of hebrew calendar to mean
    conjunction of tishrei in hebrew YEAR 
@@ -131,22 +127,13 @@ function hebrew_elapsed_days(hYear){
 	var parts = (p_elapsed % 1080) + 1080 * (h_elapsed % 24);
 	
 	var day = 1 + 29 * m_elapsed + Math.floor(h_elapsed / 24);
-	var alt_day;
-
-	if ((parts >= 19440) ||
+	var alt_day = day + ((parts >= 19440) ||
 		((2 == (day % 7)) && (parts >= 9924) && !(LEAP_YR_HEB (hYear))) ||
-		((1 == (day % 7)) && (parts >= 16789) && LEAP_YR_HEB (hYear - 1)))
-		alt_day = day + 1;
-	else
-		alt_day = day;
-	
-	if ((alt_day % 7) === 0 ||
-		(alt_day % 7) === 3 ||
-		(alt_day % 7) === 5)
-		return alt_day + 1;
-	else
-		return alt_day;
+		((1 == (day % 7)) && (parts >= 16789) && LEAP_YR_HEB (hYear - 1)));
 
+	return alt_day + ((alt_day % 7) === 0 ||
+		(alt_day % 7) == 3 ||
+		(alt_day % 7) == 5);
 }
 exports.hebrew_elapsed_days = hebrew_elapsed_days;
 
@@ -169,34 +156,34 @@ function short_kislev(year) {
 }
 exports.short_kislev = short_kislev;
 
-exports.lookup_hebrew_month = function lookup_hebrew_month(c) {
-  /* the Hebrew months are unique to their second letter
-	 N         nisan  (november?)
-	 I         iyyar
-	 E        Elul
-	 C        Cheshvan
-	 K        Kislev
-	 1        1Adar
-	 2        2Adar   
-	 Si Sh     sivan, Shvat
-	 Ta Ti Te Tamuz, Tishrei, Tevet
-	 Av Ad    Av, Adar
+function lookup_hebrew_month(c) {
+	/*
+	the Hebrew months are unique to their second letter
+	N         nisan  (november?)
+	I         iyyar
+	E        Elul
+	C        Cheshvan
+	K        Kislev
+	1        1Adar
+	2        2Adar   
+	Si Sh     sivan, Shvat
+	Ta Ti Te Tamuz, Tishrei, Tevet
+	Av Ad    Av, Adar
 
-	 אב אד אי אל   אב אדר אייר אלול
-	 ח            חשון
-	 ט            טבת
-	 כ            כסלב
-	 נ            ניסן
-	 ס            סיון
-	 ש            שבט
-	 תמ תש        תמוז תשרי
-   */
+	אב אד אי אל   אב אדר אייר אלול
+	ח            חשון
+	ט            טבת
+	כ            כסלב
+	נ            ניסן
+	ס            סיון
+	ש            שבט
+	תמ תש        תמוז תשרי
+	*/
 	switch (c.toLowerCase()[0]) {
 		case 'n':
 		case 'נ':
 			return (c.toLowerCase()[1] == 'o') ?	/* this catches "november" */
-				0
-				: months.NISAN;
+				0 : months.NISAN;
 		case 'i':
 			return months.IYYAR;
 		case 'e':
@@ -224,21 +211,19 @@ exports.lookup_hebrew_month = function lookup_hebrew_month(c) {
 					return months.TISHREI;
 				case 'e':
 					return months.TEVET;
-				default:
-					return 0;
 			}
+			break;
 		case 'a':
 			switch (c.toLowerCase()[1]) {
 				case 'v':
 					return months.AV;
 				case 'd':
-					if (c.indexOf('2') > -1 || /ii/i.test(c)) {
+					if (c.indexOf('2') > -1 || /ii/i.test(c) || /b/i.test(c)) {
 						return months.ADAR_II;
 					}
-					return months.ADAR_I;	/* else assume rishon */
-				default:
-					return 0;
+					return months.ADAR_I; // else assume rishon
 			}
+			break;
 		case 'ס':
 			return months.SIVAN;
 		case 'ש':
@@ -248,30 +233,28 @@ exports.lookup_hebrew_month = function lookup_hebrew_month(c) {
 				case 'ב':
 					return months.AV;
 				case 'ד':
-					if (c.indexOf('1') > -1 || c.indexOf('א', 1) > 1) {
-						return months.ADAR_I;
+					if (c.indexOf('2') > -1 || c.indexOf('ב', 1) > 1) {
+						return months.ADAR_II;
 					}
-					return months.ADAR_II;	/* else assume sheni */
+					return months.ADAR_I; // else assume rishon
 				case 'י':
 					return months.IYYAR;
 				case 'ל':
 					return months.ELUL;
-				default:
-					return 0;
 			}
+			break;
 		case 'ת':
 			switch (c.toLowerCase()[1]) {
 				case 'מ':
 					return months.TAMUZ;
 				case 'ש':
 					return months.TISHREI;
-				default:
-					return 0;
 			}
-		default:
-			return 0;
+			break;
 	}
+	return 0;
 };
+exports.lookup_hebrew_month = lookup_hebrew_month;
 
 /* Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d.  Similarly, applying it to d+3 gives the DAYNAME nearest to
@@ -384,7 +367,7 @@ function filter(self, fun, thisp) {
 }
 exports.filter = filter;
 
-exports.gematriya = function gematriya(num, limit) {
+function gematriya(num, limit) {
 	if (typeof num !== 'number' && typeof num !== 'string') {
 		throw new TypeError('non-number or string given to gematriya()');
 	}
@@ -484,6 +467,7 @@ exports.gematriya = function gematriya(num, limit) {
 		return num.join('');
 	}
 };
+exports.gematriya = gematriya;
 
 exports.range = function range(start, end, step) {
 	step = step || 1;

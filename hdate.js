@@ -18,8 +18,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
@@ -31,10 +30,10 @@ var c = require('./common'),
 	suncalc = require('suncalc'),
 	cities = require('./cities');
 
-suncalc.addTime(-16.1, 'alot_hashacher', undefined);
-suncalc.addTime(-11.5, 'misheyakir', undefined);
-suncalc.addTime(-10.2, 'misheyakir_machmir', undefined);
-suncalc.addTime(-8.5, undefined, 'tzeit');
+suncalc.addTime(-16.1, 'alot_hashacher', 0);
+suncalc.addTime(-11.5, 'misheyakir', 0);
+suncalc.addTime(-10.2, 'misheyakir_machmir', 0);
+suncalc.addTime(-8.5, 0, 'tzeit');
 
 // for minifying optimizations
 var prototype = 'prototype',
@@ -43,6 +42,7 @@ var prototype = 'prototype',
 	getDate = 'getDate',
 	getTime = 'getTime',
 	abs = 'abs',
+	hour = 'hour',
 	TISHREI = c.months.TISHREI,
 	MONTHS_IN_HEB = c.MONTHS_IN_HEB,
 	max_days_in_heb_month = c.max_days_in_heb_month,
@@ -86,29 +86,17 @@ function HDate(day, month, year) {
 		case 2:
 			return new HDate(day, month, (new HDate)[getFullYear]());
 		case 3:
-			this.day = 1;
-			this.month = 1;
-			this.year = typeof year === 'number' ? year :
-				year.toString().charCodeAt(0) >= 1488 && year.toString().charCodeAt(0) <= 1514 ? c.gematriya(year.toString()) : parseInt(year, 10);
+			this.day = this.month = 1;
+			this.year = c.dayYearNum(year);
 
-			this.setMonth(typeof month === 'number' ? month :
-				month.charCodeAt(0) >= 1488 && month.charCodeAt(0) <= 1514 && /('|")/.test(month) ? c.gematriya(month) :
-					month.charCodeAt(0) >= 48 && month.charCodeAt(0) <= 57 /* number */ ? parseInt(month, 10) : c.lookup_hebrew_month(month));
-			this.setDate(typeof day === 'number' ? day :
-				day.charCodeAt(0) >= 1488 && day.charCodeAt(0) <= 1514 ? c.gematriya(day) : parseInt(day, 10));
-			
-			fixMonth(this);
-			fixDate(this);
-
+			this.setMonth(c.monthNum(month));
+			this.setDate(c.dayYearNum(day));
 			break;
 		default:
 			throw new TypeError('HDate called with bad arguments');
 	}
 
-	this.il = false;
-	this.setLocation.apply(this, HDate.defaultLocation);
-
-	return this;
+	return this.setLocation.apply(this, HDate.defaultLocation);
 }
 
 HDate.defaultLocation = [0, 0];
@@ -236,17 +224,14 @@ function hebrew2abs(d) {
 		}
 	}
 	
-	
-	ret = c.hebrew_elapsed_days(d[getFullYear]()) - 1373429 + tempabs;
-	return ret;
+	return c.hebrew_elapsed_days(d[getFullYear]()) - 1373429 + tempabs;
 }
 
 function abs2hebrew(d) {
 	var mmap = [
 		c.months.KISLEV, c.months.TEVET, c.months.SHVAT, c.months.ADAR_I, c.months.NISAN,
-		c.months.IYYAR, c.months.SIVAN, c.months.TAMUZ,
-		TISHREI, TISHREI, TISHREI, c.months.CHESHVAN
-	], hebdate, gregdate, day, month, year;
+		c.months.IYYAR, c.months.SIVAN, c.months.TAMUZ, TISHREI, TISHREI, TISHREI, c.months.CHESHVAN
+	], hebdate, gregdate, month, year;
 
 	if (d >= 10555144) {
 		throw new RangeError("parameter to abs2hebrew " + d + " out of range");
@@ -255,7 +240,7 @@ function abs2hebrew(d) {
 	gregdate = greg.abs2greg(d);
 	hebdate = new HDate(1, TISHREI, (year = 3760 + gregdate[getFullYear]()));
 	
-	while (hebdate.setFullYear(year + 1), d >= hebrew2abs(hebdate)) {
+	while (d >= hebrew2abs(hebdate.setFullYear(year + 1))) {
 		year++;
 	}
 
@@ -275,10 +260,7 @@ function abs2hebrew(d) {
 		throw new RangeError("assertion failure d < hebrew2abs(m,d,y) => " + d + " < " + hebrew2abs(hebdate) + "!");
 	} */
 
-	hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1);
-	hebdate.setLocation.apply(hebdate, HDate.defaultLocation);
-	
-	return hebdate;
+	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 
 HDate[prototype].greg = function toGreg() {
@@ -294,9 +276,9 @@ HDate[prototype][abs] = function abs() {
 };
 
 HDate[prototype].toString = function toString(o) {
-	return c.LANGUAGE([this[getDate](), null, c.gematriya(this[getDate]())], o).toString() + ' ' +
+	return c.LANGUAGE([this[getDate](), null, c.gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
-		c.LANGUAGE([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o).toString();
+		c.LANGUAGE([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o);
 };
 
 HDate[prototype].getMonthName = function getMonthName(o) {
@@ -304,9 +286,7 @@ HDate[prototype].getMonthName = function getMonthName(o) {
 };
 
 HDate[prototype].setCity = function setCity(city) {
-	var c = cities.getCity(city);
-	this.il = c[2];
-	return this.setLocation(cities.getLocation(c));
+	return this.setLocation(cities.getLocation(cities.getCity(city)));
 };
 
 HDate[prototype].setLocation = function setLocation(lat, lon) {
@@ -343,13 +323,13 @@ HDate[prototype].sunset = function sunset() {
 	return suncalc.getTimes(this.greg(), this.lat, this.long).sunset;
 };
 
-HDate[prototype].hour = function hour() {
+HDate[prototype][hour] = function hour() {
 	return (this.sunset() - this.sunrise()) / 12; // ms in hour
 };
 
 HDate[prototype].hourMins = function hourMins() {
 	// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
-	return this.hour() / (1000 * 60);
+	return this[hour]() / (1000 * 60);
 };
 
 HDate[prototype].nightHour = function nightHour() {
@@ -363,7 +343,7 @@ HDate[prototype].nightHourMins = function nightHourMins() {
 
 var zemanim = {
 	chatzot: function chatzot(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 6));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 6));
 	},
 	chatzot_night: function chatzot_night(hdate) {
 		return new Date(hdate.sunrise()[getTime]() - (hdate.nightHour() * 6));
@@ -378,19 +358,19 @@ var zemanim = {
 		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).misheyakir_machmir;
 	},
 	sof_zman_shma: function sof_zman_shma(hdate) { // Gra
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 3));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 3));
 	},
 	sof_zman_tfilla: function sof_zman_tfilla(hdate) { // Gra
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 4));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 4));
 	},
 	mincha_gedola: function mincha_gedola(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 6.5));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 6.5));
 	},
 	mincha_ketana: function mincha_ketana(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 9.5));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 9.5));
 	},
 	plag_hamincha: function plag(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 10.75));
+		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 10.75));
 	},
 	tzeit: function tzeit(hdate) {
 		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).tzeit;
