@@ -18,13 +18,12 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 
 // name, lat, long, Israel

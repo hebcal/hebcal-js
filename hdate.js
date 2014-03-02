@@ -23,7 +23,7 @@
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'),
 	greg = require('./greg'),

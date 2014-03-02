@@ -7,14 +7,14 @@ marked --gfm --breaks README.md > README.html
 echo "fs=require('fs');p=JSON.parse(fs.readFileSync('package.json').toString());p.readme=fs.readFileSync('README.md').toString();fs.writeFileSync('package.json',JSON.stringify(p,null,'\t'))" | node
 
 cd client
-HEADER="/*
+header="/*
 	Hebcal - A Jewish Calendar Generator
 
 	https://github.com/hebcal/hebcal-js
 
 	Licensed GPLv3
  */"
-mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/eyal\\/git\\/hebcal\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
+mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/[a-z]+\\/git\\/hebcal\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
 srccode="console.log(';'+require('fs').readFileSync(f).toString().replace(map,f+'.map'))"
 echo "Starting client.js"
 browserify --debug client.js | exorcist client.js.map > hebcal.js
@@ -22,11 +22,11 @@ echo "f='hebcal.js',map='client.js.map';$srccode" | node > hebcal.js~
 mv hebcal.js~ hebcal.js
 echo "f='client.js.map';$mapcode" | node > hebcal.js.map
 mv client.js.map /tmp
-uglifyjs -m -v -c --preamble "$HEADER" --in-source-map hebcal.js.map --source-map hebcal.min.js.map hebcal.js > hebcal.min.js
+uglifyjs -m -v -c --preamble "$header" --in-source-map hebcal.js.map --source-map hebcal.min.js.map hebcal.js > hebcal.min.js
 echo "Starting hebcal.noloc.js"
 browserify --debug hebcal.noloc.src.js | exorcist hebcal.noloc.src.js.map > hebcal.noloc.js
 echo "f='hebcal.noloc.js',map='hebcal.noloc.src.js.map';$srccode" | node > hebcal.noloc.js~
 mv hebcal.noloc.js~ hebcal.noloc.js
 echo "f='hebcal.noloc.src.js.map';$mapcode" | node > hebcal.noloc.js.map
 mv hebcal.noloc.src.js.map /tmp
-uglifyjs -m -v -c --preamble "$HEADER" --in-source-map hebcal.noloc.js.map --source-map hebcal.noloc.min.js.map hebcal.noloc.js > hebcal.noloc.min.js
+uglifyjs -m -v -c --preamble "$header" --in-source-map hebcal.noloc.js.map --source-map hebcal.noloc.min.js.map hebcal.noloc.js > hebcal.noloc.min.js
