@@ -26,6 +26,9 @@
 	"dependencies": {
 		"suncalc": ""
 	},
+	"devDependencies": {
+		"hrtimer": ""
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/hebcal-js/hebcal.git"
