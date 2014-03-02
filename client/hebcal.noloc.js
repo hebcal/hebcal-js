@@ -1036,7 +1036,13 @@ suncalc.addTime(-8.5, undefined, 'tzeit');
 var prototype = 'prototype',
 	getFullYear = 'getFullYear',
 	getMonth = 'getMonth',
-	getDate = 'getDate';
+	getDate = 'getDate',
+	getTime = 'getTime',
+	abs = 'abs',
+	TISHREI = c.months.TISHREI,
+	MONTHS_IN_HEB = c.MONTHS_IN_HEB,
+	max_days_in_heb_month = c.max_days_in_heb_month,
+	day_on_or_before = c.day_on_or_before;
 
 function HDate(day, month, year) {
 	switch (arguments.length) {
@@ -1117,20 +1123,20 @@ Object.defineProperty(HDate, 'defaultCity', {
 
 function fixDate(date) {
 	if (date.day < 1) {
-		if (date.month == c.months.TISHREI) {
+		if (date.month == TISHREI) {
 			date.year -= 1;
 		}
+		date.day += max_days_in_heb_month(date.month, date.year);
 		date.month -= 1;
-		date.day += c.max_days_in_heb_month(date.month + 1, date.year);
 		fixMonth(date);
 		fixDate(date);
 	}
-	if (date.day > c.max_days_in_heb_month(date.month, date.year)) {
+	if (date.day > max_days_in_heb_month(date.month, date.year)) {
 		if (date.month == c.months.ELUL) {
 			date.year += 1;
 		}
+		date.day -= max_days_in_heb_month(date.month, date.year);
 		date.month += 1;
-		date.day -= c.max_days_in_heb_month(date.month -1, date.year);
 		fixMonth(date);
 		fixDate(date);
 	}
@@ -1139,14 +1145,14 @@ function fixDate(date) {
 
 function fixMonth(date) {
 	if (date.month < 1) {
+		date.month += MONTHS_IN_HEB(date.year);
 		date.year -= 1;
-		date.month += c.MONTHS_IN_HEB(date.year + 1);
 		fixMonth(date);
 		fixDate(date);
 	}
-	if (date.month > c.MONTHS_IN_HEB(date.year)) {
+	if (date.month > MONTHS_IN_HEB(date.year)) {
+		date.month -= MONTHS_IN_HEB(date.year);
 		date.year += 1;
-		date.month -= c.MONTHS_IN_HEB(date.year - 1);
 		fixMonth(date);
 		fixDate(date);
 	}
@@ -1165,11 +1171,11 @@ HDate[prototype][getMonth] = function getMonth() {
 };
 
 HDate[prototype].getTishreiMonth = function getTishreiMonth() {
-	return (this[getMonth]() + c.MONTHS_IN_HEB(this[getFullYear]()) - 6) % c.MONTHS_IN_HEB(this[getFullYear]());
+	return (this[getMonth]() + MONTHS_IN_HEB(this[getFullYear]()) - 6) % MONTHS_IN_HEB(this[getFullYear]());
 };
 
 HDate[prototype].daysInMonth = function daysInMonth() {
-	return c.max_days_in_heb_month(this[getMonth](), this[getFullYear]());
+	return max_days_in_heb_month(this[getMonth](), this[getFullYear]());
 };
 
 HDate[prototype][getDate] = function getDate() {
@@ -1195,7 +1201,7 @@ HDate[prototype].setMonth = function setMonth(month) {
 };
 
 HDate[prototype].setTishreiMonth = function setTishreiMonth(month) {
-	return this.setMonth((month + 6) % c.MONTHS_IN_HEB(this[getFullYear]()) || 13);
+	return this.setMonth((month + 6) % MONTHS_IN_HEB(this[getFullYear]()) || 13);
 };
 
 HDate[prototype].setDate = function setDate(date) {
@@ -1212,18 +1218,18 @@ HDate[prototype].setDate = function setDate(date) {
 function hebrew2abs(d) {
 	var m, tempabs = d[getDate]();
 	
-	if (d[getMonth]() < c.months.TISHREI)
-	{
-		for (m = c.months.TISHREI; m <= c.MONTHS_IN_HEB(d[getFullYear]()); m++)
-			tempabs += c.max_days_in_heb_month(m, d[getFullYear]());
+	if (d[getMonth]() < TISHREI) {
+		for (m = TISHREI; m <= MONTHS_IN_HEB(d[getFullYear]()); m++) {
+			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+		}
 
-		for (m = c.months.NISAN; m < d[getMonth](); m++)
-			tempabs += c.max_days_in_heb_month(m, d[getFullYear]());
-	}
-	else
-	{
-		for (m = c.months.TISHREI; m < d[getMonth](); m++)
-			tempabs += c.max_days_in_heb_month(m, d[getFullYear]());
+		for (m = c.months.NISAN; m < d[getMonth](); m++) {
+			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+		}
+	} else {
+		for (m = TISHREI; m < d[getMonth](); m++) {
+			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+		}
 	}
 	
 	
@@ -1235,7 +1241,7 @@ function abs2hebrew(d) {
 	var mmap = [
 		c.months.KISLEV, c.months.TEVET, c.months.SHVAT, c.months.ADAR_I, c.months.NISAN,
 		c.months.IYYAR, c.months.SIVAN, c.months.TAMUZ,
-		c.months.TISHREI, c.months.TISHREI, c.months.TISHREI, c.months.CHESHVAN
+		TISHREI, TISHREI, TISHREI, c.months.CHESHVAN
 	], hebdate, gregdate, day, month, year;
 
 	if (d >= 10555144) {
@@ -1243,7 +1249,7 @@ function abs2hebrew(d) {
 	}
 	
 	gregdate = greg.abs2greg(d);
-	hebdate = new HDate(1, c.months.TISHREI, (year = 3760 + gregdate[getFullYear]()));
+	hebdate = new HDate(1, TISHREI, (year = 3760 + gregdate[getFullYear]()));
 	
 	while (hebdate.setFullYear(year + 1), d >= hebrew2abs(hebdate)) {
 		year++;
@@ -1254,21 +1260,18 @@ function abs2hebrew(d) {
 		month = mmap[gregdate[getMonth]()];
 	} else {
 		// we're outside the usual range, so assume nothing about hebrew/gregorian calendar drift...
-		month = c.months.TISHREI;
+		month = TISHREI;
 	}
 
-	while (d > hebrew2abs(hebdate = new HDate(c.max_days_in_heb_month(month, year), month, year))) {
-		month = (month % c.MONTHS_IN_HEB(year)) + 1;
+	while (d > hebrew2abs(hebdate = new HDate(max_days_in_heb_month(month, year), month, year))) {
+		month = (month % MONTHS_IN_HEB(year)) + 1;
 	}
-
-	hebdate.setDate(1);
 	
-	day = parseInt(d - hebrew2abs(hebdate) + 1, 10);
 	/* if (day < 0) {
 		throw new RangeError("assertion failure d < hebrew2abs(m,d,y) => " + d + " < " + hebrew2abs(hebdate) + "!");
 	} */
 
-	hebdate.setDate(day);
+	hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1);
 	hebdate.setLocation.apply(hebdate, HDate.defaultLocation);
 	
 	return hebdate;
@@ -1282,7 +1285,7 @@ HDate[prototype].gregEve = function gregEve() {
 	return this.prev().sunset();
 };
 
-HDate[prototype].abs = function abs() {
+HDate[prototype][abs] = function abs() {
 	return hebrew2abs(this);
 };
 
@@ -1329,19 +1332,11 @@ HDate[prototype].setLocation = function setLocation(lat, lon) {
 };
 
 HDate[prototype].sunrise = function sunrise() {
-	var g = this.greg(), d = new Date();
-	g.setHours(d.getHours());
-	g.setMinutes(d.getMinutes());
-
-	return suncalc.getTimes(g, this.lat, this.long).sunrise;
+	return suncalc.getTimes(this.greg(), this.lat, this.long).sunrise;
 };
 
 HDate[prototype].sunset = function sunset() {
-	var g = this.greg(), d = new Date();
-	g.setHours(d.getHours());
-	g.setMinutes(d.getMinutes());
-
-	return suncalc.getTimes(g, this.lat, this.long).sunset;
+	return suncalc.getTimes(this.greg(), this.lat, this.long).sunset;
 };
 
 HDate[prototype].hour = function hour() {
@@ -1364,49 +1359,37 @@ HDate[prototype].nightHourMins = function nightHourMins() {
 
 var zemanim = {
 	chatzot: function chatzot(hdate) {
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 6));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 6));
 	},
 	chatzot_night: function chatzot_night(hdate) {
-		return new Date(hdate.sunrise().getTime() - (hdate.nightHour() * 6));
+		return new Date(hdate.sunrise()[getTime]() - (hdate.nightHour() * 6));
 	},
 	alot_hashacher: function alot_hashacher(hdate) {
-		var g = hdate.greg(), d = new Date();
-		g.setHours(d.getHours());
-		g.setMinutes(d.getMinutes());
-		return suncalc.getTimes(g, hdate.lat, hdate.long).alot_hashacher;
+		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).alot_hashacher;
 	},
 	misheyakir: function misheyakir(hdate) {
-		var g = hdate.greg(), d = new Date();
-		g.setHours(d.getHours());
-		g.setMinutes(d.getMinutes());
-		return suncalc.getTimes(g, hdate.lat, hdate.long).misheyakir;
+		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).misheyakir;
 	},
 	misheyakir_machmir: function misheyakir_machmir(hdate) {
-		var g = hdate.greg(), d = new Date();
-		g.setHours(d.getHours());
-		g.setMinutes(d.getMinutes());
-		return suncalc.getTimes(g, hdate.lat, hdate.long).misheyakir_machmir;
+		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).misheyakir_machmir;
 	},
 	sof_zman_shma: function sof_zman_shma(hdate) { // Gra
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 3));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 3));
 	},
 	sof_zman_tfilla: function sof_zman_tfilla(hdate) { // Gra
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 4));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 4));
 	},
 	mincha_gedola: function mincha_gedola(hdate) {
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 6.5));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 6.5));
 	},
 	mincha_ketana: function mincha_ketana(hdate) {
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 9.5));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 9.5));
 	},
 	plag_hamincha: function plag(hdate) {
-		return new Date(hdate.sunrise().getTime() + (hdate.hour() * 10.75));
+		return new Date(hdate.sunrise()[getTime]() + (hdate.hour() * 10.75));
 	},
 	tzeit: function tzeit(hdate) {
-		var g = hdate.greg(), d = new Date();
-		g.setHours(d.getHours());
-		g.setMinutes(d.getMinutes());
-		return suncalc.getTimes(g, hdate.lat, hdate.long).tzeit;
+		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).tzeit;
 	},
 	neitz_hachama: function neitz(hdate) {
 		return hdate.sunrise();
@@ -1432,12 +1415,12 @@ HDate[prototype].next = function next() {
 
 HDate[prototype].prev = function prev() {
 	if (this[getDate]() === 1) {
-		if (this[getMonth]() === c.months.TISHREI) {
-			return new HDate(c.max_days_in_heb_month(c.months.ELUL, this[getFullYear]() -1 ), c.months.ELUL, this[getFullYear]() - 1);
+		if (this[getMonth]() === TISHREI) {
+			return new HDate(max_days_in_heb_month(c.months.ELUL, this[getFullYear]() -1 ), c.months.ELUL, this[getFullYear]() - 1);
 		} else if (this[getMonth]() === c.months.NISAN) {
-			return new HDate(c.max_days_in_heb_month(c.MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]()), c.MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]());
+			return new HDate(max_days_in_heb_month(MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]()), MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]());
 		} else {
-			return new HDate(c.max_days_in_heb_month(this[getMonth]() - 1, this[getFullYear]()), this[getMonth]() - 1, this[getFullYear]());
+			return new HDate(max_days_in_heb_month(this[getMonth]() - 1, this[getFullYear]()), this[getMonth]() - 1, this[getFullYear]());
 		}
 	} else {
 		return new HDate(this[getDate]() - 1, this[getMonth](), this[getFullYear]());
@@ -1449,29 +1432,29 @@ HDate[prototype].isSameDate = function isSameDate(other) {
 		if (other[getFullYear]() === -1) {
 			other = new HDate(other).setFullYear(this[getFullYear]());
 		}
-		return this.abs() === other.abs();
+		return this[abs]() === other[abs]();
 	}
 	return false;
 };
 
 HDate[prototype].before = function before(day) {
-	return new HDate(c.day_on_or_before(day, this.abs() - 1));
+	return new HDate(day_on_or_before(day, this[abs]() - 1));
 };
 
 HDate[prototype].onOrBefore = function onOrBefore(day) {
-	return new HDate(c.day_on_or_before(day, this.abs()));
+	return new HDate(day_on_or_before(day, this[abs]()));
 };
 
 HDate[prototype].nearest = function nearest(day) {
-	return new HDate(c.day_on_or_before(day, this.abs() + 3));
+	return new HDate(day_on_or_before(day, this[abs]() + 3));
 };
 
 HDate[prototype].onOrAfter = function onOrAfter(day) {
-	return new HDate(c.day_on_or_before(day, this.abs() + 6));
+	return new HDate(day_on_or_before(day, this[abs]() + 6));
 };
 
 HDate[prototype].after = function after(day) {
-	return new HDate(c.day_on_or_before(day, this.abs() + 7));
+	return new HDate(day_on_or_before(day, this[abs]() + 7));
 };
 
 module.exports = HDate;
@@ -1851,6 +1834,10 @@ Hebcal[Month] = function Month(month, year) {
 
 	this.length = this.days.length;
 
+	this.holidays = holidays.getHolidaysForYear(year).filter(function(h){
+		return h.date.getMonth() === month;
+	}, this);
+
 	defProp(this, 'il', {
 		enumerable: true,
 		configurable: true,
@@ -2085,7 +2072,7 @@ HDate[prototype].tachanun = (function() {
 	function tachanun() {
 		var checkPrev = !arguments[0];
 
-		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+		var year = this.getYearObject();
 
 		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
 			year[find](c.range(1, c.max_days_in_heb_month(c.months.NISAN, this.getFullYear())), c.months.NISAN), // all of Nisan
@@ -2137,7 +2124,7 @@ HDate[prototype].hallel = (function() {
 	};
 
 	function hallel() {
-		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+		var year = this.getYearObject();
 
 		var whole = __cache.il[year.year] === this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
 			year[find](c.range(25, 33), c.months.KISLEV), // Chanukah

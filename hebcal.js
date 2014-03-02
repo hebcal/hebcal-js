@@ -373,6 +373,10 @@ Hebcal[Month] = function Month(month, year) {
 
 	this.length = this.days.length;
 
+	this.holidays = holidays.getHolidaysForYear(year).filter(function(h){
+		return h.date.getMonth() === month;
+	}, this);
+
 	defProp(this, 'il', {
 		enumerable: true,
 		configurable: true,
@@ -607,7 +611,7 @@ HDate[prototype].tachanun = (function() {
 	function tachanun() {
 		var checkPrev = !arguments[0];
 
-		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+		var year = this.getYearObject();
 
 		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
 			year[find](c.range(1, c.max_days_in_heb_month(c.months.NISAN, this.getFullYear())), c.months.NISAN), // all of Nisan
@@ -659,7 +663,7 @@ HDate[prototype].hallel = (function() {
 	};
 
 	function hallel() {
-		var year = (this.getMonthObject() && this.getYearObject()) || new Hebcal(this.getFullYear());
+		var year = this.getYearObject();
 
 		var whole = __cache.il[year.year] === this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
 			year[find](c.range(25, 33), c.months.KISLEV), // Chanukah
