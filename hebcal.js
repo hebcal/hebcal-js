@@ -452,7 +452,7 @@ Hebcal[Month][prototype][next] = function() {
 	}
 };
 
-Hebcal[Month][prototype][getDay] = function getDay(day) {
+Hebcal[Month][prototype][getDay] = function(day) {
 	day = c.dayYearNum(day);
 	if (day > this.days[length]) {
 		return this[next]()[getDay](day - this.days[length]);
@@ -469,8 +469,8 @@ Hebcal[Month][prototype].getName = function getName(o) {
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
-	var prev = this[prev]();
-	return prev[length] === 30 ? [prev[getDay](-1), this[getDay](1)] : [this[getDay](1)];
+	var prevMonth = this[prev]();
+	return prevMonth[length] === 30 ? [prevMonth[getDay](-1), this[getDay](1)] : [this[getDay](1)];
 };
 
 Hebcal[Month][prototype].setCity = function setCity(city) {
@@ -535,7 +535,7 @@ HDate[prototype].getMonthObject = function getMonthObject() {
 	return this.__month || new Hebcal[Month](this[getMonth](), this[getFullYear]());
 };
 
-HDate[prototype][getYearObject] = function getYearObject() {
+HDate[prototype][getYearObject] = function() {
 	return this.getMonthObject()[getYearObject]();
 };
 

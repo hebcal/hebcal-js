@@ -19,13 +19,12 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 
 // name, lat, long, Israel
@@ -224,13 +223,12 @@ finished = Hebcal.events.emit('ready');
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var charCodeAt = 'charCodeAt';
 
@@ -714,13 +712,12 @@ exports.range = function range(start, end, step) {
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'), greg = require('./greg');
 
@@ -860,13 +857,12 @@ exports.dafname = dafname;
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 exports.monthNames = [
 	'',
@@ -1003,7 +999,7 @@ exports.abs2greg = function abs2greg(theDate) {
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'),
 	greg = require('./greg'),
@@ -1443,13 +1439,12 @@ module.exports = HDate;
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'),
 	HDate = require('./hdate'),
@@ -1878,7 +1873,7 @@ Hebcal[Month][prototype][next] = function() {
 	}
 };
 
-Hebcal[Month][prototype][getDay] = function getDay(day) {
+Hebcal[Month][prototype][getDay] = function(day) {
 	day = c.dayYearNum(day);
 	if (day > this.days[length]) {
 		return this[next]()[getDay](day - this.days[length]);
@@ -1895,8 +1890,8 @@ Hebcal[Month][prototype].getName = function getName(o) {
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
-	var prev = this[prev]();
-	return prev[length] === 30 ? [prev[getDay](-1), this[getDay](1)] : [this[getDay](1)];
+	var prevMonth = this[prev]();
+	return prevMonth[length] === 30 ? [prevMonth[getDay](-1), this[getDay](1)] : [this[getDay](1)];
 };
 
 Hebcal[Month][prototype].setCity = function setCity(city) {
@@ -1961,7 +1956,7 @@ HDate[prototype].getMonthObject = function getMonthObject() {
 	return this.__month || new Hebcal[Month](this[getMonth](), this[getFullYear]());
 };
 
-HDate[prototype][getYearObject] = function getYearObject() {
+HDate[prototype][getYearObject] = function() {
 	return this.getMonthObject()[getYearObject]();
 };
 
@@ -2452,13 +2447,12 @@ module.exports = Hebcal;
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'), HDate = require('./hdate');
 
@@ -3346,13 +3340,12 @@ if (typeof define === 'function' && define.amd) {
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 /*
  * Many of the following algorithms were taken from hebrew calendar
