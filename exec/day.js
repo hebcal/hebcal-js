@@ -54,10 +54,19 @@ module.exports = function(opts) {
 			var t = day.tachanun();
 			if (t == 0) {
 				echo.tachanun = 'No Tachanun.';
-				return;
 			}
 			var all = !!(t&4), s = !!(t&2), m = !!(t&1);
-			echo.tachanun = new String('Tachanun is said at ' + (s ? 'Shacharit' + (m ? ' and Mincha' : '') : m ? 'Mincha' : '') + (!all ? ' by some congregations' : '') + '.');
+			if (s && m) {
+				echo.tachanun = 'Ordinary Tachanun.';
+			} else if (s) {
+				echo.tachanun = 'No Tachanun at Mincha.';
+			} else if (m) {
+				echo.tachanun = 'No Tachanun at Shacharit.';
+			}
+			if (!all && t) {
+				echo.tachanun += 'Some congregations say Tachanun.';
+			}
+			echo.tachanun = new String(echo.tachanun);
 			echo.tachanun.val = t;
 		})();
 	}
@@ -86,13 +95,16 @@ module.exports = function(opts) {
 		(function(){
 			var h = day.holidays(),
 				candles = Hebcal.filter(h.map(function(h){return h.candleLighting()}), true),
-				havdalah = Hebcal.filter(h.map(function(h){return h.havdalah()}), true);
+				havdalah = Hebcal.filter(h.map(function(h){return h.havdalah()}), true),
+				tmp;
 
 			if (candles.length) {
-				echo.candles = 'Candle Lighting: ' + candles[0];
+				tmp = candles[0].toTimeString();
+				echo.candles = 'Candle Lighting: ' + tmp.slice(0, tmp.indexOf('(') - 1);
 			}
 			if (havdalah.length) {
-				echo.havdalah = 'Havdalah: ' + havdalah[0];
+				tmp = havdalah[0].toTimeString();
+				echo.havdalah = 'Havdalah: ' + tmp.slice(0, tmp.indexOf('(') - 1);
 			}
 		})();
 	}

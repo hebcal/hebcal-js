@@ -5,7 +5,7 @@ var Hebcal = require('..'),
 	dayInfo = require('./day'),
 	main = require.main == module;
 
-var helpString = "node week -aipdghq";
+var helpString = "node week -abcdghipq";
 
 var opts = {
 	lang: 's',
@@ -17,6 +17,7 @@ var opts = {
 	d: function(){opts.holidays = true},
 	g: function(){opts.greg = true},
 	c: function(){opts.candles = true},
+	b: function(){opts.table = true},
 	t: function(times){
 		if (!times) {
 			times = Object.keys(new Hebcal.HDate().getZemanim()).join(',');
@@ -47,26 +48,63 @@ module.exports = function(opts) {
 		week[0].toString(opts.lang) + ' - ' + week[6].toString(opts.lang) +
 		(opts.greg ? ' / ' + week[0].greg().toDateString() + ' - ' + week[6].greg().toDateString() : '');
 
-	week.forEach(function(day,num){
-		var o = JSON.parse(JSON.stringify(opts)); // clone
-		o.day = day.toString();
-		o.parsha = false;
-		o.times = [];
-		day = dayInfo(o);
-		if (!opts.always) {
-			if (day.tachanun.val == 7) {
-				delete day.tachanun;
+	if (opts.table) {
+		echo.table = Hebcal.range(1,7).map(function(){
+			return Hebcal.range(1,7).map(function(){
+				return '';
+			});
+		});
+		week.forEach(function(day,num){
+			var i = 0, o = JSON.parse(JSON.stringify(opts)); // clone
+			o.day = day.toString();
+			o.parsha = false;
+			o.times = [];
+			day = dayInfo(o);
+			echo.table[i++][num] = day.day.split(' / ')[0];
+			if (o.greg) {
+				echo.table[i++][num] = day.day.split(' / ')[1];
 			}
-			if (day.hallel.val == 0) {
-				delete day.hallel;
-			}	
-		}
-		var e = '';
-		for (i in day) {
-			e += day[i] + '\n';
-		}
-		echo['day' + num] = e.trim();
-	});
+			if (day.holidays) {
+				echo.table[i++][num] = day.holidays;
+			}
+			if (day.tachanun && ((day.tachanun.val != 7 && !(day.tachanun.val == 5 && week[num].getDay() == 6)) || o.always)) {
+				echo.table[i++][num] = day.tachanun.toString();
+			}
+			if (day.hallel && (day.hallel.val != 0 || o.always)) {
+				echo.table[i++][num] = day.hallel.toString();
+			}
+			if (day.candles) {
+				echo.table[i++][num] = day.candles;
+			}
+			if (day.havdalah) {
+				echo.table[i++][num] = day.havdalah;
+			}
+		});
+		echo.table = table(echo.table.filter(function(e){
+			return e.join('');
+		}), {sep:' | ', vert:'-'});
+	} else {
+		week.forEach(function(day,num){
+			var o = JSON.parse(JSON.stringify(opts)); // clone
+			o.day = day.toString();
+			o.parsha = false;
+			o.times = [];
+			day = dayInfo(o);
+			if (!opts.always) {
+				if (day.tachanun && day.tachanun.val == 7) {
+					delete day.tachanun;
+				}
+				if (day.hallel && day.hallel.val == 0) {
+					delete day.hallel;
+				}	
+			}
+			var e = '';
+			for (i in day) {
+				e += day[i] + '\n';
+			}
+			echo['day' + num] = e.trim();
+		});
+	}
 
 	if (opts.parsha) {
 		echo.parsha = 'Parsha: ' + day.getParsha(opts.lang).join(', ');
@@ -100,8 +138,11 @@ if (main) {
 		dafyomi: function(){opts.dafyomi = true},
 		omer: function(){opts.omer = true},
 		city: function(city){Hebcal.defaultCity = city},
+		candleLighting: function(time){Hebcal.candleLighting = time},
+		havdalah: function(time){Hebcal.havdalah = time},
 		help: shortargs.h,
 		quiet: shortargs.q,
+		table: shortargs.b,
 		always: function(){opts.always = true}
 	});
 
