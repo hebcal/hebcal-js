@@ -25,6 +25,8 @@ version 2.1 (2014-02-23 beta)
 	Add Hebcal.parshiot and Hebcal.LANGUAGE
 	Add Hebcal().findParsha()
 	Export Hebcal.map and Hebcal.filter
+	Change default havdalah offset to 42
+	Fix bug with HDate(29 Adar2).next() going to the next year
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

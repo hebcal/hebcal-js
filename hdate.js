@@ -138,13 +138,11 @@ function fixDate(date) {
 function fixMonth(date) {
 	if (date.month < 1) {
 		date.month += MONTHS_IN_HEB(date.year);
-		date.year -= 1;
 		fixMonth(date);
 		fixDate(date);
 	}
 	if (date.month > MONTHS_IN_HEB(date.year)) {
 		date.month -= MONTHS_IN_HEB(date.year);
-		date.year += 1;
 		fixMonth(date);
 		fixDate(date);
 	}

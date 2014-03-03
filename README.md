@@ -411,7 +411,7 @@ The number of minutes before sunset to light candles. Defaults to 18.
 
 #### `Hebcal.holidays.Event.havdalah`
 
-The number of minutes after sunset to make havdalah. Defaults to 50.
+The number of minutes after sunset to make havdalah. Defaults to 42. In v2.0, it defaulted to 50.
 
 ### `Hebcal.holidays.standards`
 

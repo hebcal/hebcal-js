@@ -133,7 +133,7 @@ Event.prototype.candleLighting = function candleLighting() {
 
 Event.prototype.havdalah = function havdalah() {
 	if (this.YOM_TOV_ENDS) {
-		return new Date(this.date.sunset() + (Event.havdalah * 60 * 1000));
+		return new Date(this.date.sunset().getTime() + (Event.havdalah * 60 * 1000));
 	}
 	return null;
 };
@@ -142,7 +142,7 @@ Event.isIL = false;
 
 Event.candleLighting = 18;
 
-Event.havdalah = 50;
+Event.havdalah = 42;
 
 exports.Event = Event;
 
