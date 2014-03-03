@@ -24,6 +24,7 @@ version 2.1 (2014-02-23 beta)
 	Add HDate().getParsha() alias of getSedra()
 	Add Hebcal.parshiot and Hebcal.LANGUAGE
 	Add Hebcal().findParsha()
+	Export Hebcal.map and Hebcal.filter
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code

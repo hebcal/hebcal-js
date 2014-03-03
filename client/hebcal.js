@@ -1739,6 +1739,10 @@ Hebcal.parshiot = Sedra.parshiot;
 
 Hebcal.LANGUAGE = c.LANGUAGE;
 
+Hebcal[map] = c[map];
+
+Hebcal.filter = c.filter;
+
 defProp(Hebcal, 'defaultLocation', {
 	enumerable: true,
 	configurable: true,

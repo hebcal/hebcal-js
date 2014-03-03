@@ -469,6 +469,18 @@ Hebcal.range(15, 1, 3) // [15, 12, 9, 6, 3]
 Hebcal.range(1, 2, 0.25) // [1, 1.25, 1.5, 1.75, 2]
 ```
 
+## `Hebcal.map(object, mapFunc[, thisArg[, sameProps]])`
+
+Similar to `Array.prototype.map`, but for objects.
+
+## `Hebcal.filter(object, filterFunc[, thisArg])`
+
+Similar to `Array.prototype.filter`, but for objects. `filterFunc` supports multiple types:
+
+* Boolean: keep only truthy/falsey values
+* Array: keep only those keys
+* Function: test the function on each item of the object, passing it arguments `val, index, object`.
+
 ## `new Hebcal.Month(month, year)`
 
 This constructor contains information on a Hebrew month. It is not intended to be directly constructed, but it is fetched by `Hebcal.prototype.getMonth()`, so is useful to the end-user.
