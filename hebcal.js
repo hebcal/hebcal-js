@@ -610,7 +610,7 @@ HDate[prototype].tachanun = (function() {
 	};
 
 	function tachanun() {
-		var checkPrev = !arguments[0];
+		var checkNext = !arguments[0];
 
 		var year = this[getYearObject]();
 
@@ -644,10 +644,12 @@ HDate[prototype].tachanun = (function() {
 		if (all) {
 			return NONE;
 		}
-		if (checkPrev) {
-			return (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | ((this[next]().tachanun(true) & SHACHARIT) && MINCHA);
+		var ret;
+		if (checkNext) {
+			ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | ((this[next]().tachanun(true) & SHACHARIT) && MINCHA);
 		}
-		return (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | (this[getDay]() != 5 && MINCHA);
+		ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | (this[getDay]() != 5 && MINCHA);
+		return ret == ALL_CONGS ? NONE : ret;
 	}
 	return tachanun;
 })();
