@@ -2,10 +2,37 @@ var Hebcal = require('..'),
 	argv = require('./lib/argv'),
 	table = require('./lib/table'),
 	suntimes = require('./lib/suntimes'),
+	printObj = require('./lib/printObj'),
 	dayInfo = require('./day'),
 	main = require.main == module;
 
-var helpString = "node week -abcdghipq";
+var helpString = [
+	"Print out a calendar for a Hebrew week.",
+	"Options:\n" + table([
+		[""  , "--always", "Always display Tachanun and Hallel, even on ordinary days (only with the --tachanun and/or --hallel flags)"],
+		["-a", "--ashkenazis", "Use Ashkenazis Hebrew"],
+		["-b", "--table", "Print output in a tabular format"],
+		["-c", "--candles", "Print candle-lighting and havdalah times"],
+		["",   "--candleLighting=NUM", "Set the time for candle-lighting to NUM minutes before sunset"],
+		["",   "--city=CITY", "Set the city to the given CITY"],
+		["-d", "--holidays", "Print holidays occurring on each date"],
+		["",   "--dafyomi", "Print Daf Yomi for each day"],
+		["-g", "--greg", "Print the Gregorian date for each day"],
+		["",   "--hallel", "Print what Hallel is said on each date"],
+		["",   "--havdalah=NUM", "Set the time for havdalah to NUM minutes after sunset"],
+		["-h", "--help=SUBJECT", "With no subject, print this message and exit. The only subject available right now is times."],
+		["-i", "--ivrit", "Use Israeli Hebrew, in Hebrew characters"],
+		["",   "--omer", "Print Sefirat Haomer for each day, if applicable"],
+		["-p", "--parsha", "Print the parsha on Shabbat"],
+		["-q", "--quiet", "Don't print errors"],
+		["-t", "--times=LIST", "Print halachick times for the week. LIST should be a comma-separated list of times. If no list is provided, print all times. For a list of time names, run node week --help=times"],
+		["",   "--tachanun", "Print what Tachanun is said on each date"],
+	], {prefix: '    '}),
+	"As of now, all parameters MUST be given in = form. Required parameters to long arguments are also required to the short forms.",
+	"To print out this week with holidays, candle-lighting times for Jerusalem, parshiot, and the Gregorian dates in a table, you could use:\n    node week -bdcpg --city=Jerusalem",
+	"Table formatting is not guaranteed to be good; in fact it's nearly guaranteed to be messed up at least twice.",
+	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
+];
 
 var opts = {
 	lang: 's',
@@ -24,8 +51,21 @@ var opts = {
 		}
 		opts.times = times.split(',').map(function(str){return suntimes(str)});
 	},
-	h: function(){
-		console.log(helpString);
+	h: function(subject){
+		switch (subject) {
+			case undefined:
+				console.log(printObj(helpString));
+				break;
+			case 'times':
+				console.log(printObj([
+					"Each row is a list of synonyms for the times:",
+					table(suntimes.arr, {vert: ' '}),
+					"Time names are case insensitive."
+				]));
+				break;
+			default:
+				console.error("Unknown option to --help: " + subject);
+		}
 		process.kill();
 	},
 	q: function(){opts.quiet = true}
@@ -131,7 +171,7 @@ if (main) {
 		parsha: shortargs.p,
 		candles: shortargs.c,
 		holidays: shortargs.d,
-		showgreg: shortargs.g,
+		greg: shortargs.g,
 		times: shortargs.t,
 		tachanun: function(){opts.tachanun = true},
 		hallel: function(){opts.hallel = true},
@@ -150,10 +190,12 @@ if (main) {
 		argv.warn();
 	}
 
-	var echo = module.exports(opts), i;
-	for (i in echo) {
-		console.log(echo[i]);
-		console.log('');
+	try {
+		console.log(printObj(module.exports(opts)));
+	} catch(e) {
+		if (!opts.quiet) {
+			throw e;
+		}
 	}
 	process.kill();
 }

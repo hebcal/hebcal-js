@@ -2,9 +2,33 @@ var Hebcal = require('..'),
 	argv = require('./lib/argv'),
 	table = require('./lib/table'),
 	suntimes = require('./lib/suntimes'),
+	printObj = require('./lib/printObj'),
 	main = require.main == module;
 
-var helpString = "node day -aipdghq";
+var helpString = [
+	"Print out information for a Hebrew day.",
+	"Options:\n" + table([
+		["-a", "--ashkenazis", "Use Ashkenazis Hebrew"],
+		["-c", "--candles", "Print candle-lighting and havdalah times"],
+		["",   "--candleLighting=NUM", "Set the time for candle-lighting to NUM minutes before sunset"],
+		["",   "--city=CITY", "Set the city to the given CITY"],
+		["-d", "--holidays", "Print holidays"],
+		["",   "--dafyomi", "Print Daf Yomi"],
+		["-g", "--greg", "Print the Gregorian date"],
+		["",   "--hallel", "Print what Hallel is said"],
+		["",   "--havdalah=NUM", "Set the time for havdalah to NUM minutes after sunset"],
+		["-h", "--help=SUBJECT", "With no subject, print this message and exit. The only subject available right now is times."],
+		["-i", "--ivrit", "Use Israeli Hebrew, in Hebrew characters"],
+		["",   "--omer", "Print Sefirat Haomer, if applicable"],
+		["-p", "--parsha", "Print the parsha on Shabbat"],
+		["-q", "--quiet", "Don't print errors"],
+		["-t", "--times=LIST", "Print halachick times for the day. LIST should be a comma-separated list of times. If no list is provided, print all times. For a list of time names, run node day --help=times"],
+		["",   "--tachanun", "Print what Tachanun is said"],
+	], {prefix: '    '}),
+	"As of now, all parameters MUST be given in = form. Required parameters to long arguments are also required to the short forms.",
+	"To print out this day with holidays, halachick times for Jerusalem, parshiot, and the Gregorian date, you could use:\n    node day -dcpgt --city=Jerusalem",
+	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
+];
 
 var opts = {
 	lang: 's',
@@ -22,8 +46,21 @@ var opts = {
 		}
 		opts.times = times.split(',').map(function(str){return suntimes(str)});
 	},
-	h: function(){
-		console.log(helpString);
+	h: function(subject){
+		switch (subject) {
+			case undefined:
+				console.log(printObj(helpString));
+				break;
+			case 'times':
+				console.log(printObj([
+					"Each row is a list of synonyms for the times:",
+					table(suntimes.arr, {vert: ' '}),
+					"Time names are case insensitive."
+				]));
+				break;
+			default:
+				console.error("Unknown option to --help: " + subject);
+		}
 		process.kill();
 	},
 	q: function(){opts.quiet = true}
@@ -124,7 +161,7 @@ if (main) {
 		parsha: shortargs.p,
 		candles: shortargs.c,
 		holidays: shortargs.d,
-		showgreg: shortargs.g,
+		greg: shortargs.g,
 		times: shortargs.t,
 		tachanun: function(){opts.tachanun = true},
 		hallel: function(){opts.hallel = true},
@@ -139,9 +176,12 @@ if (main) {
 		argv.warn();
 	}
 
-	var echo = module.exports(opts), i;
-	for (i in echo) {
-		console.log(echo[i].toString());
+	try {
+		console.log(printObj(module.exports(opts)));
+	} catch(e) {
+		if (!opts.quiet) {
+			throw e;
+		}
 	}
 	process.kill();
 }

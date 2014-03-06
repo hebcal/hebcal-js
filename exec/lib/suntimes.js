@@ -42,3 +42,21 @@ module.exports = function(time){
 module.exports.add = function(time, replace) {
 	map[time] = replace;
 };
+
+module.exports.map = map;
+
+module.exports.arr = [
+	[ 'chatzot', 'chatzot', 'chatzos', 'midday', 'mid' ],
+	[ 'chatzot night', 'chatzot night', 'midnight' ],
+	[ 'alot hashacher', 'alot hashacher', 'alot', 'alos hashacher', 'alos', 'dawn' ],
+	[ 'misheyakir', 'misheyakir', 'tefillin', 'tallit', 'tallis' ],
+	[ 'misheyakir machmir', 'misheyakir machmir' ],
+	[ 'sof zman shma', 'sof zman shma', 'shma' ],
+	[ 'sof zman tfilla', 'sof zman tfilla', 'tfilla' ],
+	[ 'mincha gedola', 'mincha gedola' ],
+	[ 'mincha ketana', 'mincha ketana' ],
+	[ 'plag hamincha', 'plag hamincha', 'plag' ],
+	[ 'tzeit', 'tzeit', 'tzeis', 'nightfall' ],
+	[ 'neitz hachama', 'neitz hachama', 'neitz', 'sunrise', 'rise' ],
+	[ 'shkiah', 'shkiah', 'sunset', 'set' ]
+];
