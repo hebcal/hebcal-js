@@ -15,6 +15,7 @@ var helpString = [
 		["-c", "--candles", "Print candle-lighting and havdalah times"],
 		["",   "--candleLighting=NUM", "Set the time for candle-lighting to NUM minutes before sunset"],
 		["",   "--city=CITY", "Set the city to the given CITY"],
+		["",   "--day=DATE", "Print the week of DATE"],
 		["-d", "--holidays", "Print holidays occurring on each date"],
 		["",   "--dafyomi", "Print Daf Yomi for each day"],
 		["-g", "--greg", "Print the Gregorian date for each day"],
@@ -28,7 +29,7 @@ var helpString = [
 		["-t", "--times=LIST", "Print halachick times for the week. LIST should be a comma-separated list of times. If no list is provided, print all times. For a list of time names, run node week --help=times"],
 		["",   "--tachanun", "Print what Tachanun is said on each date"],
 	], {prefix: '    '}),
-	"As of now, all parameters MUST be given in = form. Required parameters to long arguments are also required to the short forms.",
+	"Required parameters to long arguments are also required to the short forms.",
 	"To print out this week with holidays, candle-lighting times for Jerusalem, parshiot, and the Gregorian dates in a table, you could use:\n    node week -bdcpg --city=Jerusalem",
 	"Table formatting is not guaranteed to be good; in fact it's nearly guaranteed to be messed up at least twice.",
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"

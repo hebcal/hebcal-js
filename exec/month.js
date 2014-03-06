@@ -30,7 +30,7 @@ var helpString = [
 		["",   "--tachanun", "Print what Tachanun is said on each date"],
 		["-y", "--year=NUM", "Set the current year to the given one"]
 	], {prefix: '    '}),
-	"As of now, all parameters MUST be given in = form. Required parameters to long arguments are also required to the short forms.",
+	"Required parameters to long arguments are also required to the short forms.",
 	"To print out this month with holidays, candle-lighting times for Jerusalem, parshiot, and the Gregorian dates in a table, you could use:\n    node month -tdcpg --city=Jerusalem",
 	"Table formatting is not guaranteed to be good; in fact it's nearly guaranteed to be messed up at least twice.",
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"

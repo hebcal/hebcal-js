@@ -12,6 +12,7 @@ var helpString = [
 		["-c", "--candles", "Print candle-lighting and havdalah times"],
 		["",   "--candleLighting=NUM", "Set the time for candle-lighting to NUM minutes before sunset"],
 		["",   "--city=CITY", "Set the city to the given CITY"],
+		["",   "--day=DATE", "Print the information for DATE"],
 		["-d", "--holidays", "Print holidays"],
 		["",   "--dafyomi", "Print Daf Yomi"],
 		["-g", "--greg", "Print the Gregorian date"],
@@ -25,7 +26,7 @@ var helpString = [
 		["-t", "--times=LIST", "Print halachick times for the day. LIST should be a comma-separated list of times. If no list is provided, print all times. For a list of time names, run node day --help=times"],
 		["",   "--tachanun", "Print what Tachanun is said"],
 	], {prefix: '    '}),
-	"As of now, all parameters MUST be given in = form. Required parameters to long arguments are also required to the short forms.",
+	"Required parameters to long arguments are also required to the short forms.",
 	"To print out this day with holidays, halachick times for Jerusalem, parshiot, and the Gregorian date, you could use:\n    node day -dcpgt --city=Jerusalem",
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
 ];
