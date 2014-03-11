@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 var Hebcal = require('..'),
-	argv = require('./lib/argv'),
-	table = require('./lib/table'),
-	suntimes = require('./lib/suntimes'),
-	printObj = require('./lib/printObj'),
+	argv = require('../lib/argv'),
+	table = require('../lib/table'),
+	suntimes = require('../lib/suntimes'),
+	printObj = require('../lib/printObj'),
 	dayInfo = require('./day'),
 	weekInfo = require('./week'),
 	monthInfo = require('./month'),

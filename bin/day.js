@@ -1,8 +1,8 @@
 var Hebcal = require('..'),
-	argv = require('./lib/argv'),
-	table = require('./lib/table'),
-	suntimes = require('./lib/suntimes'),
-	printObj = require('./lib/printObj'),
+	argv = require('../lib/argv'),
+	table = require('../lib/table'),
+	suntimes = require('../lib/suntimes'),
+	printObj = require('../lib/printObj'),
 	main = require.main == module;
 
 var helpString = [

@@ -24,7 +24,7 @@
 	"license": "GPL-3.0+",
 	"main": "hebcal.js",
 	"bin": {
-		"hebcaljs": "exec/hebcal.js"
+		"hebcaljs": "bin/hebcal.js"
 	},
 	"dependencies": {
 		"suncalc": ""
