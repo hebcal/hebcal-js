@@ -3,6 +3,7 @@ var map = {
 	chatzos: 'chatzot',
 	midday: 'chatzot',
 	mid: 'chatzot',
+	noon: 'chatzot',
 	chatzot_night: 'chatzot_night',
 	midnight: 'chatzot_night',
 	alot_hashacher: 'alot_hashacher',

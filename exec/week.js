@@ -35,6 +35,10 @@ var helpString = [
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
 ];
 
+if (process.env.HEBCAL_CITY) {
+	Hebcal.defaultCity = process.env.HEBCAL_CITY;
+}
+
 var opts = {
 	lang: 's',
 	times: []
@@ -46,6 +50,7 @@ var opts = {
 	g: function(){opts.greg = true},
 	c: function(){opts.candles = true},
 	b: function(){opts.table = true},
+	O: function(){opts.only = true},
 	t: function(times){
 		if (!times) {
 			times = Object.keys(new Hebcal.HDate().getZemanim()).join(',');
@@ -131,6 +136,9 @@ module.exports = function(opts) {
 			o.parsha = false;
 			o.times = [];
 			day = dayInfo(o);
+			if (o.only && !day.holidays) {
+				return;
+			}
 			if (!opts.always) {
 				if (day.tachanun && day.tachanun.val == 7) {
 					delete day.tachanun;
@@ -184,6 +192,7 @@ if (main) {
 		help: shortargs.h,
 		quiet: shortargs.q,
 		table: shortargs.b,
+		"only-events": shortargs.O,
 		always: function(){opts.always = true}
 	});
 

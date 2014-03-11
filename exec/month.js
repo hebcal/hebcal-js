@@ -36,6 +36,10 @@ var helpString = [
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
 ];
 
+if (process.env.HEBCAL_CITY) {
+	Hebcal.defaultCity = process.env.HEBCAL_CITY;
+}
+
 var opts = {
 	lang: 's',
 	month: new Hebcal.HDate().getMonth(),
@@ -48,6 +52,7 @@ var opts = {
 	g: function(){opts.greg = true},
 	c: function(){opts.candles = true},
 	t: function(){opts.table = true},
+	O: function(){opts.only = true},
 	m: function(month){opts.month = month},
 	y: function(year){opts.year = year},
 	h: function(){
@@ -131,6 +136,7 @@ if (main) {
 		help: shortargs.h,
 		quiet: shortargs.q,
 		table: shortargs.t,
+		"only-events": shortargs.O,
 		always: function(){opts.always = true}
 	});
 

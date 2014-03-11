@@ -31,6 +31,10 @@ var helpString = [
 	"For information using Hebcal programatically, see https://github.com/hebcal/hebcal and https://github.com/hebcal/hebcal-js"
 ];
 
+if (process.env.HEBCAL_CITY) {
+	Hebcal.defaultCity = process.env.HEBCAL_CITY;
+}
+
 var opts = {
 	lang: 's',
 	times: []

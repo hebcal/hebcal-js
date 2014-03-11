@@ -23,6 +23,9 @@
 	"bugs": "https://github.com/hebcal/hebcal-js/issues",
 	"license": "GPL-3.0+",
 	"main": "hebcal.js",
+	"bin": {
+		"hebcaljs": "exec/hebcal.js"
+	},
 	"dependencies": {
 		"suncalc": ""
 	},
