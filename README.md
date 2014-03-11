@@ -80,6 +80,20 @@ When using Hebcal JS in the browser, it may be helpful for debugging to include 
 
 Be forewarned: the ordering of properties/methods in this documentation is almost completely arbitrary. It mostly follows the order of the code, which is itself written in pretty much whatever order i decided i needed those methods. If you're looking for a specific thing, i highly recommend using your browser's find tool (ctrl+f, or cmd+f for you Mac types). If you just want to know everything about Hebcal JS, just start at the top and work your way down.
 
+## Command line interface
+
+Hebcal JS (as of v2.1) also provides a simple CLI. It's mainly for just testing output. If you really need an advanced CLI, use the [main Hebcal code](https://github.com/hebcal/hebcal/tree/master/c).
+
+You can access this CLI by installing Hebcal JS globally from NPM:
+
+```sh
+npm install -g hebcal
+```
+
+This exposes the `hebcaljs` command. This is to differentiate it from the ordinary `hebcal` command.
+
+For usage information, run `hebcaljs -h`.
+
 ## `Hebcal`
 
 The global variable (if running in the browser) `Hebcal` is the entrypoint to Hebcal. It is a constructor returning an object represtenting a Hebrew year, and also has many other properties.

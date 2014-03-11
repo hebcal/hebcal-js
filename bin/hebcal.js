@@ -11,7 +11,7 @@ var Hebcal = require('..'),
 	fs = require('fs');
 
 var helpString = [
-	"Print out a calendar for a Hebrew month.",
+	"Print out information about a Hebrew date range. With no arguments, it just prints the current Hebrew date.",
 	"Options:\n" + table([
 		[""  , "--always", "Always display Tachanun and Hallel, even on ordinary days (only with the --tachanun and/or --hallel flags)"],
 		["-a", "--ashkenazis", "Use Ashkenazis Hebrew"],
