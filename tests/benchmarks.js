@@ -22,7 +22,7 @@ Hebcal.range(1,100).map(function(){new Hebcal.HDate});
 hrtimer('new Hebcal.HDate()');
 console.log('');
 
-var today = new Hebcal.HDate;
+var today = new Hebcal.HDate, year = new Hebcal;
 
 console.log('today.tachanun() once');
 hrtimer('today.tachanun()');
@@ -33,6 +33,12 @@ console.log('');
 console.log('today.tachanun() 100 times');
 hrtimer('today.tachanun()');
 Hebcal.range(1,100).map(function(){today.tachanun()});
+hrtimer('today.tachanun()');
+console.log('');
+
+console.log('.tachanun() for every day of the year');
+hrtimer('today.tachanun()');
+year.map(function(d){d.tachanun()});
 hrtimer('today.tachanun()');
 console.log('');
 
@@ -48,9 +54,21 @@ Hebcal.range(1,100).map(function(){today.hallel()});
 hrtimer('today.hallel()');
 console.log('');
 
+console.log('.hallel() for every day of the year');
+hrtimer('today.hallel()');
+year.map(function(d){d.hallel()});
+hrtimer('today.hallel()');
+console.log('');
+
 console.log('today.holidays() 100 times');
 hrtimer('today.holidays()');
 Hebcal.range(1,100).map(function(){today.holidays()});
+hrtimer('today.holidays()');
+console.log('');
+
+console.log('.holidays() for every day of the year');
+hrtimer('today.holidays()');
+year.map(function(d){d.holidays()});
 hrtimer('today.holidays()');
 console.log('');
 
@@ -63,6 +81,12 @@ console.log('');
 console.log('today.getSedra() 100 times');
 hrtimer('today.getSedra()');
 Hebcal.range(1,100).map(function(){today.getSedra()});
+hrtimer('today.getSedra()');
+console.log('');
+
+console.log('.getSedra() for every day of the year');
+hrtimer('today.getSedra()');
+year.map(function(d){d.getSedra()});
 hrtimer('today.getSedra()');
 console.log('');
 

@@ -1,4 +1,4 @@
-version 2.1 (2014-02-23 beta)
+version 2.1 (2014-03-13 beta)
 	Add Hebcal.GregYear and Hebcal.GregMonth constructors
 	Fix issue with passing a string day to new HDate(day, month[, year])
 	Fix broken Adar 1/2 to new HDate(string)
@@ -28,6 +28,7 @@ version 2.1 (2014-02-23 beta)
 	Change default havdalah offset to 42
 	Fix bug with HDate(29 Adar2).next() going to the next year
 	Add command line interface
+	Add a few unit tests
 
 version 2.0 (2014-02-18)
 	Completely rewrote original JavaScript code
