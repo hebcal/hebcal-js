@@ -3,7 +3,7 @@
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -26,39 +26,28 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
  */
-window.Hebcal = require('./hebcal');
+window.Hebcal = require('..');
 
-var readyFunc, finished = false;
+var finished = false, warn = (typeof console != 'undefined' && (console.warn || console.log)) || function(){};
 
-Object.defineProperty(Hebcal, 'onready', {
-	enumberable: true,
-	configurable: true,
-
-	get: function() {
-		return readyFunc;
-	},
-	set: function(func) {
-		readyFunc = func;
-		if (!finished) {
-			finished = true;
-			Hebcal.onready();
-		}
+Hebcal.events.on('newListener', function(e){
+	if (e === 'ready' && !finished && Hebcal.ready) {
+		finished = Hebcal.events.emit('ready');
 	}
 });
 
-if (navigator.geolocation) {
-	Hebcal.ready = false;
-	navigator.geolocation.getCurrentPosition(function(p){
-		Hebcal.defaultLocation = [p.coords.latitude,p.coords.longitude];
-		ready();
-	}, ready);
-} else {
-	ready();
-}
+Object.defineProperty(Hebcal, 'onready', {
+	configurable: true,
 
-function ready() {
-	Hebcal.ready = true;
-	if (typeof Hebcal.onready === 'function') {
-		Hebcal.onready();
+	get: function() {
+		warn('Getting deprecated property Hebcal.onready');
+		return Hebcal.events.listeners('ready')[0];
+	},
+	set: function(func) {
+		warn('Setting deprecated property Hebcal.onready; use Hebcal.events.on(\'ready\', func) instead');
+		Hebcal.events.on('ready', func);
 	}
-}
+});
+
+Hebcal.ready = true;
+finished = Hebcal.events.emit('ready');

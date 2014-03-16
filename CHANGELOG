@@ -1,0 +1,34 @@
+version 2.1 (2014-03-16 [Purim 5774])
+	Add Hebcal.GregYear and Hebcal.GregMonth constructors
+	Fix issue with passing a string day to new HDate(day, month[, year])
+	Fix broken Adar 1/2 to new HDate(string)
+	Default unspecified Adar to be 1, not 2
+	Change behavior of Hebcal.prototype.map to map over individual days
+	Add hallel and tachanun to HDate()s
+	Add Hebcal.events property
+	Setting Hebcal.defaultLocation or Hebcal.defaultCity calls an event
+	Add Hebcal().getDay() method
+	Fix issue with new Hebcal(-1)
+	Make city names case-insensitive
+	Add Ashkenazis sedra names
+	Fix issue with Shabbat Mevarchim in Elul
+	Add Shabbat Mevarchim and Rosh Chodesh to holidays
+	Add HDate().onOrBefore()
+	Add Hebcal().days() and Hebcal().filter()
+	Remove some internal methods from the export
+	Fix small bug in Hebcal.GregYear().hebyears
+	Have HDate().getMonthObject(), getYearObject(), getGregMonthObject(), getGregYearObject() always return a value, even if unaffiliated
+	Move client files to new folder
+	Change cities to use lat/long decimals
+	Cache results of HDate().getSedra()
+	Add HDate().getParsha() alias of getSedra()
+	Add Hebcal.parshiot and Hebcal.LANGUAGE
+	Add Hebcal().findParsha()
+	Export Hebcal.map and Hebcal.filter
+	Change default havdalah offset to 42
+	Fix bug with HDate(29 Adar2).next() going to the next year
+	Add command line interface
+	Add a few unit tests
+
+version 2.0 (2014-02-18 [19 Adar 1 5774])
+	Completely rewrote original JavaScript code

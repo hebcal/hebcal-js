@@ -9,7 +9,7 @@ Hebcal JS is a JavaScript API to aid working with the Hebrew calendar. It is ava
 
 It can convert between Hebrew and Gregorian dates, get weekly sedra, holidays, and halachik times (_zemanim_).
 
-You can include it in a client-side (browser) script with the `client.min.js` script in this directory. It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
+You can include it in a client-side (browser) script with the `hebcal.min.js` script in the `client` subfolder. It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
 
 ```sh
 $ npm install hebcal
@@ -20,13 +20,20 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.0. It is approximately equivalent to Hebcal C 3.14.
 I (Eyal) did not write Hebcal JS 1.0. 2.0 is a nearly-complete rewrite of it.
 
+The version documented here is 2.1.0.
+
+## Releases
+
+* 2.0.0 - 2014-02-18 (19 Adar 1 5774)
+* 2.1.0 (current) - 2014-03-16 (14 Adar 2 5774 [Purim])
+
 ## Contributors
 
 Hebcal JS was ported from C by Eyal Schachter.
 
 The original C and JavaScript code was written by Danny Sadinoff, with contributions by Michael J. Radwin.
 
-## License
+## License / Distribution
 
 Copyright (C) 1994-2011 Danny Sadinoff
 Portions Copyright (c) 2011 Michael J. Radwin. All Rights Reserved.
@@ -35,7 +42,9 @@ Hebcal JavaScript is distributed under the GNU Public License version 3. The ori
 
 Remember, the GPL means you can't use this in a closed-source program!
 
-If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that I can adjust the program to meet users' needs.
+If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that i can adjust the program to meet users' needs.
+
+The original Hebcal is at [hebcal/hebcal](https://github.com/hebcal/hebcal).
 
 # API
 
@@ -58,19 +67,41 @@ Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, A
 
 ### Sun times
 
-Hebcal JS uses the [SunCalc](https://github.com/mourner/suncalc) JavaScript library to calculate sun times. They do not provide an accuracy claim, but I have found their times to be up to 3 minutes off from the accepted times. Do not rely on Zemanim until the last moment!
+Hebcal JS uses the [SunCalc](https://github.com/mourner/suncalc) JavaScript library to calculate sun times. They do not provide an accuracy claim, but i have found their times to be up to 3 minutes off from the accepted times. Do not rely on Zemanim until the last moment!
 
 ### Finding location in browser
 
-Both scripts run on the exact same code, except for one thing. In the browser, Hebcal will attempt to set `Hebcal.defaultLocation` to the user's location using the [geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) API. The `Hebcal.onready` event is fired once the location has been obtained, or failed to be obtained.
+Both scripts run on the exact same code, except for one thing. In the browser, Hebcal will attempt to set `Hebcal.defaultLocation` to the user's location using the [geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) API. The `ready` event (see `Hebcal.events`) is fired once the location has been obtained, or failed to be obtained.
 
 This will cause any webpages with the Hebcal script to request the user's permission to view their location. If they deny it, the default location will be `[0, 0]`.
 
-To turn of this feature, use the `client.noloc.min.js` script instead of the usual `client.min.js` script. The unminified version is `client.noloc.js`.
+To turn off this feature, use the `hebcal.noloc.min.js` script instead of the usual `hebcal.min.js` script. The unminified version is `hebcal.noloc.js`. All of these files are in the `client` folder.
+
+### Source maps
+
+When using Hebcal JS in the browser, it may be helpful for debugging to include a sourcemap file for browsers that support it. Both minified and unminified, regular and noloc, have a sourcemap file. This is `<js filename>.map`.
+
+### Ordering in this documentation
+
+Be forewarned: the ordering of properties/methods in this documentation is almost completely arbitrary. It mostly follows the order of the code, which is itself written in pretty much whatever order i decided i needed those methods. If you're looking for a specific thing, i highly recommend using your browser's find tool (ctrl+f, or cmd+f for you Mac types). If you just want to know everything about Hebcal JS, just start at the top and work your way down.
+
+## Command line interface
+
+Hebcal JS (as of v2.1) also provides a simple CLI. It's mainly for just testing output. If you really need an advanced CLI, use the [main Hebcal code](https://github.com/hebcal/hebcal/tree/master/c).
+
+You can access this CLI by installing Hebcal JS globally from NPM:
+
+```sh
+npm install -g hebcal
+```
+
+This exposes the `hebcaljs` command. This is to differentiate it from the ordinary `hebcal` command.
+
+For usage information, run `hebcaljs -h`.
 
 ## `Hebcal`
 
-The global variable (if running in the browser) `Hebcal` is the entrypoint to Hebcal. It is a constructor returning an object represtenting a Hebrew year, and also has other useful properties.
+The global variable (if running in the browser) `Hebcal` is the entrypoint to Hebcal. It is a constructor returning an object represtenting a Hebrew year, and also has many other properties.
 
 ```
 new Hebcal([year[, month]]);
@@ -79,9 +110,11 @@ new Hebcal([year[, month]]);
 `year`, if provided, should be an `int` representing a Hebrew year, for example, `5774`. If it is falsey (includes `null`, `undefined`, `0`, `false`, etc), it defaults to the current year. If it is not falsy, and not a number, Hebcal will throw an error.
 
 `month`, if provided, supports multiple types:
+
 * String -- The name of a single month.
 * Number -- The number of a single month (Nisan is 1, Tishrei 7).
 * Array -- An array of either of the above two, or mixed. Basically, anything that can be passed to `Hebcal.Month` (see below).
+
 If not provided, it defaults to all of the months in the given `year`.
 If it is a different type, Hebcal will throw an error.
 
@@ -95,28 +128,28 @@ var year = new Hebcal();
 
 #### `Hebcal.prototype.year`
 
-Number. The year represented in the `Hebcal`.
+Number. The year represented in the `Hebcal`. (Not actually a prototype value.)
 
 #### `Hebcal.prototype.months`
 
-Array of `Hebcal.Month`s. Is not intended to be used directly, but rather with the `getMonth()` and `map()` methods.
+Array of `Hebcal.Month`s. Is not intended to be used directly, but rather with the `getMonth()` and `map()` methods. (Not actually a prototype value.)
 
 #### `Hebcal.prototype.holidays`
 
-Array of holidays, as `Hebcal.holidays.Event`s, for the represented year. Can be used directly.
+Array of holidays, as `Hebcal.holidays.Event`s, for the represented year. Can be used directly. (Not actually a prototype value.)
 
 #### `Hebcal.prototype.length`
 
-Number of days in the year.
+Number of days in the year. (Not actually a prototype value.)
 
 #### `Hebcal.prototype.il`
 
 Boolean get/set. Whether the current location is in Israel or not. This is relevant with regards to holidays.
-This gets set by `Hebcal.defaultCity`, and `year.setCity()`. It's possible that you may have to set it yourself in certain circumstances.
+This gets set by `Hebcal.defaultCity`, and `year.setCity()`. It's possible that you may have to set it yourself in certain circumstances. (Not actually a prototype value.)
 
 #### `Hebcal.prototype.lat` and `long`
 
-Number get/sets. The latitude and longitude of the current location. This is relevant with regards to getting times for dates.
+Number get/sets. The latitude and longitude of the current location. This is relevant with regards to getting times for dates. (Not actually prototype values.)
 Default: 0.
 
 #### `Hebcal.prototype.setCity(city)`
@@ -177,9 +210,26 @@ If the month is a positive number, it is a month index. Remember, Nisan is 1, Ti
 If the month is a negative number, it is a month index from the end of the year.
 If the month is a string, it can be a month name in Hebrew or English.
 
+#### `Hebcal.prototype.getDay(day)`
+
+Takes a single argument, the day to get. `day` should be a number representing the number of days from Nisan 1. Nisan 1 is 1, Rosh Hashanah is usually a little above 200, but it can vary. Returns a `Hebcal.HDate` representing the requested day.
+
+If the day is a positive number, it is a day index.
+If the day is a negative number, it is a day index from the end of the year. So, 1 would be the 29th of Elul.
+
+#### `Hebcal.prototype.days()`
+
+Return an array of all the days in the year. This method was added in Hebcal JS 2.1.
+
 #### `Hebcal.prototype.map(mapFunc[, thisArg])`
 
-A shortcut for `year.months.map(mapFunc, [thisArg])`.
+In 2.0: A shortcut for `year.months.map(mapFunc, [thisArg])`.
+
+In 2.1 and beyond: Map over each day in the year, calling `mapFunc` in context of `thisArg`. Returns an array.
+
+#### `Hebcal.prototype.filter(filterFunc[, thisArg])`
+
+Only keep days in the year that pass the `filterFunc` tester function. Returns an array of `Hebcal.HDate`s. This method was added in Hebcal JS 2.1.
 
 #### `Hebcal.prototype.addHoliday(event)`
 
@@ -190,6 +240,16 @@ year.addHoliday(new Hebcal.holidays.Event(new Date(2014,0,1), 'New Years Day', H
 ```
 
 See `Hebcal.holidays` for more information on creating an event.
+
+#### `Hebcal.prototype.findSedra(parsha, o)`
+
+Find the Shabbat on which a given parsha is read. The parsha name (first argument) should correspond to the language string ('s', 'a', or 'h') in the second argument. If no second argument is provided, the parsha should be in Sfardit.
+
+This method was added in v2.1.
+
+#### `Hebcal.prototype.findParsha(parsha, o)`
+
+An alias of `findSedra()`. This method was added in v2.1.
 
 #### `Hebcal.prototype.find()`
 
@@ -243,7 +303,11 @@ Get locations for several cities around the world.
 
 Returns an array describing the location of a city, or an array of `0`s if the city wasn't found. This array is intended to be passed to `Hebcal.cities.getLocation()`.
 
-`[latdeg, latmins, longdeg, longmins, Israel]`
+In v2.0: `[/* number */ latdeg, /* number */ latmins, /* number */ longdeg, /* number */ longmins, /* boolean */ Israel]`
+
+In v2.1+: `[/* number */ lat, /* number */ long, /* boolean */ Israel]`
+
+The old syntax also works.
 
 ### `Hebcal.cities.getLocation(cityInfo)`
 
@@ -264,7 +328,7 @@ This method does not return anything.
 
 Return the name of the city nearest to the given coordinates.
 
-The coordinates can be given either as numbers, or as arrays of `[deg, mins]`.
+The coordinates can be given either as numbers, or as arrays of `[deg, mins]`. The array format is deprecated as of v2.1.
 
 ## `Hebcal.defaultCity`
 
@@ -309,11 +373,11 @@ A constructor for Events. This is meant to be added to a holidays list.
 
 #### `Hebcal.holidays.Event.prototype.date`
 
-A `Hebcal.HDate` representing the date passed to the constructor.
+A `Hebcal.HDate` representing the date passed to the constructor. (Not actually a prototype value.)
 
 #### `Hebcal.holidays.Event.prototype.desc`
 
-An Array, either the array passed as `desc`, or the string passed, wrapped in an array.
+An Array, either the array passed as `desc`, or the string passed, wrapped in an array. (Not actually a prototype value.)
 
 #### `Hebcal.holidays.Event.prototype.IGNORE_YEAR`
 
@@ -326,7 +390,7 @@ Boolean, whether or not we ignore the year of the date. Always true for Gregoria
 #### `Hebcal.holidays.Event.prototype.IL_ONLY`
 #### `Hebcal.holidays.Event.prototype.LIGHT_CANDLES_TZEIS`
 
-Booleans, whether or not the bitmasks for those values were provided.
+Booleans, whether or not the bitmasks for those values were provided. (Not actually prototype values.)
 
 #### `Hebcal.holidays.Event.prototype.is([date[, il]])`
 
@@ -366,15 +430,19 @@ The number of minutes before sunset to light candles. Defaults to 18.
 
 #### `Hebcal.holidays.Event.havdalah`
 
-The number of minutes after sunset to make havdalah. Defaults to 50.
+The number of minutes after sunset to make havdalah. Defaults to 42. In v2.0, it defaulted to 50.
 
 ### `Hebcal.holidays.standards`
 
 Array of standard holidays that do not change based on years. Is used internally, and exported only incidentally.
 
+This has been **removed** as of Hebcal JS 2.1.
+
 ### `Hebcal.holidays.getHolidaysForYear(year)`
 
 Returns an array of all holidays for the year, including variable ones. Is used internally, and exported only incidentally.
+
+This has been **removed** as of Hebcal JS 2.1.
 
 ## `Hebcal.candleLighting`
 
@@ -384,7 +452,15 @@ An alias of `Hebcal.holidays.Event.candleLighting`.
 
 An alias of `Hebcal.holidays.Event.havdalah`.
 
-## `Hebcal.gematriya(num | string[, limit])`
+## `Hebcal.parshiot`
+
+An array of parsha names. Each item in the array is a description array (see intro). The second item is often null, so it is worthwhile to use `Hebcal.LANGUAGE()` to extract the names. This property was added in v2.1.
+
+## `Hebcal.LANGUAGE(str, o)`
+
+Return a language from a string. `o` should be a standard options string. This is mostly internal, but can be useful with regards to `Hebcal.parshiot` (above), for listing parsha names in a certain language. This property was added in v2.1.
+
+## `Hebcal.gematriya(string | num[, limit])`
 
 Return a gematriya string from a number, or a number from a string. Is imperfect above 1000.
 
@@ -412,9 +488,21 @@ Hebcal.range(15, 1, 3) // [15, 12, 9, 6, 3]
 Hebcal.range(1, 2, 0.25) // [1, 1.25, 1.5, 1.75, 2]
 ```
 
+## `Hebcal.map(object, mapFunc[, thisArg[, sameProps]])`
+
+Similar to `Array.prototype.map`, but for objects.
+
+## `Hebcal.filter(object, filterFunc[, thisArg])`
+
+Similar to `Array.prototype.filter`, but for objects. `filterFunc` supports multiple types:
+
+* Boolean: keep only truthy/falsey values
+* Array: keep only those keys
+* Function: test the function on each item of the object, passing it arguments `val, index, object`.
+
 ## `new Hebcal.Month(month, year)`
 
-This constructor contains information on a Hebrew month. It is not intended to be directly constructed, but is fetched by `Hebcal.prototype.getMonth()`, so is useful to the end-user.
+This constructor contains information on a Hebrew month. It is not intended to be directly constructed, but it is fetched by `Hebcal.prototype.getMonth()`, so is useful to the end-user.
 
 ```js
 var month = new Hebcal.Month(7, 5774); // Tishrei
@@ -425,31 +513,31 @@ var month = new Hebcal.Month('Tishrei', 5774); // Tishrei
 
 ### `Hebcal.Month.prototype.month`
 
-A number representing the `month` argument to the constructor.
+A number representing the `month` argument to the constructor. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.year`
 
-A number representing the `year` argument to the constructor.
+A number representing the `year` argument to the constructor. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.days`
 
-An array of days in the month. Each day is an instance of `Hebcal.HDate`.
+An array of days in the month. Each day is an instance of `Hebcal.HDate`. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.length`
 
-Number; the length of the month. Equivalent to the length of the `days` array.
+Number; the length of the month. Equivalent to the length of the `days` array. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.il`
 
-Boolean get/set. Whether or not the location is in Israel. Is usually set by the parent year.
+Boolean get/set. Whether or not the location is in Israel. Is usually set by the parent year. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.lat`, `Hebcal.Month.prototype.long`
 
-Number get/set. Latitude/Longitude of the location. Is usually set by the parent year.
+Number get/set. Latitude/Longitude of the location. Is usually set by the parent year. (Not actually prototype values.)
 
 ### `Hebcal.Month.prototype.__year`
 
-Internal, non-enumerable. A reference to the containing year. Only set if the month was created by a `Hebcal()`.
+Internal, non-enumerable. A reference to the containing year. Only set if the month was created by a `Hebcal()`. (Not actually a prototype value.)
 
 ### `Hebcal.Month.prototype.isLeapYear()`
 
@@ -470,6 +558,8 @@ Returns a `Hebcal.HDate` at a 1-based index in the month. Negative indices are f
 ### `Hebcal.Month.prototype.getYearObject()`
 
 Returns `this.__year` internal value.
+
+As of v2.1, if it is "unaffiliated" (no `__year`), return a new `Hebcal` object.
 
 ### `Hebcal.Month.prototype.getName(o)`
 
@@ -492,7 +582,7 @@ If `day` is a number, it is a 1-based index in the month. String, `Hebcal.HDate`
 Default strings are:
 
 * `rosh_chodesh`: Same as `Hebcal.Month.prototype.rosh_chodesh()`
-* `shabbat_mevarchim` (aliased as `shabbos_mevarchim`): The last Shabbat in the month.
+* `shabbat_mevarchim` (aliased as `shabbos_mevorchim`): The last Shabbat in the month.
 
 Strings are extensible in the same manner: Add a property of `Hebcal.Month.prototype.find.strings`. Name conversion rules and function context apply the same as with `Hebcal.prototype.find()`.
 
@@ -522,7 +612,7 @@ If 1 argument is passed:
 ```js
 var day = new Hebcal.HDate(new Date(2014, 0, 1));
 var day = new Hebcal.HDate('1 Tishrei 5774');
-var day = new Hebcal.HDate('15 Adar2 5774');
+var day = new Hebcal.HDate('15 Adar 2 5774');
 ```
 
 If 2: An `HDate` with the given `day` and `month`, and the current year.
@@ -545,29 +635,29 @@ The location will be set to `Hebcal.defaultLocation`.
 
 ### `Hebcal.HDate.prototype.year`
 
-Number. The year passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getFullYear()`.
+Number. The year passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getFullYear()`. (Not actually a prototype value.)
 
 ### `Hebcal.HDate.prototype.month`
 
-Number. The month passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getMonth()`.
+Number. The month passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getMonth()`. (Not actually a prototype value.)
 
 ### `Hebcal.HDate.prototype.day`
 
-Number. The day passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getDate()`.
+Number. The day passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getDate()`. (Not actually a prototype value.)
 
 ### `Hebcal.HDate.prototype.lat`
 ### `Hebcal.HDate.prototype.long`
 
-Numbers. The latitude/longitude of the location. These default to the values of `Hebcal.defaultLocation`.
+Numbers. The latitude/longitude of the location. These default to the values of `Hebcal.defaultLocation`. (Not actually prototype values.)
 
 ### `Hebcal.HDate.prototype.il`
 
 Boolean. Whether the current location is in Israel or not. This is relevant with regards to holidays.
-This gets set by `Hebcal.defaultCity`, and `day.setCity()`. It's possible that you may have to set it yourself in certain circumstances.
+This gets set by `Hebcal.defaultCity`, and `day.setCity()`. It's possible that you may have to set it yourself in certain circumstances. (Not actually a prototype value.)
 
 ### `Hebcal.HDate.prototype.__month`
 
-Internal, non-enumerable. A reference to the containing month. Only set if the day was created by a `Hebcal.Month()`.
+Internal, non-enumerable. A reference to the containing month. Only set if the day was created by a `Hebcal.Month()`. (Not actually a prototype value.)
 
 ### `Hebcal.HDate.prototype.getFullYear()`
 
@@ -649,6 +739,10 @@ new Hebcal.HDate(19,12,5773).getSedra('a') // [ 'Ki Tisa' ]
 new Hebcal.HDate(8,8,5774).getSedra('h') // [ 'לך-לך' ]
 ```
 
+### `Hebcal.HDate.prototype.getParsha(o)`
+
+An alias of `getSedra()`. Added v2.1.
+
 ### `Hebcal.HDate.prototype.setCity(city)`
 
 Set the location to the coordinates of a given city. For more about cities, see `Hebcal.cities`. Returns the object it was called upon.
@@ -692,11 +786,13 @@ Returns an object containing halachik times (zemanim) for the day. Each property
 * `alot_hashacher` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx))
 * `misheyakir` (calculated as when the sun is at -11.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `misheyakir_machmir` (calculated as when the sun is at -10.2 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
+* `neitz_hachama` (the same as sunrise, but allows an event to be fired (added 2.1))
 * `sof_zman_shma` (calculated as sunrise + 3 hours, according to the Gra and Baal HaTanya)
 * `sof_zman_tfilla` (calculated as sunrise + 4 hours, according to the Gra and Baal HaTanya)
 * `mincha_gedola` (calculated as sunrise + 6.5 hours)
 * `mincha_ketana` (calculated as sunrise + 9.5 hours)
 * `plag_hamincha` (calculated as sunrise + 10.75 hours)
+* `shkiah` (the same as sunset, but allows an event to be fired (added 2.1))
 * `tzeit` (calculated as when the sun is at -8.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 
 You can add a zeman to be returned with `Hebcal.HDate.addZeman()` (aliased as `Hebcal.addZeman()`).
@@ -723,6 +819,16 @@ Returns an `HDate` representing the last day `dayNumber` before the current date
 
 ```js
 new Hebcal.HDate(new Date('Wednesday February 19, 2014')).before(6).greg() // Sat Feb 15 2014
+```
+
+### `Hebcal.HDate.prototype.onOrBefore(dayNumber)`
+
+Returns an `HDate` representing the a `dayNumber` on or before the current date. Sunday is 0, Saturday 6. This property was added in Hebcal JS 2.1.
+
+```js
+new Hebcal.HDate(new Date('Wednesday February 19, 2014')).onOrBefore(6).greg() // Sat Feb 15 2014
+new Hebcal.HDate(new Date('Saturday February 22, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
+new Hebcal.HDate(new Date('Sunday February 23, 2014')).onOrBefore(6).greg() // Sat Feb 22 2014
 ```
 
 ### `Hebcal.HDate.prototype.nearest(dayNumber)`
@@ -758,9 +864,19 @@ new Hebcal.HDate(new Date('Sunday February 23, 2014')).after(6).greg() // Sat Ma
 
 Return `this.__month` internal.
 
+As of v2.1, if it is "unaffiliated" (no `__month`), return a new `Hebcal.Month`.
+
 ### `Hebcal.HDate.prototype.getYearObject()`
 
 Call `getYearObject()` of `this.getMonthObject()`.
+
+### `Hebcal.HDate.prototype.getGregMonthObject()`
+
+Return `this.__gregmonth` internal, or a new `Hebcal.GregMonth`. This method was added in Hebcal JS 2.1.
+
+### `Hebcal.HDate.prototype.getGregYearObject()`
+
+Call `getYearObject()` of `this.getGregMonthObject()`. This method was added in Hebcal JS 2.1.
 
 ### `Hebcal.HDate.prototype.holidays()`
 
@@ -785,6 +901,54 @@ new Hebcal.HDate(15, 'nisan', 5774).dafyomi() // Beitzah 16
 new Hebcal.HDate(15, 'elul', 5772).dafyomi('a') // Berachos 30
 ```
 
+### `Hebcal.HDate.prototype.tachanun()`
+
+Return a bitmask containing information on what Tachanun (or Tzidchatcha on Shabbat) is said on that day.
+
+Tachanun is not said on Rosh Chodesh, the month of Nisan, Lag Baomer, Rosh Chodesh Sivan until Isru Chag, Tisha B'av, 15 Av, Erev Rosh Hashanah, Rosh Hashanah, Erev Yom Kippur until after Simchat Torah, Chanukah, Tu B'shvat, Purim and Shushan Purim, and Purim and Shushan Purim Katan.
+
+In some congregations Tachanun is not said until from Rosh Chodesh Sivan until 14th Sivan, Sukkot until after Rosh Chodesh Cheshvan, Pesach Sheini, Yom Ha'atzmaut, and Yom Yerushalayim.
+
+Tachanun is not said at Mincha on days before it is not said at Shacharit. Tachanun is not said at Shacharit on Shabbat, but is at Mincha, usually.
+
+The bitmask is made up of the following values:
+
+* 0 - No Tachanun, according to everybody
+* 1 - Tachanun is said at Mincha
+* 2 - Tachanun is said at Shacharit
+* 4 - All congregations say Tachanun on the day
+
+These bitmasks are also available as properties of the function:
+
+* `tachanun.NONE = 0`
+* `tachanun.MINCHA = 1`
+* `tachanun.SHACHARIT = 2`
+* `tachanun.ALL_CONGS = 4`
+
+However, due to the lengthliness of typing `Hebcal.HDate.prototype.tachanun.*BITMASK*`, it may be easier to just use the values directly.
+
+### `Hebcal.HDate.prototype.hallel()`
+
+Return a number containing information on what Hallel is said on that day.
+
+Whole Hallel is said on Chanukah, the first Yom Tov of Pesach, Shavuot, Sukkot, Yom Ha'atzmaut, and Yom Yerushalayim.
+
+Half Hallel is said on Rosh Chodesh (not Rosh Hashanah), and the last 6 days of Pesach.
+
+The number is one of the following values:
+
+* 0 - No Hallel
+* 1 - Half Hallel
+* 2 - Whole Hallel
+
+These values are also available as properties of the function:
+
+* `hallel.NONE = 0`
+* `hallel.HALF = 1`
+* `hallel.WHOLE = 2`
+
+However, due to the uncomfortableness of typing `Hebcal.HDate.prototype.hallel.*BITMASK*`, it may be easier to just use the values directly.
+
 ### `Hebcal.HDate.defaultLocation`
 
 An alias of `Hebcal.defaultLocation`.
@@ -797,9 +961,13 @@ An alias of `Hebcal.defaultCity`.
 
 Return an absolute date from an `HDate`. Equivalent to `Hebcal.HDate.prototype.abs()`.
 
+**Obsolete** in 2.1. Use `HDate().abs()`.
+
 ### `Hebcal.HDate.abs2hebrew(absdate)`
 
 Return an `HDate` from absolute date. Equivalent to `new Hebcal.HDate(absdate)`.
+
+**Obsolete** in 2.1. Use `new HDate()`.
 
 ### `Hebcal.HDate.addZeman(zeman, func)`
 
@@ -811,11 +979,258 @@ Add a zeman to the object of times returned by `Hebcal.HDate.prototype.getZemani
 
 Boolean; whether the geolocating code has completed or failed yet. If using the noloc script, it is always true.
 
-## `Hebcal.onready()` (client-side only)
+## `Hebcal.onready()` (client-side only, deprecated 2.1)
 
 Set this to a function to be executed when geolocation has finished. Is called immediately upon being set in a no-loc environment.
 
 This function is liable to be buggy.
+
+This has been replaced as of Hebcal 2.1 with the `ready` event (see below). It will still work, but it is preferable not to use it.
+
+## `Hebcal.events`
+
+A bunch of Hebcal-related events. This object is an instance of Node's [`events.EventEmitter`](http://nodejs.org/api/events.html). See there for methods.
+
+Just a quick overview in case you don't feel like looking there right now:
+
+```js
+Hebcal.events.on('locationChange', function(oldloc){
+	console.log('moved from '+oldloc+' to '+Hebcal.defaultLocation);
+});
+Hebcal.events.removeListener('locationChange', Hebcal.events.listeners('locationChange')[0]);
+```
+
+This property is new in Hebcal 2.1.
+
+### `Hebcal.events.refreshInterval`
+
+Number get/set. How often, in milliseconds, to check for zemanim and day changes.
+Upon being set, it updates the time of the interval.
+Defaults to 300000, which is 5 minutes.
+If set to 0, disables checking.
+
+### `Hebcal.events.beforeZeman`
+
+Number. If it is under this number of milliseconds before a zeman, call the `almostZeman` event.
+Defaults to 600000, which is 10 minutes.
+
+### `Hebcal.events.customs`
+
+Object of custom events, default empty. Each key in the object should be the name of a custom event, the property a `Date` object or UNIX timestamp number.
+
+A `custom` event will be fired when the date reaches one of these times.
+
+I figured that as long as i was building in time-based alerts, i could add this.
+
+### Events that can be emitted
+
+#### `ready` (client-side only)
+
+Fires when geolocating finished. If it is only set after geolocation finishes, all `ready` events are called then.
+
+#### `locationChange`
+
+Fires when the location is set using `Hebcal.defaultLocation` or `Hebcal.defaultCity`. WARNING: it does not fire when using `Hebcal.HDate.defaultLocation` or `Hebcal.HDate.defaultCity`.
+
+#### `dayChange`
+
+Fires at sunset. Sunset is calculated according to `Hebcal.defaultLocation`.
+
+#### `almostZeman(zeman, msUntil)`
+
+Fires when it is almost a zeman. Almost is if the current time is less than `Hebcal.events.beforeZeman` milliseconds until a zeman. Zemanim are calculated according to `Hebcal.defaultLocation`.
+
+The callback function for this event is passed two parameters: the name of the zeman, and the number of milliseconds until it occurs (approximately).
+
+#### `atZeman(zeman)`
+
+Fires when the time is at a zeman. Zemanim are calculated according to `Hebcal.defaultLocation`. This is not precise; rather, it fires if there will not be another check before the zeman passes.
+
+The callback function for this event is passed one parameter: the name of the zeman.
+
+#### `custom(time)`
+
+Fires when the time is at a custom breakpoint. This is not precise; rather, it fires if there will not be another check before the time passes.
+
+The callback function for this event is passed one parameter: the name of the custom event.
+
+## `new Hebcal.GregYear([year[, month]])`
+
+A constructor similar to `new Hebcal()`, but instead of being based on Hebrew years, `GregYear` is based on a Gregorian year. This property was added in Hebcal JS 2.1.
+
+`year`, if provided, should be a number representing a Gregorian year, for example, `2014`.
+If it is falsey (includes `null`, `undefined`, `0`, `false`, etc), it defaults to the current year.
+
+If it is a string, it can either be just a number with the year, or a year number and month. Anything that `new Date()` accepts works. For example, all of the following evaluate to February 2014: `2014-2`, `2014 Feb`, `2014/02`, `February 2014`.
+
+If it is not falsy, and not a number or string, Hebcal will throw an error.
+
+`month`, if provided, supports multiple types:
+
+* String -- The name of a single month.
+* Number -- The number of a single month (January is 1)
+* Array -- An array of either of the above two, or mixed. Basically, anything that can be passed to `Hebcal.GregMonth` (see below).
+
+If not provided, it defaults to all of the months in the given `year`.
+If it is a different type, Hebcal will throw an error.
+
+To get the full current year:
+
+```js
+var gregyear = new Hebcal.GregYear();
+```
+
+### `Hebcal.GregYear.prototype.year`
+
+Number. The year passed to the constructor. (Not actually a prototype value.)
+
+### `Hebcal.GregYear.prototype.months`
+
+Array of `Hebcal.GregMonth`s. Is not intended to be used directly, but rather with the `getMonth()` and `map()` methods. (Not actually a prototype value.)
+
+### `Hebcal.GregYear.prototype.hebyears`
+
+Array of numbers, which Hebrew years are in this Gregorian year. Only includes Hebrew years for the months passed.
+
+### `Hebcal.GregYear.prototype.holidays`
+
+Array of holidays, as `Hebcal.holidays.Event`s, for the represented year. Can be used directly. (Not actually a prototype value.)
+
+### `Hebcal.GregYear.prototype.length`
+
+Number of days in the year. (Not actually a prototype value.)
+
+### `Hebcal.GregYear.prototype.il`
+
+Boolean get/set. Whether the current location is in Israel or not. This is relevant with regards to holidays.
+This gets set by `Hebcal.defaultCity`, and `gregyear.setCity()`. It's possible that you may have to set it yourself in certain circumstances. (Not actually a prototype value.)
+
+### `Hebcal.GregYear.prototype.lat` and `long`
+
+Number get/sets. The latitude and longitude of the current location. This is relevant with regards to getting times for dates. (Not actually prototype values.)
+Default: 0.
+
+### `Hebcal.GregYear.prototype.isLeapYear()`
+
+Returns a Boolean, takes no arguments.
+
+### `Hebcal.GregYear.prototype.setCity(city)`
+
+Functions exactly the same as `Hebcal.prototype.setCity(city)`.
+
+### `Hebcal.GregYear.prototype.setLocation(lat, long)`
+
+Functions exactly the same as `Hebcal.prototype.setLocation(lat, long)`.
+
+### `Hebcal.GregYear.prototype.next()`
+
+Return a `Hebcal.GregYear` for the following year. Takes 0 arguments.
+
+### `Hebcal.GregYear.prototype.prev()`
+
+Return a `Hebcal.GregYear` for the preceding year. Takes 0 arguments.
+
+### `Hebcal.GregYear.prototype.getMonth(month)`
+
+```js
+var jan = year.getMonth(1);
+var dec = year.getMonth(-1);
+var sept = year.getMonth('sept');
+var nextJan = year.getMonth(13);
+```
+
+Takes a single argument, the month to get. Returns `Hebcal.GregMonth` representing the requested month.
+
+If the month is a positive number, it is a month index.
+If the month is a negative number, it is a month index from the end of the year.
+If the month is a string, it should be a month name in English.
+
+### `Hebcal.GregYear.prototype.days()`
+
+Functions exactly the same as `Hebcal.prototype.days()`.
+
+### `Hebcal.GregYear.prototype.map(mapFunc[, thisArg])`
+
+Functions exactly the same as `Hebcal.prototype.map(mapFunc, thisArg)`.
+
+### `Hebcal.GregYear.prototype.filter(filterFunc[, thisArg])`
+
+Functions exactly the same as `Hebcal.prototype.filter(filterFunc, thisArg)`.
+
+### `Hebcal.GregYear.prototype.addHoliday(event)`
+
+Functions exactly the same as `Hebcal.prototype.addHoliday(event)`.
+
+## `new Hebcal.GregMonth(month, year)`
+
+This constructor contains information on a Gregorian month. It is not intended to be directly constructed, but it is fetched by `Hebcal.GregYear.prototype.getMonth()`, so is useful to the end-user. This property was added in Hebcal JS 2.1.
+
+```js
+var month = new Hebcal.Month(3, 2014); // March
+var month = new Hebcal.Month('September', 2014); // September
+```
+
+`month` can be a month name or number; `year` must be a number. An error is thrown if one of these conditions is not met.
+
+### `Hebcal.GregMonth.prototype.month`
+
+A number representing the `month` argument to the constructor. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.year`
+
+A number representing the `year` argument to the constructor. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.days`
+
+An array of days in the month. Each day is an instance of `Hebcal.HDate`. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.length`
+
+Number; the length of the month. Equivalent to the length of the `days` array. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.il`
+
+Boolean get/set. Whether or not the location is in Israel. Is usually set by the parent year. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.lat`, `Hebcal.GregMonth.prototype.long`
+
+Number get/set. Latitude/Longitude of the location. Is usually set by the parent year. (Not actually prototype values.)
+
+### `Hebcal.GregMonth.prototype.__year`
+
+Internal, non-enumerable. A reference to the containing year. Only set if the month was created by a `Hebcal.GregYear()`. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.hebmonths`
+
+Array of Hebrew months in the Gregorian month. Each item of the array is an object with properties `month` and `year`. (Not actually a prototype value.)
+
+### `Hebcal.GregMonth.prototype.isLeapYear()`
+
+Returns a Boolean, whether or not the year is a leap year.
+
+### `Hebcal.GregMonth.prototype.prev()`
+
+Returns a `Hebcal.GregMonth` representing the previous month.
+
+### `Hebcal.GregMonth.prototype.next()`
+
+Returns a `Hebcal.GregMonth` representing the following month.
+
+### `Hebcal.GregMonth.prototype.getDay(day)`
+
+Returns a `Hebcal.HDate` at a 1-based index in the month. Negative indices are from the end of the month.
+
+### `Hebcal.GregMonth.prototype.getYearObject()`
+
+Returns `this.__year` internal value. If it is "unaffiliated" (no `__year`), return a new `Hebcal.GregYear` object.
+
+### `Hebcal.GregMonth.prototype.getName()`
+
+Returns a string with the name of the month in English.
+
+### `Hebcal.GregMonth.prototype.map(mapFunc[, thisArg])`
+
+A shortcut for `month.days.map(mapFunc, [thisArg])`.
 
 ## Finale
 

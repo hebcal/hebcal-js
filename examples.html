@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Hebcal examples</title>
-		<script type="text/javascript" src="client.min.js"></script>
+		<script type="text/javascript" src="client/hebcal.min.js"></script>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	</head>
 	<body>
@@ -47,7 +47,7 @@
 
 		<script type="text/javascript">
 var d = document, o, year, today;
-Hebcal.onready = function() {
+Hebcal.events.on('ready', function() {
 	year = new Hebcal();
 	function load() {
 		o = d.querySelector('#textstyle').value;
@@ -101,7 +101,9 @@ Hebcal.onready = function() {
 			'Shabbat: ' + bm.onOrAfter(6).toString(o) + ', ' + bm.onOrAfter(6).greg().toDateString() + '<br/>' +
 			'Parsha: ' + bm.getSedra(o);
 	};
-};
+}).on('almostZeman', function(zeman, time){
+	alert('It is ' + ~~(time / 1000 / 60) + ' minutes until ' + zeman + '.');
+});
 		</script>
 	</body>
 </html>

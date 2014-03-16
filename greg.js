@@ -3,7 +3,7 @@
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 exports.monthNames = [
 	'',
@@ -42,10 +41,18 @@ exports.monthNames = [
 	'December'
 ];
 
+exports.lookupMonthNum = function lookupMonthNum(month) {
+	return new Date(month + ' 1').getMonth() + 1;
+};
+
 exports.monthLengths = [
 	[0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	[0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 ];
+
+exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
+	return exports.monthLengths[+LEAP(year)][month];
+};
 
 exports.shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -110,7 +117,7 @@ exports.abs2greg = function abs2greg(theDate) {
 	d.setFullYear(year);
 	return d;
 
-
+/*
 	console.log(year)
 	var month = 1, mlen;
 	console.log(month)
@@ -125,4 +132,5 @@ exports.abs2greg = function abs2greg(theDate) {
 	d.setFullYear(year);
 	console.log(d)
 	return d;
+*/
 };

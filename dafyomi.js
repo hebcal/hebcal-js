@@ -3,7 +3,7 @@
 	Copyright (C) 1994-2004  Danny Sadinoff
 	Portions Copyright (c) 2002 Michael J. Radwin. All Rights Reserved.
 
-	https://github.com/hebcal/hebcal
+	https://github.com/hebcal/hebcal-js
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-	Danny Sadinoff can be reached at 
-	danny@sadinoff.com
+	Danny Sadinoff can be reached at danny@sadinoff.com
 
 	Michael Radwin has made significant contributions as a result of
 	maintaining hebcal.com.
 
-	The JavaScript code was completely rewritten in 2014 by Eyal Schachter
+	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
 var c = require('./common'), greg = require('./greg');
 
@@ -33,49 +32,49 @@ var shas = [
 	[ "Berachot",       "Berachos",         "ברכות",         64  ],
 	[ "Shabbat",        "Shabbos",          "שבת",          157 ],
 	[ "Eruvin",         "Eruvin",           "ערובין",         105 ],
-	[ "Pesachim",       "Pesachim",         "פסחים",         121 ],
-	[ "Shekalim",       "Shekalim",         "שקלים",         22  ],
-	[ "Yoma",           "Yoma",             "יומא",           88  ],
-	[ "Sukkah",         "Sukkah",           "סוכה",          56  ],
-	[ "Beitzah",        "Beitzah",          "ביצה",          40  ],
-	[ "Rosh Hashana",   "Rosh Hashana",     "ראש השנה",      35  ],
+	[ "Pesachim",       0,                  "פסחים",         121 ],
+	[ "Shekalim",       0,                  "שקלים",         22  ],
+	[ "Yoma",           0,                  "יומא",           88  ],
+	[ "Sukkah",         0,                  "סוכה",          56  ],
+	[ "Beitzah",        0,                  "ביצה",          40  ],
+	[ "Rosh Hashana",   0,                  "ראש השנה",      35  ],
 	[ "Taanit",         "Taanis",           "תענית",          31  ],
-	[ "Megillah",       "Megillah",         "מגילה",          32  ],
-	[ "Moed Katan",     "Moed Katan",       "מועד קטן",       29  ],
-	[ "Chagigah",       "Chagigah",         "חגיגה",          27  ],
+	[ "Megillah",       0,                  "מגילה",          32  ],
+	[ "Moed Katan",     0,                  "מועד קטן",       29  ],
+	[ "Chagigah",       0,                  "חגיגה",          27  ],
 	[ "Yevamot",        "Yevamos",          "יבמות",          122 ],
 	[ "Ketubot",        "Kesubos",          "כתובות",         112 ],
-	[ "Nedarim",        "Nedarim",          "נדרים",          91  ],
-	[ "Nazir",          "Nazir",            "נזיר",           66  ],
-	[ "Sotah",          "Sotah",            "סוטה",          49  ],
-	[ "Gitin",          "Gitin",            "גיטין",           90  ],
-	[ "Kiddushin",      "Kiddushin",        "קידושין",         82  ],
-	[ "Baba Kamma",     "Baba Kamma",       "בבא קמא",      119 ],
-	[ "Baba Metzia",    "Baba Metzia",      "בבא מציעא",     119 ],
+	[ "Nedarim",        0,                  "נדרים",          91  ],
+	[ "Nazir",          0,                  "נזיר",           66  ],
+	[ "Sotah",          0,                  "סוטה",          49  ],
+	[ "Gitin",          0,                  "גיטין",           90  ],
+	[ "Kiddushin",      0,                  "קידושין",         82  ],
+	[ "Baba Kamma",     0,                  "בבא קמא",      119 ],
+	[ "Baba Metzia",    0,                  "בבא מציעא",     119 ],
 	[ "Baba Batra",     "Baba Basra",       "בבא בתרא",     176 ],
-	[ "Sanhedrin",      "Sanhedrin",        "סנהדרין",        113 ],
+	[ "Sanhedrin",      0,                  "סנהדרין",        113 ],
 	[ "Makkot",         "Makkos",           "מכות",          24  ],
 	[ "Shevuot",        "Shevuos",          "שבועות",        49  ],
-	[ "Avodah Zarah",   "Avodah Zarah",     "עבודה זרה",     76  ],
+	[ "Avodah Zarah",   0,                  "עבודה זרה",     76  ],
 	[ "Horayot",        "Horayos",          "הוריות",         14  ],
-	[ "Zevachim",       "Zevachim",         "זבכים",         120 ],
+	[ "Zevachim",       0,                  "זבכים",         120 ],
 	[ "Menachot",       "Menachos",         "מנחות",         110 ],
-	[ "Chullin",        "Chullin",          "חולין",          142 ],
+	[ "Chullin",        0,                  "חולין",          142 ],
 	[ "Bechorot",       "Bechoros",         "בכורות",         61  ],
-	[ "Arachin",        "Arachin",          "ערכין",          34  ],
-	[ "Temurah",        "Temurah",          "תמורה",         34  ],
+	[ "Arachin",        0,                  "ערכין",          34  ],
+	[ "Temurah",        0,                  "תמורה",         34  ],
 	[ "Keritot",        "Kerisos",          "כריתות",         28  ],
-	[ "Meilah",         "Meilah",           "מעילה",         22  ],
-	[ "Kinnim",         "Kinnim",           "כינים",          4   ],
-	[ "Tamid",          "Tamid",            "תמיד",          10  ],
+	[ "Meilah",         0,                  "מעילה",         22  ],
+	[ "Kinnim",         0,                  "כינים",          4   ],
+	[ "Tamid",          0,                  "תמיד",          10  ],
 	[ "Midot",          "Midos",            "מידות",          4   ],
-	[ "Niddah",         "Niddah",           "נידה",           73  ]
+	[ "Niddah",         0,                  "נידה",           73  ]
 ].map(function(m){
 	return {name: m.slice(0,3), blatt: m[3]};
 });
 
 function dafyomi(gregdate) {
-	var dafcnt = 40, cno, dno, osday, nsday, total, count, j, cday, blatt, tmp_date;
+	var dafcnt = 40, cno, dno, osday, nsday, total, count, j, cday, blatt;
 
 	if (!(gregdate instanceof Date)) {
 		throw new TypeError('non-date given to dafyomi');
