@@ -16,7 +16,6 @@ version 2.1 (2014-03-16 [Purim 5774])
 	Add HDate().onOrBefore()
 	Add Hebcal().days() and Hebcal().filter()
 	Remove some internal methods from the export
-	Fix small bug in Hebcal.GregYear().hebyears
 	Have HDate().getMonthObject(), getYearObject(), getGregMonthObject(), getGregYearObject() always return a value, even if unaffiliated
 	Move client files to new folder
 	Change cities to use lat/long decimals
