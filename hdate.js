@@ -325,12 +325,16 @@ HDate[prototype].setLocation = function setLocation(lat, lon) {
 	return this;
 };
 
+function suntime(hdate) {
+	return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long);
+}
+
 HDate[prototype].sunrise = function sunrise() {
-	return suncalc.getTimes(this.greg(), this.lat, this.long).sunrise;
+	return suntime(this).sunrise;
 };
 
 HDate[prototype].sunset = function sunset() {
-	return suncalc.getTimes(this.greg(), this.lat, this.long).sunset;
+	return suntime(this).sunset;
 };
 
 HDate[prototype][hour] = function hour() {
@@ -351,39 +355,43 @@ HDate[prototype].nightHourMins = function nightHourMins() {
 	return this.nightHour() / (1000 * 60);
 };
 
+function hourOffset(hdate, hours) {
+	return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * hours));
+}
+
 var zemanim = {
 	chatzot: function chatzot(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 6));
+		return hourOffset(hdate, 6);
 	},
 	chatzot_night: function chatzot_night(hdate) {
 		return new Date(hdate.sunrise()[getTime]() - (hdate.nightHour() * 6));
 	},
 	alot_hashacher: function alot_hashacher(hdate) {
-		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).alot_hashacher;
+		return suntime(hdate).alot_hashacher;
 	},
 	misheyakir: function misheyakir(hdate) {
-		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).misheyakir;
+		return suntime(hdate).misheyakir;
 	},
 	misheyakir_machmir: function misheyakir_machmir(hdate) {
-		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).misheyakir_machmir;
+		return suntime(hdate).misheyakir_machmir;
 	},
 	sof_zman_shma: function sof_zman_shma(hdate) { // Gra
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 3));
+		return hourOffset(hdate, 3);
 	},
 	sof_zman_tfilla: function sof_zman_tfilla(hdate) { // Gra
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 4));
+		return hourOffset(hdate, 4);
 	},
 	mincha_gedola: function mincha_gedola(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 6.5));
+		return hourOffset(hdate, 6.5);
 	},
 	mincha_ketana: function mincha_ketana(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 9.5));
+		return hourOffset(hdate, 9.5);
 	},
 	plag_hamincha: function plag(hdate) {
-		return new Date(hdate.sunrise()[getTime]() + (hdate[hour]() * 10.75));
+		return hourOffset(hdate, 10.75);
 	},
 	tzeit: function tzeit(hdate) {
-		return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long).tzeit;
+		return suntime(hdate).tzeit;
 	},
 	neitz_hachama: function neitz(hdate) {
 		return hdate.sunrise();

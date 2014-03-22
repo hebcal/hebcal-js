@@ -56,6 +56,16 @@ var prototype = 'prototype',
 	TISHREI = months.TISHREI,
 	NISAN = months.NISAN;
 
+function getset(g, s) {
+	return {
+		enumerable: true,
+		configurable: true,
+
+		get: g,
+		set: s
+	};
+}
+
 // Main Hebcal function
 
 function Hebcal(year, month) {
@@ -95,46 +105,28 @@ function Hebcal(year, month) {
 
 	this[length] = c.days_in_heb_year(year);
 
-	defProp(this, 'il', {
-		enumerable: true,
-		configurable: true,
+	defProp(this, 'il', getset(function() {
+		return this[getMonth](1).il;
+	}, function(il) {
+		this.months.forEach(function(m){
+			m.il = il;
+		});
+	}));
 
-		get: function() {
-			return this[getMonth](1).il;
-		},
-		set: function(il) {
-			this.months.forEach(function(m){
-				m.il = il;
-			});
-		}
-	});
-
-	defProp(this, 'lat', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getMonth](1).lat;
-		},
-		set: function(lat) {
-			this.months.forEach(function(m){
-				m.lat = lat;
-			});
-		}
-	});
-	defProp(this, 'long', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getMonth](1).long;
-		},
-		set: function(lon) {
-			this.months.forEach(function(m){
-				m.long = lon;
-			});
-		}
-	});
+	defProp(this, 'lat', getset(function() {
+		return this[getMonth](1).lat;
+	}, function(lat) {
+		this.months.forEach(function(m){
+			m.lat = lat;
+		});
+	}));
+	defProp(this, 'long', getset(function() {
+		return this[getMonth](1).long;
+	}, function(lon) {
+		this.months.forEach(function(m){
+			m.long = lon;
+		});
+	}));
 }
 
 Hebcal[prototype][isLeapYear] = HDate[prototype][isLeapYear];
@@ -310,54 +302,30 @@ Hebcal[map] = c[map];
 
 Hebcal.filter = c.filter;
 
-defProp(Hebcal, 'defaultLocation', {
-	enumerable: true,
-	configurable: true,
+defProp(Hebcal, 'defaultLocation', getset(function(){
+	return HDate.defaultLocation;
+}, function(loc){
+	Hebcal.events.emit('locationChange', HDate.defaultLocation);
+	HDate.defaultLocation = loc;
+}));
+defProp(Hebcal, 'defaultCity', getset(function(){
+	return HDate.defaultCity;
+}, function(city){
+	var loc = cities.getLocation(cities.getCity(city));
+	Hebcal.defaultLocation = [loc.lat, loc.long]; // call the event
+}));
 
-	get: function() {
-		return HDate.defaultLocation;
-	},
-	set: function(loc) {
-		Hebcal.events.emit('locationChange', HDate.defaultLocation);
-		HDate.defaultLocation = loc;
-	}
-});
-defProp(Hebcal, 'defaultCity', {
-	enumerable: true,
-	configurable: true,
+defProp(Hebcal, 'candleLighting', getset(function(){
+	return holidays.Event.candleLighting;
+}, function(mins){
+	holidays.Event.candleLighting = mins;
+}));
 
-	get: function() {
-		return HDate.defaultCity;
-	},
-	set: function(city) {
-		var loc = cities.getLocation(cities.getCity(city));
-		Hebcal.defaultLocation = [loc.lat, loc.long]; // call the event
-	}
-});
-
-defProp(Hebcal, 'candleLighting', {
-	enumerable: true,
-	configurable: true,
-
-	get: function() {
-		return holidays.Event.candleLighting;
-	},
-	set: function(mins) {
-		holidays.Event.candleLighting = mins;
-	}
-});
-
-defProp(Hebcal, 'havdalah', {
-	enumerable: true,
-	configurable: true,
-
-	get: function() {
-		return holidays.Event.havdalah;
-	},
-	set: function(mins) {
-		holidays.Event.havdalah = mins;
-	}
-});
+defProp(Hebcal, 'havdalah', getset(function(){
+	return holidays.Event.havdalah;
+}, function(mins){
+	holidays.Event.havdalah = mins;
+}));
 
 // Months
 
@@ -388,46 +356,28 @@ Hebcal[Month] = function Month(month, year) {
 		return h.date[getMonth]() === month;
 	}, this);
 
-	defProp(this, 'il', {
-		enumerable: true,
-		configurable: true,
+	defProp(this, 'il', getset(function(){
+		return this[getDay](1).il;
+	}, function(il){
+		this.days.forEach(function(d){
+			d.il = il;
+		});
+	}));
 
-		get: function() {
-			return this[getDay](1).il;
-		},
-		set: function(il) {
-			this.days.forEach(function(d){
-				d.il = il;
-			});
-		}
-	});
-
-	defProp(this, 'lat', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getDay](1).lat;
-		},
-		set: function(lat) {
-			this.days.forEach(function(d){
-				d.lat = lat;
-			});
-		}
-	});
-	defProp(this, 'long', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getDay](1).long;
-		},
-		set: function(lon) {
-			this.days.forEach(function(d){
-				d.long = lon;
-			});
-		}
-	});
+	defProp(this, 'lat', getset(function(){
+		return this[getDay](1).lat;
+	}, function(lat){
+		this.days.forEach(function(d){
+			d.lat = lat;
+		});
+	}));
+	defProp(this, 'long', getset(function(){
+		return this[getDay](1).long;
+	}, function(lon){
+		this.days.forEach(function(d){
+			d.long = lon;
+		});
+	}));
 
 	return this;
 };
@@ -695,23 +645,17 @@ HDate[prototype].hallel = (function() {
 (function(events){
 	var refreshInterval, refresh, today = new HDate();
 
-	defProp(events, 'refreshInterval', {
-		configurable: true,
-		enumerable: true,
-
-		get: function() {
-			return refreshInterval;
-		},
-		set: function(ms) {
-			if (refresh) {
-				refresh = clearInterval(refresh);
-			}
-			refreshInterval = ms;
-			if (ms) {
-				refresh = setInterval(checkTimes, ms);
-			}
+	defProp(events, 'refreshInterval', getset(function(){
+		return refreshInterval;
+	}, function(ms){
+		if (refresh) {
+			refresh = clearInterval(refresh);
 		}
-	});
+		refreshInterval = ms;
+		if (ms) {
+			refresh = setInterval(checkTimes, ms);
+		}
+	}));
 
 	events.beforeZeman = 1000 * 60 * 10; // 10 minutes
 
@@ -815,46 +759,28 @@ Hebcal[GregYear] = function GregYearConstructor(year, month) {
 
 	this[length] = 365 + greg.LEAP(year);
 
-	defProp(this, 'il', {
-		enumerable: true,
-		configurable: true,
+	defProp(this, 'il', getset(function() {
+		return this[getMonth](1).il;
+	}, function(il) {
+		this.months.forEach(function(m){
+			m.il = il;
+		});
+	}));
 
-		get: function() {
-			return this[getMonth](1).il;
-		},
-		set: function(il) {
-			this.months.forEach(function(m){
-				m.il = il;
-			});
-		}
-	});
-
-	defProp(this, 'lat', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getMonth](1).lat;
-		},
-		set: function(lat) {
-			this.months.forEach(function(m){
-				m.lat = lat;
-			});
-		}
-	});
-	defProp(this, 'long', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getMonth](1).long;
-		},
-		set: function(lon) {
-			this.months.forEach(function(m){
-				m.long = lon;
-			});
-		}
-	});
+	defProp(this, 'lat', getset(function() {
+		return this[getMonth](1).lat;
+	}, function(lat) {
+		this.months.forEach(function(m){
+			m.lat = lat;
+		});
+	}));
+	defProp(this, 'long', getset(function() {
+		return this[getMonth](1).long;
+	}, function(lon) {
+		this.months.forEach(function(m){
+			m.long = lon;
+		});
+	}));
 
 	return this;
 };
@@ -921,46 +847,28 @@ Hebcal[GregMonth] = function GregMonth(month, year) {
 		return i === 0 || val.month !== arr[0].month;
 	});
 
-	defProp(this, 'il', {
-		enumerable: true,
-		configurable: true,
+	defProp(this, 'il', getset(function(){
+		return this[getDay](1).il;
+	}, function(il){
+		this.days.forEach(function(d){
+			d.il = il;
+		});
+	}));
 
-		get: function() {
-			return this[getDay](1).il;
-		},
-		set: function(il) {
-			this.days.forEach(function(d){
-				d.il = il;
-			});
-		}
-	});
-
-	defProp(this, 'lat', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getDay](1).lat;
-		},
-		set: function(lat) {
-			this.days.forEach(function(d){
-				d.lat = lat;
-			});
-		}
-	});
-	defProp(this, 'long', {
-		enumerable: true,
-		configurable: true,
-
-		get: function() {
-			return this[getDay](1).long;
-		},
-		set: function(lon) {
-			this.days.forEach(function(d){
-				d.long = lon;
-			});
-		}
-	});
+	defProp(this, 'lat', getset(function(){
+		return this[getDay](1).lat;
+	}, function(lat){
+		this.days.forEach(function(d){
+			d.lat = lat;
+		});
+	}));
+	defProp(this, 'long', getset(function(){
+		return this[getDay](1).long;
+	}, function(lon){
+		this.days.forEach(function(d){
+			d.long = lon;
+		});
+	}));
 
 	return this;
 };
