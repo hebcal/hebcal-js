@@ -498,33 +498,7 @@ exports.year = function(year) {
 		));
 	}
 
-	if (year >= 5708) { // Yom HaAtzma'ut only celebrated after 1948
-		tmpDate = new HDate(1, months.IYYAR, year);
-
-		if (pesach[getDay]() === c.days.SUN) {
-			tmpDate.setDate(2);
-		} else if (pesach[getDay]() === SAT) {
-			tmpDate.setDate(3);
-		} else if (year < 5764) {
-			tmpDate.setDate(4);
-		} else if (pesach[getDay]() === c.days.TUE) {
-			tmpDate.setDate(5);
-		} else {
-			tmpDate.setDate(4);
-		}
-
-		h[push](new Event(
-			tmpDate,
-			['Yom HaZikaron', 0, 'יום הזיכרון'],
-			0
-		));
-
-		h[push](new Event(
-			tmpDate.next(),
-			['Yom HaAtzma\'ut', 0, 'יום העצמאות'],
-			0
-		));
-	}
+	h = h.concat(atzamaut(year));
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
 		h[push](new Event(
@@ -628,3 +602,33 @@ exports.year = function(year) {
 
 	return (__cache[year] = h);
 };
+
+function atzamaut(year) {
+	if (year >= 5708) { // Yom HaAtzma'ut only celebrated after 1948
+		var tmpDate = new HDate(1, months.IYYAR, year), pesach = new HDate(15, NISAN, year);
+
+		if (pesach[getDay]() === c.days.SUN) {
+			tmpDate.setDate(2);
+		} else if (pesach[getDay]() === SAT) {
+			tmpDate.setDate(3);
+		} else if (year < 5764) {
+			tmpDate.setDate(4);
+		} else if (pesach[getDay]() === c.days.TUE) {
+			tmpDate.setDate(5);
+		} else {
+			tmpDate.setDate(4);
+		}
+
+		return [new Event(
+			tmpDate,
+			['Yom HaZikaron', 0, 'יום הזיכרון'],
+			0
+		), new Event(
+			tmpDate.next(),
+			['Yom HaAtzma\'ut', 0, 'יום העצמאות'],
+			0
+		)];
+	}
+	return [];
+}
+exports.atzamaut = atzamaut;

@@ -48,11 +48,13 @@ var prototype = 'prototype',
 	getDay = 'getDay',
 	getMonth = 'getMonth',
 	getFullYear = 'getFullYear',
+	isLeapYear = 'isLeapYear',
 	length = 'length',
 	next = 'next',
 	prev = 'prev',
-	TISHREI = c.months.TISHREI,
-	NISAN = c.months.NISAN;
+	months = c.months,
+	TISHREI = months.TISHREI,
+	NISAN = months.NISAN;
 
 // Main Hebcal function
 
@@ -135,7 +137,7 @@ function Hebcal(year, month) {
 	});
 }
 
-Hebcal[prototype].isLeapYear = HDate[prototype].isLeapYear;
+Hebcal[prototype][isLeapYear] = HDate[prototype][isLeapYear];
 
 Hebcal[prototype].setCity = function setCity(city) {
 	this.months.forEach(function(m){
@@ -174,7 +176,7 @@ Hebcal[prototype][getDay] = function getDay(day) {
 	if (day < 0) {
 		return this[getDay](this[length] - day);
 	}
-	var rosh = this[find](29, c.months.ELUL)[0].abs() + 1 - this[find](1, NISAN)[0].abs(); // number of days between Nisan and Tishrei
+	var rosh = this[find](29, months.ELUL)[0].abs() + 1 - this[find](1, NISAN)[0].abs(); // number of days between Nisan and Tishrei
 	if (day <= rosh) {
 		return this[getMonth](NISAN)[getDay](day);
 	}
@@ -280,7 +282,7 @@ Hebcal[prototype][find][strings].sukkot = function sukkot() {
 };
 Hebcal[prototype][find][strings].succot = Hebcal[prototype][find][strings].succos = Hebcal[prototype][find][strings].sukkos = Hebcal[prototype][find][strings].sukkot;
 Hebcal[prototype][find][strings].shavuot = function shavuot() {
-	return this[find](c.range(6, 7-this.il), c.months.SIVAN);
+	return this[find](c.range(6, 7-this.il), months.SIVAN);
 };
 Hebcal[prototype][find][strings].shavuos = Hebcal[prototype][find][strings].shavuot;
 Hebcal[prototype][find][strings].rosh_hashana = function rosh_hashana() {
@@ -430,13 +432,13 @@ Hebcal[Month] = function Month(month, year) {
 	return this;
 };
 
-Hebcal[Month][prototype].isLeapYear = HDate[prototype].isLeapYear;
+Hebcal[Month][prototype][isLeapYear] = HDate[prototype][isLeapYear];
 
 Hebcal[Month][prototype][prev] = function() {
 	if (this.month === 1) { // Nisan
 		return this[getYearObject]()[getMonth](-1);
 	} else if (this.month === TISHREI) {
-		return this[getYearObject]()[prev]()[getMonth](c.months.ELUL);
+		return this[getYearObject]()[prev]()[getMonth](months.ELUL);
 	} else {
 		return this[getYearObject]()[getMonth](this.month - 1);
 	}
@@ -445,7 +447,7 @@ Hebcal[Month][prototype][prev] = function() {
 Hebcal[Month][prototype][next] = function() {
 	if (this.month === c.MONTHS_IN_HEB(this.year)) { // Adar
 		return this[getYearObject]()[getMonth](1);
-	} else if (this.month === c.months.ELUL) {
+	} else if (this.month === months.ELUL) {
 		return this[getYearObject]()[next]()[getMonth](TISHREI);
 	} else {
 		return this[getYearObject]()[getMonth](this.month + 1);
@@ -465,7 +467,7 @@ Hebcal[Month][prototype][getYearObject] = function getYearObject() {
 };
 
 Hebcal[Month][prototype].getName = function getName(o) {
-	return c.LANGUAGE(c.monthNames[+this.isLeapYear()][this.month], o);
+	return c.LANGUAGE(c.monthNames[+this[isLeapYear]()][this.month], o);
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
@@ -522,7 +524,7 @@ Hebcal[Month][prototype][find][strings].rosh_chodesh = function rosh_chodesh() {
 	return this.rosh_chodesh();
 };
 Hebcal[Month][prototype][find][strings].shabbat_mevarchim = function shabbat_mevarchim() {
-	return this.month === c.months.ELUL ? [] : // No birchat hachodesh in Elul
+	return this.month === months.ELUL ? [] : // No birchat hachodesh in Elul
 		this[find](this[getDay](29).onOrBefore(c.days.SAT));
 };
 Hebcal[Month][prototype][find][strings].shabbos_mevarchim = Hebcal[Month][prototype][find][strings].shabbos_mevorchim = Hebcal[Month][prototype][find][strings].shabbat_mevarchim;
@@ -583,7 +585,7 @@ HDate[prototype].holidays = function holidays() {
 
 HDate[prototype].omer = function omer() {
 	if (this.greg().getTime() > new HDate(15, NISAN, this[getFullYear]()).greg().getTime() &&
-		this.greg().getTime() < new HDate( 6, c.months.SIVAN, this[getFullYear]()).greg().getTime()) {
+		this.greg().getTime() < new HDate( 6, months.SIVAN, this[getFullYear]()).greg().getTime()) {
 		return this.abs() - new HDate(16, NISAN, this[getFullYear]()).abs() + 1;
 	}
 	return 0;
@@ -608,27 +610,27 @@ HDate[prototype].tachanun = (function() {
 	function tachanun() {
 		var checkNext = !arguments[0];
 
-		var year = this[getYearObject]();
+		var year = this[getYearObject](), y = this[getFullYear]();
 
 		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
-			year[find](c.range(1, c.max_days_in_heb_month(NISAN, this[getFullYear]())), NISAN), // all of Nisan
+			year[find](c.range(1, c.max_days_in_heb_month(NISAN, y)), NISAN), // all of Nisan
 			year[find](15 + 33, NISAN), // Lag Baomer
-			year[find](c.range(1, 8 - this.il), c.months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
-			year[find]([9, 15], c.months.AV), // Tisha B'av and Tu B'av
-			year[find](-1, c.months.ELUL), // Erev Rosh Hashanah
+			year[find](c.range(1, 8 - this.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
+			year[find](-1, months.ELUL), // Erev Rosh Hashanah
 			year[find]([1, 2], TISHREI), // Rosh Hashanah
 			year[find](c.range(9, 24 - this.il), TISHREI), // Erev Yom Kippur thru Isru Chag
-			year[find](c.range(25, 33), c.months.KISLEV), // Chanukah
-			year[find](15, c.months.SHVAT), // Tu B'shvat
-			year[find]([14, 15], year.isLeapYear() ? [c.months.ADAR_I, c.months.ADAR_II] : c.months.ADAR_I) // Purim/Shushan Purim + Katan
+			year[find](c.range(25, 33), months.KISLEV), // Chanukah
+			year[find](15, months.SHVAT), // Tu B'shvat
+			year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
 		)[map](function(d){
 			return d.abs();
 		})), some = __cache.il[year.year] === this.il && __cache.some[year.year] || (__cache.some[year.year] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
-			year[find](c.range(1, 13), c.months.SIVAN), // Until 14 Sivan
+			year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
 			year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
-			year[find](14, c.months.IYYAR), // Pesach Sheini
-			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
-			year[find](29, c.months.IYYAR) // Yom Yerushalayim
+			year[find](14, months.IYYAR), // Pesach Sheini
+			holidays.atzmaut(y)[1] || [], // Yom HaAtzma'ut, which changes based on day of week
+			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
 		)[map](function(d){
 			return d.abs();
 		}));
@@ -640,11 +642,11 @@ HDate[prototype].tachanun = (function() {
 		if (all) {
 			return NONE;
 		}
-		var ret;
+		var ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT);
 		if (checkNext) {
-			ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | ((this[next]().tachanun(true) & SHACHARIT) && MINCHA);
+			ret |= ((this[next]().tachanun(true) & SHACHARIT) && MINCHA);
 		} else {
-			ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT) | (this[getDay]() != 5 && MINCHA);
+			ret |= (this[getDay]() != 5 && MINCHA);
 		}
 		return ret == ALL_CONGS ? NONE : ret;
 	}
@@ -666,12 +668,12 @@ HDate[prototype].hallel = (function() {
 		var year = this[getYearObject]();
 
 		var whole = __cache.il[year.year] == this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
-			year[find](c.range(25, 33), c.months.KISLEV), // Chanukah
+			year[find](c.range(25, 33), months.KISLEV), // Chanukah
 			year[find]([15, this.il ? null : 16], NISAN), // First day(s) of Pesach
 			year[find]('Shavuot'),
 			year[find]('Sukkot'),
-			year.holidays.filter(function(h){return c.LANGUAGE(h.desc, 's') == 'Yom HaAtzma\'ut'})[0].date, // Yom HaAtzma'ut, which changes based on day of week
-			year[find](29, c.months.IYYAR) // Yom Yerushalayim
+			holidays.atzmaut(y)[1] || [], // Yom HaAtzma'ut, which changes based on day of week
+			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
 		)[map](function(d){
 			return d.abs();
 		}));
@@ -857,7 +859,7 @@ Hebcal[GregYear] = function GregYearConstructor(year, month) {
 	return this;
 };
 
-Hebcal[GregYear][prototype].isLeapYear = function isLeapYear() {
+Hebcal[GregYear][prototype][isLeapYear] = function isLeapYear() {
 	return this[length] === 366;
 };
 
@@ -963,7 +965,7 @@ Hebcal[GregMonth] = function GregMonth(month, year) {
 	return this;
 };
 
-Hebcal[GregMonth][prototype].isLeapYear = function isLeapYear() {
+Hebcal[GregMonth][prototype][isLeapYear] = function isLeapYear() {
 	return greg.LEAP(this.year);
 };
 
