@@ -422,10 +422,10 @@ function lookup_hebrew_month(c) {
 				case 'v':
 					return months.AV;
 				case 'd':
-					if (c.indexOf('2') > -1 || /ii/i.test(c) || /b/i.test(c)) {
-						return months.ADAR_II;
+					if (/(1|[^i]i|a|א)$/i.test(c)) {
+						return months.ADAR_I;
 					}
-					return months.ADAR_I; // else assume rishon
+					return months.ADAR_II; // else assume sheini
 			}
 			break;
 		case 'ס':
@@ -437,10 +437,10 @@ function lookup_hebrew_month(c) {
 				case 'ב':
 					return months.AV;
 				case 'ד':
-					if (c.indexOf('2') > -1 || c.indexOf('ב', 1) > 1) {
-						return months.ADAR_II;
+					if (/(2|ii|b|ב)$/i.test(c)) {
+						return months.ADAR_I;
 					}
-					return months.ADAR_I; // else assume rishon
+					return months.ADAR_II; // else assume sheini
 				case 'י':
 					return months.IYYAR;
 				case 'ל':
@@ -1099,6 +1099,11 @@ Object.defineProperty(HDate, 'defaultCity', {
 	}
 });
 
+function fix(date) {
+	fixMonth(date);
+	fixDate(date);
+}
+
 function fixDate(date) {
 	if (date.day < 1) {
 		if (date.month == TISHREI) {
@@ -1106,8 +1111,7 @@ function fixDate(date) {
 		}
 		date.day += max_days_in_heb_month(date.month, date.year);
 		date.month -= 1;
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	if (date.day > max_days_in_heb_month(date.month, date.year)) {
 		if (date.month == c.months.ELUL) {
@@ -1115,22 +1119,23 @@ function fixDate(date) {
 		}
 		date.day -= max_days_in_heb_month(date.month, date.year);
 		date.month += 1;
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	fixMonth(date);
 }
 
 function fixMonth(date) {
+	if (date.month == c.months.ADAR_II && !date.isLeapYear()) {
+		date.month -= 1; // to Adar I
+		fix(date);
+	}
 	if (date.month < 1) {
 		date.month += MONTHS_IN_HEB(date.year);
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	if (date.month > MONTHS_IN_HEB(date.year)) {
 		date.month -= MONTHS_IN_HEB(date.year);
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 }
 
@@ -1164,15 +1169,13 @@ HDate[prototype].getDay = function getDay() {
 
 HDate[prototype].setFullYear = function setFullYear(year) {
 	this.year = year;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 
 HDate[prototype].setMonth = function setMonth(month) {
 	this.month = month;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 
@@ -1182,8 +1185,7 @@ HDate[prototype].setTishreiMonth = function setTishreiMonth(month) {
 
 HDate[prototype].setDate = function setDate(date) {
 	this.day = date;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 

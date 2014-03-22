@@ -123,6 +123,11 @@ Object.defineProperty(HDate, 'defaultCity', {
 	}
 });
 
+function fix(date) {
+	fixMonth(date);
+	fixDate(date);
+}
+
 function fixDate(date) {
 	if (date.day < 1) {
 		if (date.month == TISHREI) {
@@ -130,8 +135,7 @@ function fixDate(date) {
 		}
 		date.day += max_days_in_heb_month(date.month, date.year);
 		date.month -= 1;
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	if (date.day > max_days_in_heb_month(date.month, date.year)) {
 		if (date.month == c.months.ELUL) {
@@ -139,22 +143,23 @@ function fixDate(date) {
 		}
 		date.day -= max_days_in_heb_month(date.month, date.year);
 		date.month += 1;
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	fixMonth(date);
 }
 
 function fixMonth(date) {
+	if (date.month == c.months.ADAR_II && !date.isLeapYear()) {
+		date.month -= 1; // to Adar I
+		fix(date);
+	}
 	if (date.month < 1) {
 		date.month += MONTHS_IN_HEB(date.year);
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 	if (date.month > MONTHS_IN_HEB(date.year)) {
 		date.month -= MONTHS_IN_HEB(date.year);
-		fixMonth(date);
-		fixDate(date);
+		fix(date);
 	}
 }
 
@@ -188,15 +193,13 @@ HDate[prototype].getDay = function getDay() {
 
 HDate[prototype].setFullYear = function setFullYear(year) {
 	this.year = year;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 
 HDate[prototype].setMonth = function setMonth(month) {
 	this.month = month;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 
@@ -206,8 +209,7 @@ HDate[prototype].setTishreiMonth = function setTishreiMonth(month) {
 
 HDate[prototype].setDate = function setDate(date) {
 	this.day = date;
-	fixMonth(this);
-	fixDate(this);
+	fix(this);
 	return this;
 };
 

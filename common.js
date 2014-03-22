@@ -217,10 +217,10 @@ function lookup_hebrew_month(c) {
 				case 'v':
 					return months.AV;
 				case 'd':
-					if (c.indexOf('2') > -1 || /ii/i.test(c) || /b/i.test(c)) {
-						return months.ADAR_II;
+					if (/(1|[^i]i|a|א)$/i.test(c)) {
+						return months.ADAR_I;
 					}
-					return months.ADAR_I; // else assume rishon
+					return months.ADAR_II; // else assume sheini
 			}
 			break;
 		case 'ס':
@@ -232,10 +232,10 @@ function lookup_hebrew_month(c) {
 				case 'ב':
 					return months.AV;
 				case 'ד':
-					if (c.indexOf('2') > -1 || c.indexOf('ב', 1) > 1) {
-						return months.ADAR_II;
+					if (/(2|ii|b|ב)$/i.test(c)) {
+						return months.ADAR_I;
 					}
-					return months.ADAR_I; // else assume rishon
+					return months.ADAR_II; // else assume sheini
 				case 'י':
 					return months.IYYAR;
 				case 'ל':
