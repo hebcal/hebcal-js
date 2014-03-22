@@ -135,9 +135,7 @@ function Hebcal(year, month) {
 	});
 }
 
-Hebcal[prototype].isLeapYear = function isLeapYear() {
-	return c.LEAP_YR_HEB(this.year);
-};
+Hebcal[prototype].isLeapYear = HDate[prototype].isLeapYear;
 
 Hebcal[prototype].setCity = function setCity(city) {
 	this.months.forEach(function(m){
@@ -300,7 +298,7 @@ Hebcal.range = c.range;
 
 Hebcal.gematriya = c.gematriya;
 
-Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not getHolidaysForYear()
+Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not year()
 
 Hebcal.parshiot = Sedra.parshiot;
 
@@ -384,7 +382,7 @@ Hebcal[Month] = function Month(month, year) {
 
 	this[length] = this.days[length];
 
-	this.holidays = holidays.getHolidaysForYear(year).filter(function(h){
+	this.holidays = holidays.year(year).filter(function(h){
 		return h.date[getMonth]() === month;
 	}, this);
 
@@ -432,9 +430,7 @@ Hebcal[Month] = function Month(month, year) {
 	return this;
 };
 
-Hebcal[Month][prototype].isLeapYear = function isLeapYear() {
-	return c.LEAP_YR_HEB(this.year);
-};
+Hebcal[Month][prototype].isLeapYear = HDate[prototype].isLeapYear;
 
 Hebcal[Month][prototype][prev] = function() {
 	if (this.month === 1) { // Nisan
@@ -469,7 +465,7 @@ Hebcal[Month][prototype][getYearObject] = function getYearObject() {
 };
 
 Hebcal[Month][prototype].getName = function getName(o) {
-	return c.LANGUAGE(c.monthNames[+this.isLeapYear()][this.month],o);
+	return c.LANGUAGE(c.monthNames[+this.isLeapYear()][this.month], o);
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
@@ -545,11 +541,11 @@ HDate[prototype][getYearObject] = function() {
 
 var HDatePrev = HDate[prototype][prev]; // slightly less overhead when using unaffiliated HDate()s
 HDate[prototype][prev] = function prev() {
-	var n = HDatePrev.call(this);
+	var p = HDatePrev.call(this);
 	if (!this.__month) {
-		return n;
+		return p;
 	}
-	return this[getYearObject]()[find](n)[0];
+	return this[getYearObject]()[find](p)[0];
 };
 
 var HDateNext = HDate[prototype][next];
@@ -569,7 +565,7 @@ HDate[prototype].getSedra = (function(){
 		if (!sedraYear || (sedraYear.il != this.il)) {
 			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
 		}
-		return sedraYear.getFromHDate(this)[map](function(p){
+		return sedraYear.get(this)[map](function(p){
 			return c.LANGUAGE(p, o);
 		});
 	}
@@ -802,13 +798,13 @@ Hebcal[GregYear] = function GregYearConstructor(year, month) {
 		return arr.indexOf(val) === i; // keep unique values only
 	});
 
-	this.holidays = holidays.getHolidaysForYear(this.hebyears[0]).filter(function(h){
+	this.holidays = holidays.year(this.hebyears[0]).filter(function(h){
 		return h.date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
 			return m.month === h.date.greg()[getMonth]() + 1;
 		})[length];
 	}, this);
 	if (this.hebyears[1]) {
-		this.holidays = this.holidays.concat(holidays.getHolidaysForYear(this.hebyears[1]).filter(function(h){
+		this.holidays = this.holidays.concat(holidays.year(this.hebyears[1]).filter(function(h){
 			return h.date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
 				return m.month === h.date.greg()[getMonth]() + 1;
 			})[length];

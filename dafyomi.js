@@ -73,7 +73,7 @@ var shas = [
 	return {name: m.slice(0,3), blatt: m[3]};
 });
 
-function dafyomi(gregdate) {
+exports.dafyomi = function(gregdate) {
 	var dafcnt = 40, cno, dno, osday, nsday, total, count, j, cday, blatt;
 
 	if (!(gregdate instanceof Date)) {
@@ -135,10 +135,8 @@ function dafyomi(gregdate) {
 	}
 
 	return {name: shas[count].name, blatt: blatt};
-}
-exports.dafyomi = dafyomi;
+};
 
-function dafname(daf, o) {
+exports.dafname = function(daf, o) {
 	return c.LANGUAGE(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
-}
-exports.dafname = dafname;
+};

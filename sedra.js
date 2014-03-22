@@ -295,12 +295,12 @@ types['1311'] = types['1221'];
 types['1721'] = types['170'];
 
 
-Sedra.prototype.getFromHDate = function(hDate) {
-	return this.getFromDate(hDate.abs());
+Sedra.prototype.get = function(hDate) {
+	return this.abs(hDate.abs());
 };
 
 // returns an array describing the parsha on the first Saturday on or after absdate
-Sedra.prototype.getFromDate = function(absDate) {
+Sedra.prototype.abs = function(absDate) {
 
 	// find the first saturday on or after today's date
 	var absDate = c.day_on_or_before(6, absDate + 6);

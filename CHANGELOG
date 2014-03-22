@@ -1,6 +1,7 @@
 version 2.1.1 alpha (2014-03-22 [21 Adar 2 5774])
 	Change default Adar to Adar Sheini
 	Add string support to new HDate()
+	Fix Yom Ha'atzmaut not showing up until 1951
 
 version 2.1 (2014-03-16 [Purim 5774])
 	Add Hebcal.GregYear and Hebcal.GregMonth constructors

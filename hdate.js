@@ -168,7 +168,7 @@ HDate[prototype][getFullYear] = function getFullYear() {
 };
 
 HDate[prototype].isLeapYear = function isLeapYear() {
-	return c.LEAP_YR_HEB(this[getFullYear]());
+	return c.LEAP_YR_HEB(this.year);
 };
 
 HDate[prototype][getMonth] = function getMonth() {
