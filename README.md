@@ -9,7 +9,7 @@ Hebcal JS is a JavaScript API to aid working with the Hebrew calendar. It is ava
 
 It can convert between Hebrew and Gregorian dates, get weekly sedra, holidays, and halachik times (_zemanim_).
 
-You can include it in a client-side (browser) script with the `hebcal.min.js` script in the `client` subfolder. It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
+You can include it in a client-side (browser) script with the `hebcal.min.js` script in the `client` subfolder (17KB gzipped). It exposes a global variable, `Hebcal`. For Node, install `hebcal` from NPM...
 
 ```sh
 $ npm install hebcal

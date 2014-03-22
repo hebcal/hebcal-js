@@ -1043,17 +1043,27 @@ function HDate(day, month, year) {
 				d.il = day.il;
 				d.setLocation(d.lat, d.long);
 				return d;
-			} else if (typeof day === 'string' && /\s/.test(day)) {
-				var s = day.split(/\s+/);
-				if (s.length === 2) {
-					return new HDate(s[0], s[1]);
-				} else if (s.length === 3) {
-					return new HDate(s[0], s[1], s[2]);
-				} else if (s.length === 4) { // should only be if s[1] is Adar
-					if (/i/i.test(s[2])) { // Using I[I] syntax
-						s[2] = s[2].length;
-					} // otherwise using 1|2 syntax
-					return new HDate(s[0], s[1] + s[2], s[3]);
+			} else if (typeof day === 'string') {
+				switch (day.toLowerCase().trim()) {
+					case 'today':
+						return new HDate();
+					case 'yesterday':
+						return new HDate().prev();
+					case 'tomorrow':
+						return new HDate().next();
+				}
+				if (/\s/.test(day)) {
+					var s = day.split(/\s+/);
+					if (s.length === 2) {
+						return new HDate(s[0], s[1]);
+					} else if (s.length === 3) {
+						return new HDate(s[0], s[1], s[2]);
+					} else if (s.length === 4) { // should only be if s[1] is Adar
+						if (/i/i.test(s[2])) { // Using I[I] syntax
+							s[2] = s[2].length;
+						} // otherwise using 1|2 syntax
+						return new HDate(s[0], s[1] + s[2], s[3]);
+					}
 				}
 			} else if (typeof day === 'number') { // absolute date
 				return abs2hebrew(day);
