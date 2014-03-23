@@ -14,7 +14,7 @@ header="/*
 
 	Licensed GPLv3
  */"
-mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/[a-z]+\\/git\\/hebcal\\//g,'').replace(/\\/usr\\/lib\\//g,''))"
+mapcode="console.log(require('fs').readFileSync(f).toString().replace(/\\/home\\/[a-z]+\\/git\\/hebcal\\//g,'https://github.com/hebcal/hebcal-js/tree/v2.1.1').replace(/\\/usr\\/lib\\//g,''))"
 srccode="console.log(';'+require('fs').readFileSync(f).toString().replace(map,f+'.map'))"
 echo "Starting client.js"
 browserify --debug client.js | exorcist client.js.map > hebcal.js

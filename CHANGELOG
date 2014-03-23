@@ -5,6 +5,7 @@ version 2.1.1 alpha (2014-03-23 [21 Adar 2 5774])
 	Simplify cities
 	Change names of Adar I and Adar II to Adar 1/2
 	Fix HDate().getGregMonthObject()
+	Link sourcemaps to GitHub
 
 version 2.1 (2014-03-16 [Purim 5774])
 	Add Hebcal.GregYear and Hebcal.GregMonth constructors
