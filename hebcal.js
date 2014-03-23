@@ -909,7 +909,7 @@ Hebcal[GregMonth][prototype].setLocation = Hebcal[Month][prototype].setLocation;
 Hebcal[GregMonth][prototype][map] = Hebcal[Month][prototype][map];
 
 HDate[prototype].getGregMonthObject = function getGregMonthObject() {
-	return this.__gregmonth || new Hebcal[GregMonth](this.greg()[getMonth](), this.greg()[getFullYear]());
+	return this.__gregmonth || new Hebcal[GregMonth](this.greg()[getMonth]() + 1, this.greg()[getFullYear]());
 };
 
 HDate[prototype].getGregYearObject = function getGregYearObject() {

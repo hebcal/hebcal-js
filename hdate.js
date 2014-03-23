@@ -442,24 +442,28 @@ HDate[prototype].isSameDate = function isSameDate(other) {
 	return false;
 };
 
+function onOrBefore(day, t, offset) {
+	return new HDate(day_on_or_before(day, t[abs]() + offset));
+}
+
 HDate[prototype].before = function before(day) {
-	return new HDate(day_on_or_before(day, this[abs]() - 1));
+	return onOrBefore(day, this, -1);
 };
 
 HDate[prototype].onOrBefore = function onOrBefore(day) {
-	return new HDate(day_on_or_before(day, this[abs]()));
+	return onOrBefore(day, this, 0);
 };
 
 HDate[prototype].nearest = function nearest(day) {
-	return new HDate(day_on_or_before(day, this[abs]() + 3));
+	return onOrBefore(day, this, 3);
 };
 
 HDate[prototype].onOrAfter = function onOrAfter(day) {
-	return new HDate(day_on_or_before(day, this[abs]() + 6));
+	return onOrBefore(day, this, 6);
 };
 
 HDate[prototype].after = function after(day) {
-	return new HDate(day_on_or_before(day, this[abs]() + 7));
+	return onOrBefore(day, this, 7);
 };
 
 module.exports = HDate;

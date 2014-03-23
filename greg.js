@@ -25,6 +25,19 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
+var floor = Math.floor,
+	t0t1 = [30, 31],
+	tMonthLengths = [0, 31, 28, 31].concat(t0t1, t0t1, 31, t0t1, t0t1),
+	monthLengths = [
+		tMonthLengths.slice()
+	];
+tMonthLengths[2]++;
+monthLengths.push(tMonthLengths);
+
+exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
+	return monthLengths[+LEAP(year)][month];
+};
+
 exports.monthNames = [
 	'',
 	'January',
@@ -45,24 +58,13 @@ exports.lookupMonthNum = function lookupMonthNum(month) {
 	return new Date(month + ' 1').getMonth() + 1;
 };
 
-exports.monthLengths = [
-	[0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-	[0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-];
-
-exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
-	return exports.monthLengths[+LEAP(year)][month];
-};
-
-exports.shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 function dayOfYear (date) {
 	if (!date instanceof Date) {
 		throw new TypeError('Argument to greg.dayOfYear not a Date');
 	}
 	var doy = date.getDate() + 31 * date.getMonth();
 	if (date.getMonth() > 1) { // FEB
-		doy -= Math.floor((4 * (date.getMonth() + 1) + 23) / 10);
+		doy -= floor((4 * (date.getMonth() + 1) + 23) / 10);
 		if (LEAP(date.getFullYear())) {
 			doy++;
 		}
@@ -77,11 +79,12 @@ function LEAP (year) {
 exports.LEAP = LEAP;
 
 exports.greg2abs = function greg2abs(date) { // "absolute date"
+	var year = date.getFullYear() - 1;
 	return (dayOfYear(date) + // days this year
-			365 * (date.getFullYear() - 1) + // + days in prior years
-			( Math.floor((date.getFullYear() - 1) / 4) - // + Julian Leap years
-			Math.floor((date.getFullYear() - 1) / 100) + // - century years
-			Math.floor((date.getFullYear() - 1) / 400))); // + Gregorian leap years
+			365 * year + // + days in prior years
+			( floor(year / 4) - // + Julian Leap years
+			floor(year / 100) + // - century years
+			floor(year / 400))); // + Gregorian leap years
 };
 
 
@@ -95,13 +98,13 @@ exports.abs2greg = function abs2greg(theDate) {
 // calculations copied from original JS code
 
 	var d0 = theDate - 1;
-	var n400 = Math.floor(d0 / 146097);
-	var d1 =  Math.floor(d0 % 146097);
-	var n100 =  Math.floor(d1 / 36524);
+	var n400 = floor(d0 / 146097);
+	var d1 =  floor(d0 % 146097);
+	var n100 =  floor(d1 / 36524);
 	var d2 = d1 % 36524;
-	var n4 =  Math.floor(d2 / 1461);
+	var n4 =  floor(d2 / 1461);
 	var d3 = d2 % 1461;
-	var n1 =  Math.floor(d3 / 365);
+	var n1 =  floor(d3 / 365);
 
 	var day = ((d3 % 365) + 1);
 	var year = (400 * n400 + 100 * n100 + 4 * n4 + n1);
@@ -110,27 +113,5 @@ exports.abs2greg = function abs2greg(theDate) {
 		return new Date(year, 11, 31);
 	}
 
-	year++;
-
-
-	var d = new Date(year, 0, day); // new Date() is very smart
-	d.setFullYear(year);
-	return d;
-
-/*
-	console.log(year)
-	var month = 1, mlen;
-	console.log(month)
-	console.log(day)
-	while ((mlen = exports.monthLengths[+LEAP(year)][month]) < day){
-		day -= mlen;
-		month++;
-	console.log(month)
-	console.log(day)
-	}
-	var d = new Date(year, month-1, day);
-	d.setFullYear(year);
-	console.log(d)
-	return d;
-*/
+	return new Date(new Date(++year, 0, day).setFullYear(year)); // new Date() is very smart
 };
