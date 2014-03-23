@@ -3,6 +3,7 @@ version 2.1.1 alpha (2014-03-23 [21 Adar 2 5774])
 	Add string support to new HDate()
 	Fix Yom Ha'atzmaut not showing up until 1951
 	Simplify cities
+	Change names of Adar I and Adar II to Adar 1/2
 
 version 2.1 (2014-03-16 [Purim 5774])
 	Add Hebcal.GregYear and Hebcal.GregMonth constructors

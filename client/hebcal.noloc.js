@@ -259,7 +259,7 @@ var monthNames = [
 ];
 exports.monthNames = [
 	monthNames.concat([["Adar", 0, "אדר"],["Nisan", 0, "ניסן"]]),
-	monthNames.concat([["Adar I", 0, "אדר א'"],["Adar II", 0, "אדר ב'"],["Nisan", 0, "ניסן"]])
+	monthNames.concat([["Adar 1", 0, "אדר א'"],["Adar 2", 0, "אדר ב'"],["Nisan", 0, "ניסן"]])
 ];
 
 exports.days = {
