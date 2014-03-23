@@ -20,12 +20,13 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.0. It is approximately equivalent to Hebcal C 3.14.
 I (Eyal) did not write Hebcal JS 1.0. 2.0 is a nearly-complete rewrite of it.
 
-The version documented here is 2.1.0.
+The version documented here is 2.1.1 beta.
 
 ## Releases
 
 * 2.0.0 - 2014-02-18 (19 Adar 1 5774)
 * 2.1.0 (current) - 2014-03-16 (14 Adar 2 5774 [Purim])
+* 2.1.1 alpha (2014-03-23 [21 Adar 2 5774])
 
 ## Contributors
 
@@ -314,6 +315,8 @@ The old syntax also works.
 Is intended to receive the return value of `getCity()`. Returns an object containing 2 properties: `lat` and `long`, with the numbers in degrees, including minutes.
 
 An end-user should rarely need either of these; they are mainly used by `Hebcal.defaultCity` and `Hebcal.setCity()` and the methods they call.
+
+This method has been **removed** as of v2.1.1.
 
 ### `Hebcal.cities.listCities()`
 

@@ -84,7 +84,7 @@ var cities = {
 	"Washington DC": [ 38.916, -77, false ]
 };
 
-exports.getCity = function getCity(city) {
+function getCity(city) {
 	city = city.split(/\s+/).map(function(w,i,c){
 		if (c.join(' ').toLowerCase() === 'washington dc' && i === 1) { // special case
 			return w.toUpperCase();
@@ -92,11 +92,13 @@ exports.getCity = function getCity(city) {
 		return w[0].toUpperCase() + w.slice(1).toLowerCase();
 	}).join(' ');
 	return cities[city] || [ 0, 0, false ];
-};
+}
+exports.getCity = getCity;
 
-exports.listCities = function listCities() {
+function listCities() {
 	return Object.keys(cities);
-};
+}
+exports.listCities = listCities;
 
 exports.addCity = function addCity(city, info) {
 	if (!Array.isArray(info)) {
@@ -116,13 +118,6 @@ exports.addCity = function addCity(city, info) {
 	cities[city] = info;
 };
 
-exports.getLocation = function getLocation(cityInfo) {
-	return {
-		lat: cityInfo[0],
-		long: cityInfo[1]
-	};
-};
-
 exports.nearest = function nearest(lat, lon) {
 	if (Array.isArray(lat)) {
 		lat = (lat[0] * 60 + lat[1]) / 60;
@@ -137,11 +132,11 @@ exports.nearest = function nearest(lat, lon) {
 		throw new TypeError('incorrect long type passed to nearest()');
 	}
 
-	return exports.listCities().map(function(city){
-		var i = exports.getLocation(exports.getCity(city));
+	return listCities().map(function(city){
+		var i = getCity(city);
 		return {
 			name: city,
-			dist: Math.sqrt( Math.pow(Math.abs(i.lat - lat), 2) + Math.pow(Math.abs(i.long - lon), 2) )
+			dist: Math.sqrt( Math.pow(Math.abs(i[0] - lat), 2) + Math.pow(Math.abs(i[1] - lon), 2) )
 		};
 	}).reduce(function(close,city){
 		return close.dist < city.dist ? close : city;

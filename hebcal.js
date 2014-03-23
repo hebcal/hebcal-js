@@ -311,8 +311,7 @@ defProp(Hebcal, 'defaultLocation', getset(function(){
 defProp(Hebcal, 'defaultCity', getset(function(){
 	return HDate.defaultCity;
 }, function(city){
-	var loc = cities.getLocation(cities.getCity(city));
-	Hebcal.defaultLocation = [loc.lat, loc.long]; // call the event
+	Hebcal.defaultLocation = cities.getCity(city).slice(0, 2); // call the event
 }));
 
 defProp(Hebcal, 'candleLighting', getset(function(){

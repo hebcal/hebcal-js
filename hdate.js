@@ -118,8 +118,7 @@ Object.defineProperty(HDate, 'defaultCity', {
 		return cities.nearest(HDate.defaultLocation[0], HDate.defaultLocation[1]);
 	},
 	set: function(city) {
-		var loc = cities.getLocation(cities.getCity(city));
-		HDate.defaultLocation = [loc.lat, loc.long];
+		HDate.defaultLocation = cities.getCity(city).slice(0, 2);
 	}
 });
 
@@ -296,13 +295,17 @@ HDate[prototype].getMonthName = function getMonthName(o) {
 };
 
 HDate[prototype].setCity = function setCity(city) {
-	return this.setLocation(cities.getLocation(cities.getCity(city)));
+	return this.setLocation(cities.getCity(city));
 };
 
 HDate[prototype].setLocation = function setLocation(lat, lon) {
 	if (typeof lat == 'object' && !Array.isArray(lat)) {
 		lon = lat.long;
 		lat = lat.lat;
+	}
+	if (Array.isArray(lat) && typeof lon == 'undefined') {
+		lon = lat[0];
+		lat = lat[1];
 	}
 	if (Array.isArray(lat)) {
 		lat = (lat[0] * 60 + lat[1]) / 60;
