@@ -666,15 +666,18 @@ HDate[prototype].hallel = (function() {
 			today = now;
 		}
 
-		var nowGreg = new Date(), almostTime = c.filter(c[map](now.getZemanim(), function(time){
-			return time - nowGreg;
-		}), function(time) {
-			return time > 0 && time - events.beforeZeman < 0;
-		}), customTimes = c.filter(c[map](events.customs, function(time){
-			return time - nowGreg;
-		}), function(time) {
-			return time > 0 && time - events.refreshInterval < 0;
-		});
+		function close(obj, compare) {
+			return c.filter(c[map](obj, function(time){
+				return time - nowGreg;
+			}), function(time) {
+				return time > 0 && time - compare < 0;
+			});
+		}
+
+		var nowGreg = new Date(),
+			almostTime = close(now.getZemanim(), events.beforeZeman),
+			customTimes = close(events.customs, events.refreshInterval);
+		
 		for (var zeman in almostTime) {
 			events.emit('almostZeman', zeman, almostTime[zeman]);
 			if (almostTime[zeman] < events.refreshInterval) {

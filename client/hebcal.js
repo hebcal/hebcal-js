@@ -1005,7 +1005,8 @@ var prototype = 'prototype',
 	getTime = 'getTime',
 	abs = 'abs',
 	hour = 'hour',
-	TISHREI = c.months.TISHREI,
+	months = c.months,
+	TISHREI = months.TISHREI,
 	MONTHS_IN_HEB = c.MONTHS_IN_HEB,
 	max_days_in_heb_month = c.max_days_in_heb_month,
 	day_on_or_before = c.day_on_or_before;
@@ -1099,7 +1100,7 @@ function fixDate(date) {
 		fix(date);
 	}
 	if (date.day > max_days_in_heb_month(date.month, date.year)) {
-		if (date.month == c.months.ELUL) {
+		if (date.month == months.ELUL) {
 			date.year += 1;
 		}
 		date.day -= max_days_in_heb_month(date.month, date.year);
@@ -1110,7 +1111,7 @@ function fixDate(date) {
 }
 
 function fixMonth(date) {
-	if (date.month == c.months.ADAR_II && !date.isLeapYear()) {
+	if (date.month == months.ADAR_II && !date.isLeapYear()) {
 		date.month -= 1; // to Adar I
 		fix(date);
 	}
@@ -1186,7 +1187,7 @@ function hebrew2abs(d) {
 			tempabs += max_days_in_heb_month(m, d[getFullYear]());
 		}
 
-		for (m = c.months.NISAN; m < d[getMonth](); m++) {
+		for (m = months.NISAN; m < d[getMonth](); m++) {
 			tempabs += max_days_in_heb_month(m, d[getFullYear]());
 		}
 	} else {
@@ -1200,8 +1201,8 @@ function hebrew2abs(d) {
 
 function abs2hebrew(d) {
 	var mmap = [
-		c.months.KISLEV, c.months.TEVET, c.months.SHVAT, c.months.ADAR_I, c.months.NISAN,
-		c.months.IYYAR, c.months.SIVAN, c.months.TAMUZ, TISHREI, TISHREI, TISHREI, c.months.CHESHVAN
+		months.KISLEV, months.TEVET, months.SHVAT, months.ADAR_I, months.NISAN,
+		months.IYYAR, months.SIVAN, months.TAMUZ, TISHREI, TISHREI, TISHREI, months.CHESHVAN
 	], hebdate, gregdate, month, year;
 
 	if (d >= 10555144) {
@@ -1372,29 +1373,19 @@ HDate[prototype].getZemanim = function getZemanim() {
 	}, this);
 };
 
-HDate.addZeman = function addZeman(zeman, func) {
+HDate.addZeman = function(zeman, func) {
 	zemanim[zeman] = func;
 };
 
-HDate[prototype].next = function next() {
-	return new HDate(this[getDate]() + 1, this[getMonth](), this[getFullYear]());
+HDate[prototype].next = function() {
+	return abs2hebrew(this.abs() + 1);
 };
 
-HDate[prototype].prev = function prev() {
-	if (this[getDate]() === 1) {
-		if (this[getMonth]() === TISHREI) {
-			return new HDate(max_days_in_heb_month(c.months.ELUL, this[getFullYear]() -1 ), c.months.ELUL, this[getFullYear]() - 1);
-		} else if (this[getMonth]() === c.months.NISAN) {
-			return new HDate(max_days_in_heb_month(MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]()), MONTHS_IN_HEB(this[getFullYear]()), this[getFullYear]());
-		} else {
-			return new HDate(max_days_in_heb_month(this[getMonth]() - 1, this[getFullYear]()), this[getMonth]() - 1, this[getFullYear]());
-		}
-	} else {
-		return new HDate(this[getDate]() - 1, this[getMonth](), this[getFullYear]());
-	}
+HDate[prototype].prev = function() {
+	return abs2hebrew(this.abs() - 1);
 };
 
-HDate[prototype].isSameDate = function isSameDate(other) {
+HDate[prototype].isSameDate = function(other) {
 	if (other instanceof HDate) {
 		if (other[getFullYear]() === -1) {
 			other = new HDate(other).setFullYear(this[getFullYear]());
@@ -2098,15 +2089,18 @@ HDate[prototype].hallel = (function() {
 			today = now;
 		}
 
-		var nowGreg = new Date(), almostTime = c.filter(c[map](now.getZemanim(), function(time){
-			return time - nowGreg;
-		}), function(time) {
-			return time > 0 && time - events.beforeZeman < 0;
-		}), customTimes = c.filter(c[map](events.customs, function(time){
-			return time - nowGreg;
-		}), function(time) {
-			return time > 0 && time - events.refreshInterval < 0;
-		});
+		function close(obj, compare) {
+			return c.filter(c[map](obj, function(time){
+				return time - nowGreg;
+			}), function(time) {
+				return time > 0 && time - compare < 0;
+			});
+		}
+
+		var nowGreg = new Date(),
+			almostTime = close(now.getZemanim(), events.beforeZeman),
+			customTimes = close(events.customs, events.refreshInterval);
+		
 		for (var zeman in almostTime) {
 			events.emit('almostZeman', zeman, almostTime[zeman]);
 			if (almostTime[zeman] < events.refreshInterval) {
