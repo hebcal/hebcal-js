@@ -490,23 +490,19 @@ HDate[prototype][getYearObject] = function() {
 	return this.getMonthObject()[getYearObject]();
 };
 
-var HDatePrev = HDate[prototype][prev]; // slightly less overhead when using unaffiliated HDate()s
-HDate[prototype][prev] = function prev() {
-	var p = HDatePrev.call(this);
-	if (!this.__month) {
-		return p;
-	}
-	return this[getYearObject]()[find](p)[0];
-};
-
-var HDateNext = HDate[prototype][next];
-HDate[prototype][next] = function next() {
-	var n = HDateNext.call(this);
-	if (!this.__month) {
-		return n;
-	}
-	return this[getYearObject]()[find](n)[0];
-};
+(function(){
+	var orig = {}; // slightly less overhead when using unaffiliated HDate()s
+	[prev, next].forEach(function(func){
+		orig[func] = HDate[prototype][func];
+		HDate[prototype][func] = function() {
+			var day = orig[func].call(this);
+			if (!this.__month) {
+				return day;
+			}
+			return this[getYearObject]()[find](day)[0];
+		};
+	});
+})();
 
 HDate[prototype].getSedra = (function(){
 	var __cache = {};
@@ -677,7 +673,7 @@ HDate[prototype].hallel = (function() {
 		var nowGreg = new Date(),
 			almostTime = close(now.getZemanim(), events.beforeZeman),
 			customTimes = close(events.customs, events.refreshInterval);
-		
+
 		for (var zeman in almostTime) {
 			events.emit('almostZeman', zeman, almostTime[zeman]);
 			if (almostTime[zeman] < events.refreshInterval) {

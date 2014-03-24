@@ -437,23 +437,23 @@ function onOrBefore(day, t, offset) {
 	return new HDate(day_on_or_before(day, t[abs]() + offset));
 }
 
-HDate[prototype].before = function before(day) {
+HDate[prototype].before = function(day) {
 	return onOrBefore(day, this, -1);
 };
 
-HDate[prototype].onOrBefore = function onOrBefore(day) {
+HDate[prototype].onOrBefore = function(day) {
 	return onOrBefore(day, this, 0);
 };
 
-HDate[prototype].nearest = function nearest(day) {
+HDate[prototype].nearest = function(day) {
 	return onOrBefore(day, this, 3);
 };
 
-HDate[prototype].onOrAfter = function onOrAfter(day) {
+HDate[prototype].onOrAfter = function(day) {
 	return onOrBefore(day, this, 6);
 };
 
-HDate[prototype].after = function after(day) {
+HDate[prototype].after = function(day) {
 	return onOrBefore(day, this, 7);
 };
 
