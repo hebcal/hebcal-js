@@ -26,7 +26,7 @@ The version documented here is 2.1.1 beta.
 
 * 2.0.0 - 2014-02-18 (19 Adar 1 5774)
 * 2.1.0 (current) - 2014-03-16 (14 Adar 2 5774 [Purim])
-* 2.1.1 alpha (2014-03-23 [21 Adar 2 5774])
+* 2.1.1 beta (2014-03-25 [23 Adar 2 5774])
 
 ## Contributors
 
