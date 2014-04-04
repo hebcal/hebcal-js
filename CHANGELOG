@@ -1,3 +1,7 @@
+version 2.1.2 (2014-04-04 [5 Nisan 5774])
+	Fix sourcemap links
+	Fix GitHub link in package.json
+
 version 2.1.1 (2014-04-04 [5 Nisan 5774])
 	Change default Adar to Adar Sheini
 	Add string support to new HDate()
