@@ -77,7 +77,7 @@ exports.LANGUAGE = function LANGUAGE(str, opts){
 };
 
 function LEAP_YR_HEB(x) {
-	return (1 + x * 7) % 19 < 7 ? true : false;
+	return (1 + x * 7) % 19 < 7;
 }
 exports.LEAP_YR_HEB = LEAP_YR_HEB;
 
