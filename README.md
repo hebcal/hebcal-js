@@ -424,6 +424,12 @@ Return a `Date` object representing the havdalah time for an event, if applicabl
 
 The number of minutes after sunset can be customized with the `Hebcal.holidays.Event.havdalah` property.
 
+#### `Hebcal.holidays.Event.prototype.routine()`
+
+Returns a Boolean, whether or not this is a "routine" event. This can be used by programs wishing to omit certain types of events.
+
+The default routine events are `Shabbat` and `Erev Shabbat`. This can be customized by changing the `Hebcal.holidays.Event.prototype.routine.names` array.
+
 #### `Hebcal.holidays.Event.isIL`
 
 Boolean, are we in Israel? Is not automatically set. Default `false`.

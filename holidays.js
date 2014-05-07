@@ -59,7 +59,7 @@ function Pesach(day) {
 	return ['Pesach: ' + day, 0, 'פסח יום ' + c.gematriya(day)];
 }
 
-var	USER_EVENT          = 1,
+var USER_EVENT          = 1,
 	LIGHT_CANDLES       = 2,
 	YOM_TOV_ENDS        = 4,
 	CHUL_ONLY           = 8, // chutz l'aretz (Diaspora)
@@ -138,6 +138,14 @@ Event.prototype.havdalah = function havdalah() {
 	}
 	return null;
 };
+
+Event.prototype.routine = (function(){
+	function routine(){
+		return !!~routine.names.indexOf(this.getDesc('s'));
+	}
+	routine.names = [Shabbat, 'Erev ' + Shabbat];
+	return routine;
+})();
 
 Event.isIL = false;
 

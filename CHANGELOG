@@ -1,3 +1,6 @@
+version 2.2.0 alpha (2014-05-07)
+	Add Event().routine() method
+
 version 2.1.2 (2014-04-04 [5 Nisan 5774])
 	Fix sourcemap links
 	Fix GitHub link in package.json
