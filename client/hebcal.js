@@ -992,7 +992,7 @@ var c = require('./common'),
 	suncalc = require('suncalc'),
 	cities = require('./cities');
 
-suncalc.addTime(-16.1, 'alot_hashacher', 0);
+suncalc.addTime(-16.1, 'alot_hashachar', 0);
 suncalc.addTime(-11.5, 'misheyakir', 0);
 suncalc.addTime(-10.2, 'misheyakir_machmir', 0);
 suncalc.addTime(-8.5, 0, 'tzeit');
@@ -1295,28 +1295,28 @@ function suntime(hdate) {
 	return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long);
 }
 
-HDate[prototype].sunrise = function sunrise() {
+HDate[prototype].sunrise = function() {
 	return suntime(this).sunrise;
 };
 
-HDate[prototype].sunset = function sunset() {
+HDate[prototype].sunset = function() {
 	return suntime(this).sunset;
 };
 
-HDate[prototype][hour] = function hour() {
+HDate[prototype][hour] = function() {
 	return (this.sunset() - this.sunrise()) / 12; // ms in hour
 };
 
-HDate[prototype].hourMins = function hourMins() {
+HDate[prototype].hourMins = function() {
 	// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
 	return this[hour]() / (1000 * 60);
 };
 
-HDate[prototype].nightHour = function nightHour() {
+HDate[prototype].nightHour = function() {
 	return (this.sunrise() - this.gregEve()) / 12; // ms in hour
 };
 
-HDate[prototype].nightHourMins = function nightHourMins() {
+HDate[prototype].nightHourMins = function() {
 	// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
 	return this.nightHour() / (1000 * 60);
 };
@@ -1326,48 +1326,51 @@ function hourOffset(hdate, hours) {
 }
 
 var zemanim = {
-	chatzot: function chatzot(hdate) {
+	chatzot: function(hdate) {
 		return hourOffset(hdate, 6);
 	},
-	chatzot_night: function chatzot_night(hdate) {
+	chatzot_night: function(hdate) {
 		return new Date(hdate.sunrise()[getTime]() - (hdate.nightHour() * 6));
 	},
-	alot_hashacher: function alot_hashacher(hdate) {
-		return suntime(hdate).alot_hashacher;
+	alot_hashachar: function(hdate) {
+		return suntime(hdate).alot_hashachar;
 	},
-	misheyakir: function misheyakir(hdate) {
+	alot_hashacher: function(hdate) {
+		return suntime(hdate).alot_hashachar;
+	},
+	misheyakir: function(hdate) {
 		return suntime(hdate).misheyakir;
 	},
-	misheyakir_machmir: function misheyakir_machmir(hdate) {
+	misheyakir_machmir: function(hdate) {
 		return suntime(hdate).misheyakir_machmir;
 	},
-	sof_zman_shma: function sof_zman_shma(hdate) { // Gra
+	sof_zman_shma: function(hdate) { // Gra
 		return hourOffset(hdate, 3);
 	},
-	sof_zman_tfilla: function sof_zman_tfilla(hdate) { // Gra
+	sof_zman_tfilla: function(hdate) { // Gra
 		return hourOffset(hdate, 4);
 	},
-	mincha_gedola: function mincha_gedola(hdate) {
+	mincha_gedola: function(hdate) {
 		return hourOffset(hdate, 6.5);
 	},
-	mincha_ketana: function mincha_ketana(hdate) {
+	mincha_ketana: function(hdate) {
 		return hourOffset(hdate, 9.5);
 	},
-	plag_hamincha: function plag(hdate) {
+	plag_hamincha: function(hdate) {
 		return hourOffset(hdate, 10.75);
 	},
-	tzeit: function tzeit(hdate) {
+	tzeit: function(hdate) {
 		return suntime(hdate).tzeit;
 	},
-	neitz_hachama: function neitz(hdate) {
+	neitz_hachama: function(hdate) {
 		return hdate.sunrise();
 	},
-	shkiah: function shkiah(hdate) {
+	shkiah: function(hdate) {
 		return hdate.sunset();
 	}
 };
 
-HDate[prototype].getZemanim = function getZemanim() {
+HDate[prototype].getZemanim = function() {
 	return c.map(zemanim, function(z){
 		return z(this);
 	}, this);

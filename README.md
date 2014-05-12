@@ -800,7 +800,7 @@ Returns an object containing halachik times (zemanim) for the day. Each property
 
 * `chatzot` (calculated as sunrise + six hours)
 * `chatzot_night` (calculated as sunset + six hours)
-* `alot_hashacher` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx))
+* `alot_hashachar` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx)) (Before v2.2.0 it was called `alot_hashacher`. The misspelling is kept for backwards capability, but will likely be removed eventually.)
 * `misheyakir` (calculated as when the sun is at -11.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `misheyakir_machmir` (calculated as when the sun is at -10.2 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `neitz_hachama` (the same as sunrise, but allows an event to be fired (added 2.1))
