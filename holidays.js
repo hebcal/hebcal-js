@@ -89,10 +89,11 @@ function Event(date, desc, mask) {
 }
 
 Event.prototype.is = function is(date, il) {
-	if (arguments.length < 2) {
-		il = Event.isIL;
-	}
 	date = new HDate(date);
+	if (arguments.length < 2) {
+		//il = Event.isIL;
+		il = date.il;
+	}
 	if (date.getDate() != this.date.getDate() || date.getMonth() != this.date.getMonth()) {
 		return false;
 	}

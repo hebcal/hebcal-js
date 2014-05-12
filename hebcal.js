@@ -543,7 +543,7 @@ HDate[prototype][getYearObject] = function() {
 HDate[prototype].getSedra = (function(){
 	var __cache = {};
 
-	return function getSedra(o) {
+	return function(o) {
 		var sedraYear = __cache[this[getFullYear]()];
 		if (!sedraYear || (sedraYear.il != this.il)) {
 			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
@@ -555,14 +555,28 @@ HDate[prototype].getSedra = (function(){
 })();
 HDate[prototype].getParsha = HDate[prototype].getSedra;
 
-HDate[prototype].holidays = function holidays() {
+HDate[prototype].holidays = function(all) {
 	return this[getYearObject]().holidays.filter(function(h){
-		return this.isSameDate(h.date);
+		return this.isSameDate(h.date) && (all ? true : !h.routine() && h.is(this));
 	}, this)[map](function(h){
 		h.date.setLocation(this);
 		return h;
 	}, this);
 };
+
+['candleLighting', 'havdalah'].forEach(function(prop){
+	HDate[prototype][prop] = function(){
+		var hd = this.holidays(true).filter(function(h){
+			return h.is(this);
+		}, this);
+		if (hd.length) {
+			hd = c.filter(hd.map(function(h){
+				return h[prop]();
+			}), true);
+		}
+		return hd.length ? new Date(Math.max.apply(null, hd)) : null;
+	};
+});
 
 HDate[prototype].omer = function omer() {
 	if (this.greg().getTime() > new HDate(15, NISAN, this[getFullYear]()).greg().getTime() &&

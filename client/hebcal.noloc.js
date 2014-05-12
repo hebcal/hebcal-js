@@ -1954,7 +1954,7 @@ HDate[prototype][getYearObject] = function() {
 HDate[prototype].getSedra = (function(){
 	var __cache = {};
 
-	return function getSedra(o) {
+	return function(o) {
 		var sedraYear = __cache[this[getFullYear]()];
 		if (!sedraYear || (sedraYear.il != this.il)) {
 			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
@@ -1966,14 +1966,28 @@ HDate[prototype].getSedra = (function(){
 })();
 HDate[prototype].getParsha = HDate[prototype].getSedra;
 
-HDate[prototype].holidays = function holidays() {
+HDate[prototype].holidays = function(all) {
 	return this[getYearObject]().holidays.filter(function(h){
-		return this.isSameDate(h.date);
+		return this.isSameDate(h.date) && (all ? true : !h.routine() && h.is(this));
 	}, this)[map](function(h){
 		h.date.setLocation(this);
 		return h;
 	}, this);
 };
+
+['candleLighting', 'havdalah'].forEach(function(prop){
+	HDate[prototype][prop] = function(){
+		var hd = this.holidays(true).filter(function(h){
+			return h.is(this);
+		}, this);
+		if (hd.length) {
+			hd = c.filter(hd.map(function(h){
+				return h[prop]();
+			}), true);
+		}
+		return hd.length ? new Date(Math.max.apply(null, hd)) : null;
+	};
+});
 
 HDate[prototype].omer = function omer() {
 	if (this.greg().getTime() > new HDate(15, NISAN, this[getFullYear]()).greg().getTime() &&
@@ -2456,10 +2470,11 @@ function Event(date, desc, mask) {
 }
 
 Event.prototype.is = function is(date, il) {
-	if (arguments.length < 2) {
-		il = Event.isIL;
-	}
 	date = new HDate(date);
+	if (arguments.length < 2) {
+		//il = Event.isIL;
+		il = date.il;
+	}
 	if (date.getDate() != this.date.getDate() || date.getMonth() != this.date.getMonth()) {
 		return false;
 	}
@@ -2772,7 +2787,7 @@ exports.year = function(year) {
 	];
 
 	tmpDate = new HDate(10, months.TEVET, year);
-	if (tmpDate[getDay]() === SAT) {
+	if (tmpDate[getDay]() == SAT) {
 		tmpDate = tmpDate.next();
 	}
 	h[push](new Event(
@@ -2806,7 +2821,7 @@ exports.year = function(year) {
 
 		if (tmpDate[getDay]() == days.FRI) {
 			tmpDate = tmpDate.prev();
-		} else if (tmpDate[getDay]() === days.SUN) {
+		} else if (tmpDate[getDay]() == days.SUN) {
 			tmpDate = tmpDate.next();
 		}
 
@@ -2828,7 +2843,7 @@ exports.year = function(year) {
 	}
 
 	tmpDate = new HDate(17, months.TAMUZ, year);
-	if (tmpDate[getDay]() === SAT) {
+	if (tmpDate[getDay]() == SAT) {
 		tmpDate = tmpDate.next();
 	}
 	h[push](new Event(
@@ -2838,7 +2853,7 @@ exports.year = function(year) {
 	));
 
 	tmpDate = new HDate(9, months.AV, year);
-	if (tmpDate[getDay]() === SAT) {
+	if (tmpDate[getDay]() == SAT) {
 		tmpDate = tmpDate.next();
 	}
 
@@ -2881,7 +2896,7 @@ exports.year = function(year) {
 	}
 
 	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
-		if ((month === NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
+		if ((month == NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
 				c.max_days_in_heb_month(month - 1, year)) == 30) {
 			h[push](new Event(
 				new HDate(1, month, year),
@@ -2902,7 +2917,7 @@ exports.year = function(year) {
 			));
 		}
 
-		if (month === months.ELUL) {
+		if (month == months.ELUL) {
 			continue;
 		}
 
@@ -2920,13 +2935,13 @@ function atzamaut(year) {
 	if (year >= 5708) { // Yom HaAtzma'ut only celebrated after 1948
 		var tmpDate = new HDate(1, months.IYYAR, year), pesach = new HDate(15, NISAN, year);
 
-		if (pesach[getDay]() === days.SUN) {
+		if (pesach[getDay]() == days.SUN) {
 			tmpDate.setDate(2);
-		} else if (pesach[getDay]() === SAT) {
+		} else if (pesach[getDay]() == SAT) {
 			tmpDate.setDate(3);
 		} else if (year < 5764) {
 			tmpDate.setDate(4);
-		} else if (pesach[getDay]() === days.TUE) {
+		} else if (pesach[getDay]() == days.TUE) {
 			tmpDate.setDate(5);
 		} else {
 			tmpDate.setDate(4);

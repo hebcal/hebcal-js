@@ -407,7 +407,7 @@ Returns a Boolean, whether or not the event applies for a given date.
 
 `date`, if provided, can be a `Hebcal.HDate` or a Gregorian `Date`. If undefined, defaults to the current date.
 
-`il`, if provided, should be a Boolean whether or not you are in Israel. If undefined, defaults to the value of `Hebcal.holidays.Event.isIL`.
+`il`, if provided, should be a Boolean whether or not you are in Israel. If undefined, defaults to the value of `Hebcal.holidays.Event.isIL`. As of v2.2.0, `il` defaults to the `il` property of `date`.
 
 #### `Hebcal.holidays.Event.prototype.masks()`
 
@@ -431,7 +431,9 @@ The number of minutes after sunset can be customized with the `Hebcal.holidays.E
 
 #### `Hebcal.holidays.Event.prototype.routine()`
 
-Returns a Boolean, whether or not this is a "routine" event. This can be used by programs wishing to omit certain types of events.
+This property was added in v2.2.0.
+
+Returns a Boolean, whether or not this is a "routine" event. Routine events are not included by default in `Hebcal.HDate.prototype.holidays()`.
 
 The default routine events are `Shabbat` and `Erev Shabbat`. This can be customized by changing the `Hebcal.holidays.Event.prototype.routine.names` array.
 
@@ -704,7 +706,7 @@ Sets the year of the date. Returns the object it was called upon.
 
 ### `Hebcal.HDate.prototype.setMonth(month)`
 
-Sets the month of the date. Returns the object it was called upon.
+Sets the month of the date. Accepts a number or string. Returns the object it was called upon.
 
 ### `Hebcal.HDate.prototype.setTishreiMonth(month)`
 
@@ -812,6 +814,14 @@ Returns an object containing halachik times (zemanim) for the day. Each property
 
 You can add a zeman to be returned with `Hebcal.HDate.addZeman()` (aliased as `Hebcal.addZeman()`).
 
+### `Hebcal.HDate.prototype.candleLighting()`
+
+Return a `Date` object with the candle-lighting time for that day, or `null` if there is none. Added v2.2.0.
+
+### `Hebcal.HDate.prototype.havdalah()`
+
+Return a `Date` object with the havdalah time for that day, or `null` if there is none. Added v2.2.0.
+
 ### `Hebcal.HDate.prototype.next()`
 
 Return tomorrow. Or rather, an `HDate` representing the next day.
@@ -893,9 +903,13 @@ Return `this.__gregmonth` internal, or a new `Hebcal.GregMonth`. This method was
 
 Call `getYearObject()` of `this.getGregMonthObject()`. This method was added in Hebcal JS 2.1.
 
-### `Hebcal.HDate.prototype.holidays()`
+### `Hebcal.HDate.prototype.holidays(all)`
 
 Return an array containing `Hebcal.holidays.Event`s applying to the current day.
+
+The `all` argument was added in v2.2.0. If not included, it defaults to `false`. The action in prior versions is as if `true` was passed.
+
+If `all` is not present, or is false, the function only returns events that apply to the current location, and omits "routine" events. For a definition of "routine", see `Hebcal.holidays.Event.prototype.rotuine()`. If `all` is present and is `true`, or using a version before 2.2.0, all events are returned, whether or not they are relevant.
 
 ### `Hebcal.HDate.prototype.omer()`
 
