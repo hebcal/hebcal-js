@@ -20,7 +20,7 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.1.2. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.1.2.
+The version documented here is 2.2.0 alpha.
 
 ## Releases
 
@@ -28,6 +28,7 @@ The version documented here is 2.1.2.
 * 2.1.0 - 2014-03-16 (14 Adar 2 5774 [Purim])
 * 2.1.1 - 2014-04-04 (5 Nisan 5774)
 * 2.1.2 (current) - 2014-04-04 (5 Nisan 5774)
+* 2.2.0 (current alpha) - 2014-05-12
 
 ## Contributors
 
@@ -365,11 +366,13 @@ masks.LIGHT_CANDLES_TZEIS = 32;
 
 A constant to be passed to both `Date` and `Hebcal.HDate` constructors. It means run this holiday every year, not just one specific year. It is automatically applied to Gregorian dates.
 
+This is **obsolete** as of Hebcal JS 2.2.0.
+
 ### `new Hebcal.holidays.Event(date, desc[, masks])`
 
 A constructor for Events. This is meant to be added to a holidays list.
 
-`date` can be either a Gregorian `Date` object or a `Hebcal.HDate` object. If Gregorian, `Hebcal.holidays.IGNORE_YEAR` is assumed.
+`date` can be either a Gregorian `Date` object or a `Hebcal.HDate` object.
 
 `desc` can be a description array, or string. A description array looks like: `[Sfardit pronounciation[, Ashkenazis pronounciation[, Hebrew spelling]]]`. If the Sfardit and Ashkenazis are the same, pass `null` for Ashkenazis.
 
@@ -385,7 +388,9 @@ An Array, either the array passed as `desc`, or the string passed, wrapped in an
 
 #### `Hebcal.holidays.Event.prototype.IGNORE_YEAR`
 
-Boolean, whether or not we ignore the year of the date. Always true for Gregorian dates.
+**This property is removed as of Hebcal JS 2.2.0.**
+
+Boolean, whether or not we ignore the year of the date. Always true for Gregorian dates. (Not actually a prototype value.)
 
 #### `Hebcal.holidays.Event.prototype.USER_EVENT`
 #### `Hebcal.holidays.Event.prototype.LIGHT_CANDLES`

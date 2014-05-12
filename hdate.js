@@ -198,7 +198,7 @@ HDate[prototype].setFullYear = function setFullYear(year) {
 };
 
 HDate[prototype].setMonth = function setMonth(month) {
-	this.month = month;
+	this.month = c.monthNum(month);
 	fix(this);
 	return this;
 };

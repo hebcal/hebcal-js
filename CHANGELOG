@@ -1,5 +1,8 @@
-version 2.2.0 alpha (2014-05-07)
+version 2.2.0 alpha (2014-05-12)
 	Add Event().routine() method
+	Always set event based on years
+	Remove holidays.IGNORE_YEAR
+	Fix bug with giving a name to HDate().setMonth()
 
 version 2.1.2 (2014-04-04 [5 Nisan 5774])
 	Fix sourcemap links

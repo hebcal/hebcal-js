@@ -292,7 +292,7 @@ Hebcal.range = c.range;
 
 Hebcal.gematriya = c.gematriya;
 
-Hebcal.holidays = c.filter(holidays, ['masks', 'IGNORE_YEAR', 'Event']); // not year()
+Hebcal.holidays = c.filter(holidays, ['masks', 'Event']); // not year(), atzmaut()
 
 Hebcal.parshiot = Sedra.parshiot;
 
