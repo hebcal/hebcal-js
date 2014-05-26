@@ -31,7 +31,7 @@ var __cache = {};
 
 // for byte optimizations
 
-var day_on_or_before = c.day_on_or_before,
+var dayOnOrBefore = c.dayOnOrBefore,
 	months = c.months,
 	days = c.days,
 	TISHREI = months.TISHREI,
@@ -178,7 +178,7 @@ exports.year = function(year) {
 			['Erev Yom Kippur', 0, 'ערב יום כיפור'],
 			LIGHT_CANDLES
 		), new Event( // first SAT after RH
-			new HDate(day_on_or_before(SAT, 7 + RH[abs]())),
+			new HDate(dayOnOrBefore(SAT, 7 + RH[abs]())),
 			[Shabbat + ' Shuva', Shabbos + ' Shuvah', 'שבת שובה'],
 			0
 		), new Event(
@@ -278,11 +278,11 @@ exports.year = function(year) {
 			["Tu B'Shvat", 0, 'ט"ו בשבט'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 43)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 43)),
 			[Shabbat + ' Shekalim', Shabbos + ' Shekalim', 'שבת שקלים'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 30)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 30)),
 			[Shabbat + ' Zachor', Shabbos + ' Zachor', 'שבת זכור'],
 			0
 		), new Event(
@@ -302,15 +302,15 @@ exports.year = function(year) {
 			['Shushan Purim', 0, 'שושן פורים'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 14) - 7),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 14) - 7),
 			[Shabbat + ' Parah', Shabbos + ' Parah', 'שבת פרה'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 14)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 14)),
 			[Shabbat + ' Hachodesh', Shabbos + ' Hachodesh', 'שבת החודש'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 1)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 1)),
 			[Shabbat + ' HaGadol', Shabbos + ' HaGadol', 'שבת הגדול'],
 			0
 		), new Event(
@@ -395,7 +395,7 @@ exports.year = function(year) {
 			['Shavuot 2', 'Shavuos 2', 'שבועות ב\''],
 			YOM_TOV_ENDS | CHUL_ONLY
 		), new Event(
-			new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year + 1)[abs]() - 4)),
+			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year + 1)[abs]() - 4)),
 			['Leil Selichot', 'Leil Selichos', 'ליל סליחות'],
 			0
 		), new Event(
@@ -415,7 +415,7 @@ exports.year = function(year) {
 		0
 	));
 
-	if (c.LEAP_YR_HEB(year)) {
+	if (c.LEAP(year)) {
 		h[push](new Event(
 			new HDate(14, months.ADAR_I, year),
 			['Purim Katan', 0, 'פורים קטן'],
@@ -477,7 +477,7 @@ exports.year = function(year) {
 	}
 
 	h[push](new Event(
-		new HDate(day_on_or_before(SAT, tmpDate[abs]())),
+		new HDate(dayOnOrBefore(SAT, tmpDate[abs]())),
 		[Shabbat + ' Chazon', Shabbos + ' Chazon', 'שבת חזון'],
 		0
 	));
@@ -495,28 +495,28 @@ exports.year = function(year) {
 	));
 
 	h[push](new Event(
-		new HDate(day_on_or_before(SAT, tmpDate[abs]() + 7)),
+		new HDate(dayOnOrBefore(SAT, tmpDate[abs]() + 7)),
 		[Shabbat + ' Nachamu', Shabbos + ' Nachamu', 'שבת נחמו'],
 		0
 	));
 
-	for (var day = 6; day < c.days_in_heb_year(year); day += 7) {
+	for (var day = 6; day < c.daysInYear(year); day += 7) {
 		h[push](new Event(
-			new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
+			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
 			[Shabbat, Shabbos, 'שבת'],
 			YOM_TOV_ENDS
 		));
 
 		h[push](new Event(
-			new HDate(day_on_or_before(days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
+			new HDate(dayOnOrBefore(days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
 			['Erev ' + Shabbat, 'Erev ' + Shabbos, 'ערב שבת'],
 			LIGHT_CANDLES
 		));
 	}
 
-	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
-		if ((month == NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
-				c.max_days_in_heb_month(month - 1, year)) == 30) {
+	for (var month = 1; month <= c.MONTH_CNT(year); month++) {
+		if ((month == NISAN ? c.daysInMonth(c.MONTH_CNT(year - 1), year - 1) :
+				c.daysInMonth(month - 1, year)) == 30) {
 			h[push](new Event(
 				new HDate(1, month, year),
 				['Rosh Chodesh 2', 0, "ראש חודש ב'"],

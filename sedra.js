@@ -46,8 +46,8 @@ var INCOMPLETE = 0,
 
 function Sedra(hebYr, il) { // the Hebrew year
 	il = !!il;
-	var long_c = c.long_cheshvan(hebYr);
-	var short_k = c.short_kislev(hebYr);
+	var long_c = c.lngChesh(hebYr);
+	var short_k = c.shrtKis(hebYr);
 	var type;
 	this.year = hebYr;
 	if (long_c && !short_k) {
@@ -62,8 +62,8 @@ function Sedra(hebYr, il) { // the Hebrew year
 	var rosh_hashana_day = (rosh_hashana % 7) + 1;
 
 	// find the first Saturday on or after Rosh Hashana
-	this.first_saturday = c.day_on_or_before(6, rosh_hashana + 6);
-	var leap = +c.LEAP_YR_HEB(hebYr);
+	this.first_saturday = c.dayOnOrBefore(6, rosh_hashana + 6);
+	var leap = +c.LEAP(hebYr);
 	this.type = type;
 	this.rosh_hashana_day = rosh_hashana_day;
 	this.leap = leap;
@@ -303,7 +303,7 @@ Sedra.prototype.get = function(hDate) {
 Sedra.prototype.abs = function(absDate) {
 
 	// find the first saturday on or after today's date
-	var absDate = c.day_on_or_before(6, absDate + 6);
+	var absDate = c.dayOnOrBefore(6, absDate + 6);
 	
 	var weekNum = (absDate - this.first_saturday) / 7;
 	var index = this.theSedraArray[weekNum];

@@ -138,5 +138,5 @@ exports.dafyomi = function(gregdate) {
 };
 
 exports.dafname = function(daf, o) {
-	return c.LANGUAGE(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
+	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
 };

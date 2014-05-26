@@ -78,7 +78,7 @@ function Hebcal(year, month) {
 	this.year = year;
 	if (month) {
 		if (typeof month == 'string') {
-			month = c.lookup_hebrew_month(month);
+			month = c.monthFromName(month);
 		}
 		if (typeof month == 'number') {
 			month = [month];
@@ -100,10 +100,10 @@ function Hebcal(year, month) {
 			throw new TE('month to Hebcal is not a valid type');
 		}
 	} else {
-		return new Hebcal(year, c.range(1, c.MONTHS_IN_HEB(year)));
+		return new Hebcal(year, c.range(1, c.MONTH_CNT(year)));
 	}
 
-	this[length] = c.days_in_heb_year(year);
+	this[length] = c.daysInYear(year);
 
 	defProp(this, 'il', getset(function() {
 		return this[getMonth](1).il;
@@ -296,7 +296,7 @@ Hebcal.holidays = c.filter(holidays, ['masks', 'Event']); // not year(), atzmaut
 
 Hebcal.parshiot = Sedra.parshiot;
 
-Hebcal.LANGUAGE = c.LANGUAGE;
+Hebcal.LANGUAGE = c.LANG;
 
 Hebcal[map] = c[map];
 
@@ -339,7 +339,7 @@ Hebcal[Month] = function Month(month, year) {
 	this.month = month;
 	this.year = year;
 
-	this.days = c.range(1, c.max_days_in_heb_month(month, year))[map](function(i){
+	this.days = c.range(1, c.daysInMonth(month, year))[map](function(i){
 		var d = new HDate(i, month, year);
 		defProp(d, '__month', {
 			configurable: true,
@@ -394,7 +394,7 @@ Hebcal[Month][prototype][prev] = function() {
 };
 
 Hebcal[Month][prototype][next] = function() {
-	if (this.month === c.MONTHS_IN_HEB(this.year)) { // Adar
+	if (this.month === c.MONTH_CNT(this.year)) { // Adar
 		return this[getYearObject]()[getMonth](1);
 	} else if (this.month === months.ELUL) {
 		return this[getYearObject]()[next]()[getMonth](TISHREI);
@@ -416,7 +416,7 @@ Hebcal[Month][prototype][getYearObject] = function getYearObject() {
 };
 
 Hebcal[Month][prototype].getName = function getName(o) {
-	return c.LANGUAGE(c.monthNames[+this[isLeapYear]()][this.month], o);
+	return c.LANG(c.monthNames[+this[isLeapYear]()][this.month], o);
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
@@ -448,7 +448,7 @@ Hebcal[Month][prototype].molad = function() {
     m_adj = this.month - 7;
 	year = this.year - 1;
     if (m_adj < 0) {
-		m_adj += c.MONTHS_IN_HEB(year + 1);
+		m_adj += c.MONTH_CNT(year + 1);
 	}
 
     m_elapsed = parseInt(m_adj +
@@ -550,7 +550,7 @@ HDate[prototype].getSedra = (function(){
 			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
 		}
 		return sedraYear.get(this)[map](function(p){
-			return c.LANGUAGE(p, o);
+			return c.LANG(p, o);
 		});
 	}
 })();
@@ -609,7 +609,7 @@ HDate[prototype].tachanun = (function() {
 		var year = this[getYearObject](), y = this[getFullYear]();
 
 		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
-			year[find](c.range(1, c.max_days_in_heb_month(NISAN, y)), NISAN), // all of Nisan
+			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
 			year[find](15 + 33, NISAN), // Lag Baomer
 			year[find](c.range(1, 8 - this.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
 			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av

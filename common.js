@@ -72,34 +72,34 @@ exports.days = {
 	SAT: 6
 };
 
-exports.LANGUAGE = function LANGUAGE(str, opts){
+exports.LANG = function LANGUAGE(str, opts){
 	return opts == 'h' && str[2] || (opts == 'a' && str[1] || str[0]);
 };
 
-function LEAP_YR_HEB(x) {
+function LEAP(x) {
 	return (1 + x * 7) % 19 < 7;
 }
-exports.LEAP_YR_HEB = LEAP_YR_HEB;
+exports.LEAP = LEAP;
 
-exports.MONTHS_IN_HEB = function MONTHS_IN_HEB(x) {
-	return 12 + LEAP_YR_HEB(x); // boolean is cast to 1 or 0
+exports.MONTH_CNT = function MONTH_CNT(x) {
+	return 12 + LEAP(x); // boolean is cast to 1 or 0
 };
 
-exports.max_days_in_heb_month = function max_days_in_heb_month(month, year) {
+exports.daysInMonth = function daysInMonth(month, year) {
 	return 30 - (month == months.IYYAR ||
 	month == months.TAMUZ || 
 	month == months.ELUL ||
 	month == months.TEVET || 
 	month == months.ADAR_II ||
-	(month == months.ADAR_I && !LEAP_YR_HEB(year)) ||
-	(month == months.CHESHVAN && !long_cheshvan(year)) ||
-	(month == months.KISLEV && short_kislev(year)));
+	(month == months.ADAR_I && !LEAP(year)) ||
+	(month == months.CHESHVAN && !lngChesh(year)) ||
+	(month == months.KISLEV && shrtKis(year)));
 };
 
 exports.monthNum = function monthNum(month) {
 	return typeof month === 'number' ? month :
 		month[charCodeAt](0) >= 1488 && month[charCodeAt](0) <= 1514 && /('|")/.test(month) ? gematriya(month) :
-			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : lookup_hebrew_month(month);
+			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : monthFromName(month);
 };
 
 exports.dayYearNum = function dayYearNum(str) {
@@ -110,7 +110,7 @@ exports.dayYearNum = function dayYearNum(str) {
 /* Days from sunday prior to start of Hebrew calendar to mean
    conjunction of Tishrei in Hebrew YEAR 
  */
-function hebrew_elapsed_days(hYear){
+function hebElapsedDays(hYear){
 	// borrowed from original JS
 	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
 		12 * ((hYear - 1) % 19) +
@@ -126,45 +126,45 @@ function hebrew_elapsed_days(hYear){
 	
 	var day = 1 + 29 * m_elapsed + Math.floor(h_elapsed / 24);
 	var alt_day = day + ((parts >= 19440) ||
-		((2 == (day % 7)) && (parts >= 9924) && !(LEAP_YR_HEB (hYear))) ||
-		((1 == (day % 7)) && (parts >= 16789) && LEAP_YR_HEB (hYear - 1)));
+		((2 == (day % 7)) && (parts >= 9924) && !(LEAP (hYear))) ||
+		((1 == (day % 7)) && (parts >= 16789) && LEAP (hYear - 1)));
 
 	return alt_day + ((alt_day % 7) === 0 ||
 		(alt_day % 7) == 3 ||
 		(alt_day % 7) == 5);
 }
-exports.hebrew_elapsed_days = hebrew_elapsed_days;
+exports.hebElapsedDays = hebElapsedDays;
 
 /* Number of days in the hebrew YEAR */
-function days_in_heb_year(year)
+function daysInYear(year)
 {
-	return hebrew_elapsed_days(year + 1) - hebrew_elapsed_days(year);
+	return hebElapsedDays(year + 1) - hebElapsedDays(year);
 }
-exports.days_in_heb_year = days_in_heb_year;
+exports.daysInYear = daysInYear;
 
-/* true if Cheshvan is long in hebrew YEAR */
-function long_cheshvan(year) {
-	return (days_in_heb_year(year) % 10) == 5;
+/* true if Cheshvan is long in Hebrew YEAR */
+function lngChesh(year) {
+	return (daysInYear(year) % 10) == 5;
 }
-exports.long_cheshvan = long_cheshvan;
+exports.lngChesh = lngChesh;
 
-/* true if Kislev is short in hebrew YEAR */
-function short_kislev(year) {
-	return (days_in_heb_year(year) % 10) == 3;
+/* true if Kislev is short in Hebrew YEAR */
+function shrtKis(year) {
+	return (daysInYear(year) % 10) == 3;
 }
-exports.short_kislev = short_kislev;
+exports.shrtKis = shrtKis;
 
-function lookup_hebrew_month(c) {
+function monthFromName(c) {
 	/*
 	the Hebrew months are unique to their second letter
-	N         nisan  (november?)
-	I         iyyar
+	N         Nisan  (November?)
+	I         Iyyar
 	E        Elul
 	C        Cheshvan
 	K        Kislev
 	1        1Adar
 	2        2Adar   
-	Si Sh     sivan, Shvat
+	Si Sh     Sivan, Shvat
 	Ta Ti Te Tamuz, Tishrei, Tevet
 	Av Ad    Av, Adar
 
@@ -252,7 +252,7 @@ function lookup_hebrew_month(c) {
 	}
 	return 0;
 };
-exports.lookup_hebrew_month = lookup_hebrew_month;
+exports.monthFromName = monthFromName;
 
 /* Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d.  Similarly, applying it to d+3 gives the DAYNAME nearest to
@@ -260,11 +260,11 @@ exports.lookup_hebrew_month = lookup_hebrew_month;
  * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
 
 **/
-exports.day_on_or_before = function day_on_or_before(day_of_week, absdate) {
+exports.dayOnOrBefore = function dayOnOrBefore(day_of_week, absdate) {
 	return absdate - ((absdate - day_of_week) % 7);
 };
 
-exports.map = function map(self, fun, thisp, sameprops) {
+exports.map = function map(self, fun, thisp) {
 	// originally written for http://github.com/Scimonster/localbrowse
 	if (self === null || typeof fun != 'function') {
 		throw new TypeError();
@@ -273,15 +273,7 @@ exports.map = function map(self, fun, thisp, sameprops) {
 	var res = {};
 	for (var i in t) {
 		if (t.hasOwnProperty(i)) {
-			var val = fun.call(thisp, t[i], i, t);
-			if (sameprops) {
-				// the new property should have the same enumerate/write/etc as the original
-				var props = Object.getOwnPropertyDescriptor(t, i);
-				props.value = val;
-				Object.defineProperty(res, i, props);
-			} else {
-				res[i] = val;
-			}
+			res[i] = fun.call(thisp, t[i], i, t);
 		}
 	}
 	if (Array.isArray(self) || typeof self == 'string') { // came as an array, return an array
@@ -373,10 +365,10 @@ function gematriya(num, limit) {
 	if (str) {
 		num = num.replace(/('|")/g,'');
 	}
-	if (!str && limit && limit - num.toString().length < 0) {
-		num = num.toString().split('').reverse().slice(0, limit - num.toString().length).reverse().join('');
-	}
 	num = num.toString().split('').reverse();
+	if (!(!str && limit && limit - num.toString().length < 0)) {
+		num = num.slice(0, limit - num.toString().length);
+	}
 	var letters = {
 		0: '',
 		1: 'א',
@@ -407,36 +399,10 @@ function gematriya(num, limit) {
 		800: 'תת',
 		900: 'תתק',
 		1000: 'תתר'
-	}, numbers = {
-		'א': 1,
-		'ב': 2,
-		'ג': 3,
-		'ד': 4,
-		'ה': 5,
-		'ו': 6,
-		'ז': 7,
-		'ח': 8,
-		'ט': 9,
-		'י': 10,
-		'כ': 20,
-		'ל': 30,
-		'מ': 40,
-		'נ': 50,
-		'ס': 60,
-		'ע': 70,
-		'פ': 80,
-		'צ': 90,
-		'ק': 100,
-		'ר': 200,
-		'ש': 300,
-		'ת': 400,
-		'תק': 500,
-		'תר': 600,
-		'תש': 700,
-		'תת': 800,
-		'תתק': 900,
-		'תתר': 1000
-	};
+	}, numbers = {};
+	for (var i in letters) {
+		numbers[letters[i]] = i;
+	}
 
 	num = num.map(function g(n,i){
 		if (str) {
@@ -464,7 +430,7 @@ function gematriya(num, limit) {
 
 		return num.join('');
 	}
-};
+}
 exports.gematriya = gematriya;
 
 exports.range = function range(start, end, step) {

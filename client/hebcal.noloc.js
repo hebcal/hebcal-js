@@ -272,34 +272,34 @@ exports.days = {
 	SAT: 6
 };
 
-exports.LANGUAGE = function LANGUAGE(str, opts){
+exports.LANG = function LANGUAGE(str, opts){
 	return opts == 'h' && str[2] || (opts == 'a' && str[1] || str[0]);
 };
 
-function LEAP_YR_HEB(x) {
+function LEAP(x) {
 	return (1 + x * 7) % 19 < 7;
 }
-exports.LEAP_YR_HEB = LEAP_YR_HEB;
+exports.LEAP = LEAP;
 
-exports.MONTHS_IN_HEB = function MONTHS_IN_HEB(x) {
-	return 12 + LEAP_YR_HEB(x); // boolean is cast to 1 or 0
+exports.MONTH_CNT = function MONTH_CNT(x) {
+	return 12 + LEAP(x); // boolean is cast to 1 or 0
 };
 
-exports.max_days_in_heb_month = function max_days_in_heb_month(month, year) {
+exports.daysInMonth = function daysInMonth(month, year) {
 	return 30 - (month == months.IYYAR ||
 	month == months.TAMUZ || 
 	month == months.ELUL ||
 	month == months.TEVET || 
 	month == months.ADAR_II ||
-	(month == months.ADAR_I && !LEAP_YR_HEB(year)) ||
-	(month == months.CHESHVAN && !long_cheshvan(year)) ||
-	(month == months.KISLEV && short_kislev(year)));
+	(month == months.ADAR_I && !LEAP(year)) ||
+	(month == months.CHESHVAN && !lngChesh(year)) ||
+	(month == months.KISLEV && shrtKis(year)));
 };
 
 exports.monthNum = function monthNum(month) {
 	return typeof month === 'number' ? month :
 		month[charCodeAt](0) >= 1488 && month[charCodeAt](0) <= 1514 && /('|")/.test(month) ? gematriya(month) :
-			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : lookup_hebrew_month(month);
+			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : monthFromName(month);
 };
 
 exports.dayYearNum = function dayYearNum(str) {
@@ -310,7 +310,7 @@ exports.dayYearNum = function dayYearNum(str) {
 /* Days from sunday prior to start of Hebrew calendar to mean
    conjunction of Tishrei in Hebrew YEAR 
  */
-function hebrew_elapsed_days(hYear){
+function hebElapsedDays(hYear){
 	// borrowed from original JS
 	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
 		12 * ((hYear - 1) % 19) +
@@ -326,45 +326,45 @@ function hebrew_elapsed_days(hYear){
 	
 	var day = 1 + 29 * m_elapsed + Math.floor(h_elapsed / 24);
 	var alt_day = day + ((parts >= 19440) ||
-		((2 == (day % 7)) && (parts >= 9924) && !(LEAP_YR_HEB (hYear))) ||
-		((1 == (day % 7)) && (parts >= 16789) && LEAP_YR_HEB (hYear - 1)));
+		((2 == (day % 7)) && (parts >= 9924) && !(LEAP (hYear))) ||
+		((1 == (day % 7)) && (parts >= 16789) && LEAP (hYear - 1)));
 
 	return alt_day + ((alt_day % 7) === 0 ||
 		(alt_day % 7) == 3 ||
 		(alt_day % 7) == 5);
 }
-exports.hebrew_elapsed_days = hebrew_elapsed_days;
+exports.hebElapsedDays = hebElapsedDays;
 
 /* Number of days in the hebrew YEAR */
-function days_in_heb_year(year)
+function daysInYear(year)
 {
-	return hebrew_elapsed_days(year + 1) - hebrew_elapsed_days(year);
+	return hebElapsedDays(year + 1) - hebElapsedDays(year);
 }
-exports.days_in_heb_year = days_in_heb_year;
+exports.daysInYear = daysInYear;
 
-/* true if Cheshvan is long in hebrew YEAR */
-function long_cheshvan(year) {
-	return (days_in_heb_year(year) % 10) == 5;
+/* true if Cheshvan is long in Hebrew YEAR */
+function lngChesh(year) {
+	return (daysInYear(year) % 10) == 5;
 }
-exports.long_cheshvan = long_cheshvan;
+exports.lngChesh = lngChesh;
 
-/* true if Kislev is short in hebrew YEAR */
-function short_kislev(year) {
-	return (days_in_heb_year(year) % 10) == 3;
+/* true if Kislev is short in Hebrew YEAR */
+function shrtKis(year) {
+	return (daysInYear(year) % 10) == 3;
 }
-exports.short_kislev = short_kislev;
+exports.shrtKis = shrtKis;
 
-function lookup_hebrew_month(c) {
+function monthFromName(c) {
 	/*
 	the Hebrew months are unique to their second letter
-	N         nisan  (november?)
-	I         iyyar
+	N         Nisan  (November?)
+	I         Iyyar
 	E        Elul
 	C        Cheshvan
 	K        Kislev
 	1        1Adar
 	2        2Adar   
-	Si Sh     sivan, Shvat
+	Si Sh     Sivan, Shvat
 	Ta Ti Te Tamuz, Tishrei, Tevet
 	Av Ad    Av, Adar
 
@@ -452,7 +452,7 @@ function lookup_hebrew_month(c) {
 	}
 	return 0;
 };
-exports.lookup_hebrew_month = lookup_hebrew_month;
+exports.monthFromName = monthFromName;
 
 /* Note: Applying this function to d+6 gives us the DAYNAME on or after an
  * absolute day d.  Similarly, applying it to d+3 gives the DAYNAME nearest to
@@ -460,11 +460,11 @@ exports.lookup_hebrew_month = lookup_hebrew_month;
  * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
 
 **/
-exports.day_on_or_before = function day_on_or_before(day_of_week, absdate) {
+exports.dayOnOrBefore = function dayOnOrBefore(day_of_week, absdate) {
 	return absdate - ((absdate - day_of_week) % 7);
 };
 
-exports.map = function map(self, fun, thisp, sameprops) {
+exports.map = function map(self, fun, thisp) {
 	// originally written for http://github.com/Scimonster/localbrowse
 	if (self === null || typeof fun != 'function') {
 		throw new TypeError();
@@ -473,15 +473,7 @@ exports.map = function map(self, fun, thisp, sameprops) {
 	var res = {};
 	for (var i in t) {
 		if (t.hasOwnProperty(i)) {
-			var val = fun.call(thisp, t[i], i, t);
-			if (sameprops) {
-				// the new property should have the same enumerate/write/etc as the original
-				var props = Object.getOwnPropertyDescriptor(t, i);
-				props.value = val;
-				Object.defineProperty(res, i, props);
-			} else {
-				res[i] = val;
-			}
+			res[i] = fun.call(thisp, t[i], i, t);
 		}
 	}
 	if (Array.isArray(self) || typeof self == 'string') { // came as an array, return an array
@@ -573,10 +565,10 @@ function gematriya(num, limit) {
 	if (str) {
 		num = num.replace(/('|")/g,'');
 	}
-	if (!str && limit && limit - num.toString().length < 0) {
-		num = num.toString().split('').reverse().slice(0, limit - num.toString().length).reverse().join('');
-	}
 	num = num.toString().split('').reverse();
+	if (!(!str && limit && limit - num.toString().length < 0)) {
+		num = num.slice(0, limit - num.toString().length);
+	}
 	var letters = {
 		0: '',
 		1: 'א',
@@ -607,36 +599,10 @@ function gematriya(num, limit) {
 		800: 'תת',
 		900: 'תתק',
 		1000: 'תתר'
-	}, numbers = {
-		'א': 1,
-		'ב': 2,
-		'ג': 3,
-		'ד': 4,
-		'ה': 5,
-		'ו': 6,
-		'ז': 7,
-		'ח': 8,
-		'ט': 9,
-		'י': 10,
-		'כ': 20,
-		'ל': 30,
-		'מ': 40,
-		'נ': 50,
-		'ס': 60,
-		'ע': 70,
-		'פ': 80,
-		'צ': 90,
-		'ק': 100,
-		'ר': 200,
-		'ש': 300,
-		'ת': 400,
-		'תק': 500,
-		'תר': 600,
-		'תש': 700,
-		'תת': 800,
-		'תתק': 900,
-		'תתר': 1000
-	};
+	}, numbers = {};
+	for (var i in letters) {
+		numbers[letters[i]] = i;
+	}
 
 	num = num.map(function g(n,i){
 		if (str) {
@@ -664,7 +630,7 @@ function gematriya(num, limit) {
 
 		return num.join('');
 	}
-};
+}
 exports.gematriya = gematriya;
 
 exports.range = function range(start, end, step) {
@@ -826,7 +792,7 @@ exports.dafyomi = function(gregdate) {
 };
 
 exports.dafname = function(daf, o) {
-	return c.LANGUAGE(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
+	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
 };
 },{"./common":3,"./greg":5}],5:[function(require,module,exports){
 /*
@@ -994,9 +960,9 @@ var prototype = 'prototype',
 	hour = 'hour',
 	months = c.months,
 	TISHREI = months.TISHREI,
-	MONTHS_IN_HEB = c.MONTHS_IN_HEB,
-	max_days_in_heb_month = c.max_days_in_heb_month,
-	day_on_or_before = c.day_on_or_before;
+	MONTH_CNT = c.MONTH_CNT,
+	daysInMonth = c.daysInMonth,
+	dayOnOrBefore = c.dayOnOrBefore;
 
 function HDate(day, month, year) {
 	switch (arguments.length) {
@@ -1082,15 +1048,15 @@ function fixDate(date) {
 		if (date.month == TISHREI) {
 			date.year -= 1;
 		}
-		date.day += max_days_in_heb_month(date.month, date.year);
+		date.day += daysInMonth(date.month, date.year);
 		date.month -= 1;
 		fix(date);
 	}
-	if (date.day > max_days_in_heb_month(date.month, date.year)) {
+	if (date.day > daysInMonth(date.month, date.year)) {
 		if (date.month == months.ELUL) {
 			date.year += 1;
 		}
-		date.day -= max_days_in_heb_month(date.month, date.year);
+		date.day -= daysInMonth(date.month, date.year);
 		date.month += 1;
 		fix(date);
 	}
@@ -1103,11 +1069,11 @@ function fixMonth(date) {
 		fix(date);
 	}
 	if (date.month < 1) {
-		date.month += MONTHS_IN_HEB(date.year);
+		date.month += MONTH_CNT(date.year);
 		fix(date);
 	}
-	if (date.month > MONTHS_IN_HEB(date.year)) {
-		date.month -= MONTHS_IN_HEB(date.year);
+	if (date.month > MONTH_CNT(date.year)) {
+		date.month -= MONTH_CNT(date.year);
 		fix(date);
 	}
 }
@@ -1125,11 +1091,11 @@ HDate[prototype][getMonth] = function getMonth() {
 };
 
 HDate[prototype].getTishreiMonth = function getTishreiMonth() {
-	return (this[getMonth]() + MONTHS_IN_HEB(this[getFullYear]()) - 6) % MONTHS_IN_HEB(this[getFullYear]());
+	return (this[getMonth]() + MONTH_CNT(this[getFullYear]()) - 6) % MONTH_CNT(this[getFullYear]());
 };
 
 HDate[prototype].daysInMonth = function daysInMonth() {
-	return max_days_in_heb_month(this[getMonth](), this[getFullYear]());
+	return daysInMonth(this[getMonth](), this[getFullYear]());
 };
 
 HDate[prototype][getDate] = function getDate() {
@@ -1153,7 +1119,7 @@ HDate[prototype].setMonth = function setMonth(month) {
 };
 
 HDate[prototype].setTishreiMonth = function setTishreiMonth(month) {
-	return this.setMonth((month + 6) % MONTHS_IN_HEB(this[getFullYear]()) || 13);
+	return this.setMonth((month + 6) % MONTH_CNT(this[getFullYear]()) || 13);
 };
 
 HDate[prototype].setDate = function setDate(date) {
@@ -1170,20 +1136,20 @@ function hebrew2abs(d) {
 	var m, tempabs = d[getDate]();
 	
 	if (d[getMonth]() < TISHREI) {
-		for (m = TISHREI; m <= MONTHS_IN_HEB(d[getFullYear]()); m++) {
-			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+		for (m = TISHREI; m <= MONTH_CNT(d[getFullYear]()); m++) {
+			tempabs += daysInMonth(m, d[getFullYear]());
 		}
 
 		for (m = months.NISAN; m < d[getMonth](); m++) {
-			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+			tempabs += daysInMonth(m, d[getFullYear]());
 		}
 	} else {
 		for (m = TISHREI; m < d[getMonth](); m++) {
-			tempabs += max_days_in_heb_month(m, d[getFullYear]());
+			tempabs += daysInMonth(m, d[getFullYear]());
 		}
 	}
 	
-	return c.hebrew_elapsed_days(d[getFullYear]()) - 1373429 + tempabs;
+	return c.hebElapsedDays(d[getFullYear]()) - 1373429 + tempabs;
 }
 
 function abs2hebrew(d) {
@@ -1211,10 +1177,10 @@ function abs2hebrew(d) {
 		month = TISHREI;
 	}
 
-	while (d > hebrew2abs(hebdate = new HDate(max_days_in_heb_month(month, year), month, year))) {
-		month = (month % MONTHS_IN_HEB(year)) + 1;
+	while (d > hebrew2abs(hebdate = new HDate(daysInMonth(month, year), month, year))) {
+		month = (month % MONTH_CNT(year)) + 1;
 	}
-	
+
 	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 
@@ -1231,13 +1197,13 @@ HDate[prototype][abs] = function abs() {
 };
 
 HDate[prototype].toString = function toString(o) {
-	return c.LANGUAGE([this[getDate](), null, c.gematriya(this[getDate]())], o) + ' ' +
+	return c.LANG([this[getDate](), null, c.gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
-		c.LANGUAGE([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o);
+		c.LANG([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o);
 };
 
 HDate[prototype].getMonthName = function getMonthName(o) {
-	return c.LANGUAGE(c.monthNames[+this.isLeapYear()][this[getMonth]()], o);
+	return c.LANG(c.monthNames[+this.isLeapYear()][this[getMonth]()], o);
 };
 
 HDate[prototype].setCity = function setCity(city) {
@@ -1382,7 +1348,7 @@ HDate[prototype].isSameDate = function(other) {
 };
 
 function onOrBefore(day, t, offset) {
-	return new HDate(day_on_or_before(day, t[abs]() + offset));
+	return new HDate(dayOnOrBefore(day, t[abs]() + offset));
 }
 
 HDate[prototype].before = function(day) {
@@ -1487,7 +1453,7 @@ function Hebcal(year, month) {
 	this.year = year;
 	if (month) {
 		if (typeof month == 'string') {
-			month = c.lookup_hebrew_month(month);
+			month = c.monthFromName(month);
 		}
 		if (typeof month == 'number') {
 			month = [month];
@@ -1509,10 +1475,10 @@ function Hebcal(year, month) {
 			throw new TE('month to Hebcal is not a valid type');
 		}
 	} else {
-		return new Hebcal(year, c.range(1, c.MONTHS_IN_HEB(year)));
+		return new Hebcal(year, c.range(1, c.MONTH_CNT(year)));
 	}
 
-	this[length] = c.days_in_heb_year(year);
+	this[length] = c.daysInYear(year);
 
 	defProp(this, 'il', getset(function() {
 		return this[getMonth](1).il;
@@ -1705,7 +1671,7 @@ Hebcal.holidays = c.filter(holidays, ['masks', 'Event']); // not year(), atzmaut
 
 Hebcal.parshiot = Sedra.parshiot;
 
-Hebcal.LANGUAGE = c.LANGUAGE;
+Hebcal.LANGUAGE = c.LANG;
 
 Hebcal[map] = c[map];
 
@@ -1748,7 +1714,7 @@ Hebcal[Month] = function Month(month, year) {
 	this.month = month;
 	this.year = year;
 
-	this.days = c.range(1, c.max_days_in_heb_month(month, year))[map](function(i){
+	this.days = c.range(1, c.daysInMonth(month, year))[map](function(i){
 		var d = new HDate(i, month, year);
 		defProp(d, '__month', {
 			configurable: true,
@@ -1803,7 +1769,7 @@ Hebcal[Month][prototype][prev] = function() {
 };
 
 Hebcal[Month][prototype][next] = function() {
-	if (this.month === c.MONTHS_IN_HEB(this.year)) { // Adar
+	if (this.month === c.MONTH_CNT(this.year)) { // Adar
 		return this[getYearObject]()[getMonth](1);
 	} else if (this.month === months.ELUL) {
 		return this[getYearObject]()[next]()[getMonth](TISHREI);
@@ -1825,7 +1791,7 @@ Hebcal[Month][prototype][getYearObject] = function getYearObject() {
 };
 
 Hebcal[Month][prototype].getName = function getName(o) {
-	return c.LANGUAGE(c.monthNames[+this[isLeapYear]()][this.month], o);
+	return c.LANG(c.monthNames[+this[isLeapYear]()][this.month], o);
 };
 
 Hebcal[Month][prototype].rosh_chodesh = function rosh_chodesh() {
@@ -1857,7 +1823,7 @@ Hebcal[Month][prototype].molad = function() {
     m_adj = this.month - 7;
 	year = this.year - 1;
     if (m_adj < 0) {
-		m_adj += c.MONTHS_IN_HEB(year + 1);
+		m_adj += c.MONTH_CNT(year + 1);
 	}
 
     m_elapsed = parseInt(m_adj +
@@ -1959,7 +1925,7 @@ HDate[prototype].getSedra = (function(){
 			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
 		}
 		return sedraYear.get(this)[map](function(p){
-			return c.LANGUAGE(p, o);
+			return c.LANG(p, o);
 		});
 	}
 })();
@@ -2018,7 +1984,7 @@ HDate[prototype].tachanun = (function() {
 		var year = this[getYearObject](), y = this[getFullYear]();
 
 		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
-			year[find](c.range(1, c.max_days_in_heb_month(NISAN, y)), NISAN), // all of Nisan
+			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
 			year[find](15 + 33, NISAN), // Lag Baomer
 			year[find](c.range(1, 8 - this.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
 			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
@@ -2411,7 +2377,7 @@ var __cache = {};
 
 // for byte optimizations
 
-var day_on_or_before = c.day_on_or_before,
+var dayOnOrBefore = c.dayOnOrBefore,
 	months = c.months,
 	days = c.days,
 	TISHREI = months.TISHREI,
@@ -2558,7 +2524,7 @@ exports.year = function(year) {
 			['Erev Yom Kippur', 0, 'ערב יום כיפור'],
 			LIGHT_CANDLES
 		), new Event( // first SAT after RH
-			new HDate(day_on_or_before(SAT, 7 + RH[abs]())),
+			new HDate(dayOnOrBefore(SAT, 7 + RH[abs]())),
 			[Shabbat + ' Shuva', Shabbos + ' Shuvah', 'שבת שובה'],
 			0
 		), new Event(
@@ -2658,11 +2624,11 @@ exports.year = function(year) {
 			["Tu B'Shvat", 0, 'ט"ו בשבט'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 43)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 43)),
 			[Shabbat + ' Shekalim', Shabbos + ' Shekalim', 'שבת שקלים'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 30)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 30)),
 			[Shabbat + ' Zachor', Shabbos + ' Zachor', 'שבת זכור'],
 			0
 		), new Event(
@@ -2682,15 +2648,15 @@ exports.year = function(year) {
 			['Shushan Purim', 0, 'שושן פורים'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 14) - 7),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 14) - 7),
 			[Shabbat + ' Parah', Shabbos + ' Parah', 'שבת פרה'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 14)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 14)),
 			[Shabbat + ' Hachodesh', Shabbos + ' Hachodesh', 'שבת החודש'],
 			0
 		), new Event(
-			new HDate(day_on_or_before(SAT, pesach[abs]() - 1)),
+			new HDate(dayOnOrBefore(SAT, pesach[abs]() - 1)),
 			[Shabbat + ' HaGadol', Shabbos + ' HaGadol', 'שבת הגדול'],
 			0
 		), new Event(
@@ -2775,7 +2741,7 @@ exports.year = function(year) {
 			['Shavuot 2', 'Shavuos 2', 'שבועות ב\''],
 			YOM_TOV_ENDS | CHUL_ONLY
 		), new Event(
-			new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year + 1)[abs]() - 4)),
+			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year + 1)[abs]() - 4)),
 			['Leil Selichot', 'Leil Selichos', 'ליל סליחות'],
 			0
 		), new Event(
@@ -2795,7 +2761,7 @@ exports.year = function(year) {
 		0
 	));
 
-	if (c.LEAP_YR_HEB(year)) {
+	if (c.LEAP(year)) {
 		h[push](new Event(
 			new HDate(14, months.ADAR_I, year),
 			['Purim Katan', 0, 'פורים קטן'],
@@ -2857,7 +2823,7 @@ exports.year = function(year) {
 	}
 
 	h[push](new Event(
-		new HDate(day_on_or_before(SAT, tmpDate[abs]())),
+		new HDate(dayOnOrBefore(SAT, tmpDate[abs]())),
 		[Shabbat + ' Chazon', Shabbos + ' Chazon', 'שבת חזון'],
 		0
 	));
@@ -2875,28 +2841,28 @@ exports.year = function(year) {
 	));
 
 	h[push](new Event(
-		new HDate(day_on_or_before(SAT, tmpDate[abs]() + 7)),
+		new HDate(dayOnOrBefore(SAT, tmpDate[abs]() + 7)),
 		[Shabbat + ' Nachamu', Shabbos + ' Nachamu', 'שבת נחמו'],
 		0
 	));
 
-	for (var day = 6; day < c.days_in_heb_year(year); day += 7) {
+	for (var day = 6; day < c.daysInYear(year); day += 7) {
 		h[push](new Event(
-			new HDate(day_on_or_before(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
+			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
 			[Shabbat, Shabbos, 'שבת'],
 			YOM_TOV_ENDS
 		));
 
 		h[push](new Event(
-			new HDate(day_on_or_before(days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
+			new HDate(dayOnOrBefore(days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
 			['Erev ' + Shabbat, 'Erev ' + Shabbos, 'ערב שבת'],
 			LIGHT_CANDLES
 		));
 	}
 
-	for (var month = 1; month <= c.MONTHS_IN_HEB(year); month++) {
-		if ((month == NISAN ? c.max_days_in_heb_month(c.MONTHS_IN_HEB(year - 1), year - 1) :
-				c.max_days_in_heb_month(month - 1, year)) == 30) {
+	for (var month = 1; month <= c.MONTH_CNT(year); month++) {
+		if ((month == NISAN ? c.daysInMonth(c.MONTH_CNT(year - 1), year - 1) :
+				c.daysInMonth(month - 1, year)) == 30) {
 			h[push](new Event(
 				new HDate(1, month, year),
 				['Rosh Chodesh 2', 0, "ראש חודש ב'"],
@@ -3280,8 +3246,8 @@ var INCOMPLETE = 0,
 
 function Sedra(hebYr, il) { // the Hebrew year
 	il = !!il;
-	var long_c = c.long_cheshvan(hebYr);
-	var short_k = c.short_kislev(hebYr);
+	var long_c = c.lngChesh(hebYr);
+	var short_k = c.shrtKis(hebYr);
 	var type;
 	this.year = hebYr;
 	if (long_c && !short_k) {
@@ -3296,8 +3262,8 @@ function Sedra(hebYr, il) { // the Hebrew year
 	var rosh_hashana_day = (rosh_hashana % 7) + 1;
 
 	// find the first Saturday on or after Rosh Hashana
-	this.first_saturday = c.day_on_or_before(6, rosh_hashana + 6);
-	var leap = +c.LEAP_YR_HEB(hebYr);
+	this.first_saturday = c.dayOnOrBefore(6, rosh_hashana + 6);
+	var leap = +c.LEAP(hebYr);
 	this.type = type;
 	this.rosh_hashana_day = rosh_hashana_day;
 	this.leap = leap;
@@ -3537,7 +3503,7 @@ Sedra.prototype.get = function(hDate) {
 Sedra.prototype.abs = function(absDate) {
 
 	// find the first saturday on or after today's date
-	var absDate = c.day_on_or_before(6, absDate + 6);
+	var absDate = c.dayOnOrBefore(6, absDate + 6);
 	
 	var weekNum = (absDate - this.first_saturday) / 7;
 	var index = this.theSedraArray[weekNum];

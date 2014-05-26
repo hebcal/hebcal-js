@@ -505,9 +505,11 @@ Hebcal.range(15, 1, 3) // [15, 12, 9, 6, 3]
 Hebcal.range(1, 2, 0.25) // [1, 1.25, 1.5, 1.75, 2]
 ```
 
-## `Hebcal.map(object, mapFunc[, thisArg[, sameProps]])`
+## `Hebcal.map(object, mapFunc[, thisArg])`
 
 Similar to `Array.prototype.map`, but for objects.
+
+Prior to v2.2, this function accepted a fourth argument, `sameprops`. It is now **obsolete**.
 
 ## `Hebcal.filter(object, filterFunc[, thisArg])`
 
@@ -589,6 +591,18 @@ Returns an array containing `Hebcal.HDate`s for that month's Rosh Chodesh. Retur
 ### `Hebcal.Month.prototype.map(mapFunc[, thisArg])`
 
 A shortcut for `month.days.map(mapFunc, [thisArg])`.
+
+### `Hebcal.Month.prototype.molad()`
+
+Returns an object representing the [Molad](https://en.wikipedia.org/wiki/Molad) for the month. This method is *new* in v2.2.0.
+
+The object returned has the following properties:
+
+* `doy` - Number, from 0-6, with the day of week
+* `hour` - Number, from 1-24, with the hour of the molad
+* `minutes` - Number, from 0-59, with the minute
+* `chalakim` - Number, from 0-17, with the chalakim of the minute
+* `day` - Date, containing the exact time of the molad
 
 ### `Hebcal.Month.prototype.find(day)`
 
