@@ -1,10 +1,9 @@
 #!/bin/sh
 # generate client files
 # requires browserify, uglifyjs, exorcist, marked, and node (of course)
-# also generates README.html and fixes the README in package.json
+# also generates README.html
 echo "Creating README"
 marked --gfm --breaks README.md > README.html
-echo "fs=require('fs');p=JSON.parse(fs.readFileSync('package.json').toString());p.readme=fs.readFileSync('README.md').toString();fs.writeFileSync('package.json',JSON.stringify(p,null,'\t'))" | node
 
 cd client
 header="/*
