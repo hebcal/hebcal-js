@@ -107,15 +107,14 @@ exports.dayYearNum = function dayYearNum(str) {
 		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
 };
 
-/* Days from sunday prior to start of hebrew calendar to mean
-   conjunction of tishrei in hebrew YEAR 
+/* Days from sunday prior to start of Hebrew calendar to mean
+   conjunction of Tishrei in Hebrew YEAR 
  */
 function hebrew_elapsed_days(hYear){
 	// borrowed from original JS
-	var yearl = hYear;
-	var m_elapsed = 235 * Math.floor((yearl - 1) / 19) +
-		12 * ((yearl - 1) % 19) +
-		Math.floor(((((yearl - 1) % 19) * 7) + 1) / 19);
+	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
+		12 * ((hYear - 1) % 19) +
+		Math.floor(((((hYear - 1) % 19) * 7) + 1) / 19);
 	
 	var p_elapsed = 204 + (793 * (m_elapsed % 1080));
 	

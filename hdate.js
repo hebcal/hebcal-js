@@ -258,7 +258,7 @@ function abs2hebrew(d) {
 		// optimize search
 		month = mmap[gregdate[getMonth]()];
 	} else {
-		// we're outside the usual range, so assume nothing about hebrew/gregorian calendar drift...
+		// we're outside the usual range, so assume nothing about Hebrew/Gregorian calendar drift...
 		month = TISHREI;
 	}
 
@@ -266,10 +266,6 @@ function abs2hebrew(d) {
 		month = (month % MONTHS_IN_HEB(year)) + 1;
 	}
 	
-	/* if (day < 0) {
-		throw new RangeError("assertion failure d < hebrew2abs(m,d,y) => " + d + " < " + hebrew2abs(hebdate) + "!");
-	} */
-
 	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 

@@ -319,15 +319,14 @@ exports.dayYearNum = function dayYearNum(str) {
 		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
 };
 
-/* Days from sunday prior to start of hebrew calendar to mean
-   conjunction of tishrei in hebrew YEAR 
+/* Days from sunday prior to start of Hebrew calendar to mean
+   conjunction of Tishrei in Hebrew YEAR 
  */
 function hebrew_elapsed_days(hYear){
 	// borrowed from original JS
-	var yearl = hYear;
-	var m_elapsed = 235 * Math.floor((yearl - 1) / 19) +
-		12 * ((yearl - 1) % 19) +
-		Math.floor(((((yearl - 1) % 19) * 7) + 1) / 19);
+	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
+		12 * ((hYear - 1) % 19) +
+		Math.floor(((((hYear - 1) % 19) * 7) + 1) / 19);
 	
 	var p_elapsed = 204 + (793 * (m_elapsed % 1080));
 	
@@ -1220,7 +1219,7 @@ function abs2hebrew(d) {
 		// optimize search
 		month = mmap[gregdate[getMonth]()];
 	} else {
-		// we're outside the usual range, so assume nothing about hebrew/gregorian calendar drift...
+		// we're outside the usual range, so assume nothing about Hebrew/Gregorian calendar drift...
 		month = TISHREI;
 	}
 
@@ -1228,10 +1227,6 @@ function abs2hebrew(d) {
 		month = (month % MONTHS_IN_HEB(year)) + 1;
 	}
 	
-	/* if (day < 0) {
-		throw new RangeError("assertion failure d < hebrew2abs(m,d,y) => " + d + " < " + hebrew2abs(hebdate) + "!");
-	} */
-
 	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 
@@ -1869,7 +1864,6 @@ Hebcal[Month][prototype][map] = function() {
 };
 
 Hebcal[Month][prototype].molad = function() {
-	console.warn('this method is broken!');
 	var retMolad = {}, year, m_elapsed, p_elapsed, h_elapsed, parts, m_adj;
 
     m_adj = this.month - 7;
@@ -1877,29 +1871,31 @@ Hebcal[Month][prototype].molad = function() {
     if (m_adj < 0) {
 		m_adj += c.MONTHS_IN_HEB(year + 1);
 	}
-	console.log(m_adj, year)
 
     m_elapsed = parseInt(m_adj +
         235 * (year / 19)/* +
         12 * (year % 19) +
         (((year % 19) * 7) + 1) / 19*/);
-		console.log(m_elapsed)
 
     p_elapsed = parseInt(204 + (793 * (m_elapsed % 1080)));
-	console.log(p_elapsed)
 
     h_elapsed = parseInt(5 + (12 * m_elapsed) +
         793 * (m_elapsed / 1080)/* +
         p_elapsed / 1080*/ -
         6);
-		console.log(h_elapsed)
 
     parts = parseInt((p_elapsed % 1080) + 1080 * (h_elapsed % 24));
-	console.log(parts)
 
-    retMolad.day = parseInt(1 + 29 * m_elapsed + h_elapsed / 24);
+    retMolad.doy = new HDate(parseInt(1 + 29 * m_elapsed + h_elapsed / 24)).getDay();
     retMolad.hour = Math.round(h_elapsed % 24);
-    retMolad.chalakim = parseInt(parts % 1080);
+    var chalakim = parseInt(parts % 1080);
+    retMolad.minutes = parseInt(chalakim / 18);
+    retMolad.chalakim = chalakim % 18;
+    var day = this.prev().find('shabbat_mevarchim')[0].onOrAfter(retMolad.doy).greg();
+    day.setHours(retMolad.hour);
+    day.setMinutes(retMolad.minutes);
+    day.setSeconds(retMolad.chalakim * 3.33);
+    retMolad.day = day;
 
     return retMolad;
 };
@@ -3722,7 +3718,10 @@ EventEmitter.prototype.addListener = function(type, listener) {
                     'leak detected. %d listeners added. ' +
                     'Use emitter.setMaxListeners() to increase limit.',
                     this._events[type].length);
-      console.trace();
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
     }
   }
 

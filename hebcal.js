@@ -443,7 +443,6 @@ Hebcal[Month][prototype][map] = function() {
 };
 
 Hebcal[Month][prototype].molad = function() {
-	console.warn('this method is broken!');
 	var retMolad = {}, year, m_elapsed, p_elapsed, h_elapsed, parts, m_adj;
 
     m_adj = this.month - 7;
@@ -451,29 +450,31 @@ Hebcal[Month][prototype].molad = function() {
     if (m_adj < 0) {
 		m_adj += c.MONTHS_IN_HEB(year + 1);
 	}
-	console.log(m_adj, year)
 
     m_elapsed = parseInt(m_adj +
         235 * (year / 19)/* +
         12 * (year % 19) +
         (((year % 19) * 7) + 1) / 19*/);
-		console.log(m_elapsed)
 
     p_elapsed = parseInt(204 + (793 * (m_elapsed % 1080)));
-	console.log(p_elapsed)
 
     h_elapsed = parseInt(5 + (12 * m_elapsed) +
         793 * (m_elapsed / 1080)/* +
         p_elapsed / 1080*/ -
         6);
-		console.log(h_elapsed)
 
     parts = parseInt((p_elapsed % 1080) + 1080 * (h_elapsed % 24));
-	console.log(parts)
 
-    retMolad.day = parseInt(1 + 29 * m_elapsed + h_elapsed / 24);
+    retMolad.doy = new HDate(parseInt(1 + 29 * m_elapsed + h_elapsed / 24)).getDay();
     retMolad.hour = Math.round(h_elapsed % 24);
-    retMolad.chalakim = parseInt(parts % 1080);
+    var chalakim = parseInt(parts % 1080);
+    retMolad.minutes = parseInt(chalakim / 18);
+    retMolad.chalakim = chalakim % 18;
+    var day = this.prev().find('shabbat_mevarchim')[0].onOrAfter(retMolad.doy).greg();
+    day.setHours(retMolad.hour);
+    day.setMinutes(retMolad.minutes);
+    day.setSeconds(retMolad.chalakim * 3.33);
+    retMolad.day = day;
 
     return retMolad;
 };
