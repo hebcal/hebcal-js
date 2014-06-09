@@ -180,7 +180,7 @@ function monthFromName(c) {
 	switch (c.toLowerCase()[0]) {
 		case 'n':
 		case 'נ':
-			return (c.toLowerCase()[1] == 'o') ?	/* this catches "november" */
+			return (c.toLowerCase()[1] == 'o') ?    /* this catches "november" */
 				0 : months.NISAN;
 		case 'i':
 			return months.IYYAR;
@@ -366,42 +366,42 @@ function gematriya(num, limit) {
 		num = num.replace(/('|")/g,'');
 	}
 	num = num.toString().split('').reverse();
-	if (!(!str && limit && limit - num.toString().length < 0)) {
-		num = num.slice(0, limit - num.toString().length);
+	if (!str && limit) {
+		num = num.slice(0, limit);
 	}
-	var letters = {
-		0: '',
-		1: 'א',
-		2: 'ב',
-		3: 'ג',
-		4: 'ד',
-		5: 'ה',
-		6: 'ו',
-		7: 'ז',
-		8: 'ח',
-		9: 'ט',
-		10: 'י',
-		20: 'כ',
-		30: 'ל',
-		40: 'מ',
-		50: 'נ',
-		60: 'ס',
-		70: 'ע',
-		80: 'פ',
-		90: 'צ',
-		100: 'ק',
-		200: 'ר',
-		300: 'ש',
-		400: 'ת',
-		500: 'תק',
-		600: 'תר',
-		700: 'תש',
-		800: 'תת',
-		900: 'תתק',
-		1000: 'תתר'
-	}, numbers = {};
-	for (var i in letters) {
-		numbers[letters[i]] = i;
+	var letters = {}, numbers = {
+		'': 0,
+		א: 1,
+		ב: 2,
+		ג: 3,
+		ד: 4,
+		ה: 5,
+		ו: 6,
+		ז: 7,
+		ח: 8,
+		ט: 9,
+		י: 10,
+		כ: 20,
+		ל: 30,
+		מ: 40,
+		נ: 50,
+		ס: 60,
+		ע: 70,
+		פ: 80,
+		צ: 90,
+		ק: 100,
+		ר: 200,
+		ש: 300,
+		ת: 400,
+		תק: 500,
+		תר: 600,
+		תש: 700,
+		תת: 800,
+		תתק: 900,
+		תתר: 1000
+	}, i;
+	for (i in numbers) {
+		letters[numbers[i]] = i;
 	}
 
 	num = num.map(function g(n,i){
