@@ -149,7 +149,7 @@ var opts = {
 		process.kill();
 	},
 	v: function(){
-		console.log('Hebcal JS 2.1.1');
+		console.log('Hebcal JS ' + require('../package.json').version);
 		process.kill();
 	},
 	q: function(){opts.quiet = true}

@@ -116,7 +116,7 @@ Event.prototype.masks = function mask() {
 };
 
 Event.prototype.getDesc = function getDesc(o) {
-	return c.LANGUAGE(this.desc, o);
+	return c.LANG(this.desc, o);
 };
 
 Event.prototype.candleLighting = function candleLighting() {
