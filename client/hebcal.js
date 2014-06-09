@@ -237,6 +237,8 @@ function ready() {
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
+var gematriya = require('gematriya');
+
 var charCodeAt = 'charCodeAt';
 
 var months = exports.months = {
@@ -569,82 +571,6 @@ function filter(self, fun, thisp) {
 }
 exports.filter = filter;
 
-function gematriya(num, limit) {
-	if (typeof num !== 'number' && typeof num !== 'string') {
-		throw new TypeError('non-number or string given to gematriya()');
-	}
-	var str = typeof num === 'string';
-	if (str) {
-		num = num.replace(/('|")/g,'');
-	}
-	num = num.toString().split('').reverse();
-	if (!(!str && limit && limit - num.toString().length < 0)) {
-		num = num.slice(0, limit - num.toString().length);
-	}
-	var letters = {}, numbers = {
-		'': 0,
-		א: 1,
-		ב: 2,
-		ג: 3,
-		ד: 4,
-		ה: 5,
-		ו: 6,
-		ז: 7,
-		ח: 8,
-		ט: 9,
-		י: 10,
-		כ: 20,
-		ל: 30,
-		מ: 40,
-		נ: 50,
-		ס: 60,
-		ע: 70,
-		פ: 80,
-		צ: 90,
-		ק: 100,
-		ר: 200,
-		ש: 300,
-		ת: 400,
-		תק: 500,
-		תר: 600,
-		תש: 700,
-		תת: 800,
-		תתק: 900,
-		תתר: 1000
-	};
-	for (var i in numbers) {
-		letters[numbers[i]] = i;
-	}
-
-	num = num.map(function g(n,i){
-		if (str) {
-			return numbers[n] < numbers[num[i - 1]] && numbers[n] < 100 ? numbers[n] * 1000 : numbers[n];
-		} else {
-			if (parseInt(n, 10) * Math.pow(10, i) > 1000) {
-				return g(n, i-3);
-			}
-			return letters[parseInt(n, 10) * Math.pow(10, i)];
-		}
-	});
-
-	if (str) {
-		return num.reduce(function(o,t){
-			return o + t;
-		}, 0);
-	} else {
-		num = num.reverse().join('').replace(/יה/g,'טו').replace(/יו/g,'טז').split('');
-
-		if (num.length === 1) {
-			num.push("'");
-		} else if (num.length > 1) {
-			num.splice(-1, 0, '"');
-		}
-
-		return num.join('');
-	}
-}
-exports.gematriya = gematriya;
-
 exports.range = function range(start, end, step) {
 	step = step || 1;
 	if (step < 0) {
@@ -663,7 +589,7 @@ exports.range = function range(start, end, step) {
 	}
 	return arr;
 };
-},{}],4:[function(require,module,exports){
+},{"gematriya":9}],4:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -691,7 +617,9 @@ exports.range = function range(start, end, step) {
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
-var c = require('./common'), greg = require('./greg');
+var c = require('./common'),
+	greg = require('./greg'),
+	gematriya = require('gematriya');
 
 var shas = [
 	// sname, aname, hname, blatt
@@ -804,9 +732,9 @@ exports.dafyomi = function(gregdate) {
 };
 
 exports.dafname = function(daf, o) {
-	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
+	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? gematriya(daf.blatt) : daf.blatt);
 };
-},{"./common":3,"./greg":5}],5:[function(require,module,exports){
+},{"./common":3,"./greg":5,"gematriya":9}],5:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -955,7 +883,8 @@ exports.abs2greg = function abs2greg(theDate) {
 var c = require('./common'),
 	greg = require('./greg'),
 	suncalc = require('suncalc'),
-	cities = require('./cities');
+	cities = require('./cities'),
+	gematriya = require('gematriya');
 
 suncalc.addTime(-16.1, 'alot_hashachar', 0);
 suncalc.addTime(-11.5, 'misheyakir', 0);
@@ -1209,9 +1138,9 @@ HDate[prototype][abs] = function abs() {
 };
 
 HDate[prototype].toString = function toString(o) {
-	return c.LANG([this[getDate](), null, c.gematriya(this[getDate]())], o) + ' ' +
+	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
-		c.LANG([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o);
+		c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
 };
 
 HDate[prototype].getMonthName = function getMonthName(o) {
@@ -1384,7 +1313,7 @@ HDate[prototype].after = function(day) {
 };
 
 module.exports = HDate;
-},{"./cities":1,"./common":3,"./greg":5,"suncalc":9}],7:[function(require,module,exports){
+},{"./cities":1,"./common":3,"./greg":5,"gematriya":9,"suncalc":10}],7:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -1419,7 +1348,8 @@ var c = require('./common'),
 	dafyomi = require('./dafyomi'),
 	cities = require('./cities'),
 	greg = require('./greg'),
-	EventEmitter = require('events').EventEmitter;
+	EventEmitter = require('events').EventEmitter,
+	gematriya = require('gematriya');
 
 // for minifying optimizations
 var prototype = 'prototype',
@@ -1677,7 +1607,7 @@ Hebcal.cities = cities;
 
 Hebcal.range = c.range;
 
-Hebcal.gematriya = c.gematriya;
+Hebcal.gematriya = gematriya;
 
 Hebcal.holidays = c.filter(holidays, ['masks', 'Event']); // not year(), atzmaut()
 
@@ -2355,7 +2285,7 @@ HDate[prototype].getGregYearObject = function getGregYearObject() {
 
 module.exports = Hebcal;
 
-},{"./cities":1,"./common":3,"./dafyomi":4,"./greg":5,"./hdate":6,"./holidays":8,"./sedra":10,"events":11}],8:[function(require,module,exports){
+},{"./cities":1,"./common":3,"./dafyomi":4,"./greg":5,"./hdate":6,"./holidays":8,"./sedra":11,"events":12,"gematriya":9}],8:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -2383,7 +2313,9 @@ module.exports = Hebcal;
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
-var c = require('./common'), HDate = require('./hdate');
+var c = require('./common'),
+	HDate = require('./hdate'),
+	gematriya = require('gematriya');
 
 var __cache = {};
 
@@ -2403,7 +2335,7 @@ var dayOnOrBefore = c.dayOnOrBefore,
 	Shabbos = 'Shabbos';
 
 function Chanukah(day) {
-	return ['Chanukah: Candle ' + day, 0, 'חנוכה: נר ' + c.gematriya(day)];
+	return ['Chanukah: Candle ' + day, 0, 'חנוכה: נר ' + gematriya(day)];
 }
 
 function CHM(desc) {
@@ -2411,11 +2343,11 @@ function CHM(desc) {
 }
 
 function Sukkot(day) {
-	return ['Sukkot: ' + day, 'Succos: ' + day, 'סוכות יום ' + c.gematriya(day)];
+	return ['Sukkot: ' + day, 'Succos: ' + day, 'סוכות יום ' + gematriya(day)];
 }
 
 function Pesach(day) {
-	return ['Pesach: ' + day, 0, 'פסח יום ' + c.gematriya(day)];
+	return ['Pesach: ' + day, 0, 'פסח יום ' + gematriya(day)];
 }
 
 var USER_EVENT          = 1,
@@ -2938,7 +2870,117 @@ function atzamaut(year) {
 }
 exports.atzamaut = atzamaut;
 
-},{"./common":3,"./hdate":6}],9:[function(require,module,exports){
+},{"./common":3,"./hdate":6,"gematriya":9}],9:[function(require,module,exports){
+/*
+ * Convert numbers to gematriya representation, and vice-versa.
+ *
+ * Licensed MIT.
+ *
+ * Copyright (c) 2014 Eyal Schachter
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+(function(){
+	var letters = {}, numbers = {
+		'': 0,
+		א: 1,
+		ב: 2,
+		ג: 3,
+		ד: 4,
+		ה: 5,
+		ו: 6,
+		ז: 7,
+		ח: 8,
+		ט: 9,
+		י: 10,
+		כ: 20,
+		ל: 30,
+		מ: 40,
+		נ: 50,
+		ס: 60,
+		ע: 70,
+		פ: 80,
+		צ: 90,
+		ק: 100,
+		ר: 200,
+		ש: 300,
+		ת: 400,
+		תק: 500,
+		תר: 600,
+		תש: 700,
+		תת: 800,
+		תתק: 900,
+		תתר: 1000
+	}, i;
+	for (i in numbers) {
+		letters[numbers[i]] = i;
+	}
+
+	function gematriya(num, limit) {
+		if (typeof num !== 'number' && typeof num !== 'string') {
+			throw new TypeError('non-number or string given to gematriya()');
+		}
+		var str = typeof num === 'string';
+		if (str) {
+			num = num.replace(/('|")/g,'');
+		}
+		num = num.toString().split('').reverse();
+		if (!str && limit) {
+			num = num.slice(0, limit);
+		}
+
+		num = num.map(function g(n,i){
+			if (str) {
+				return numbers[n] < numbers[num[i - 1]] && numbers[n] < 100 ? numbers[n] * 1000 : numbers[n];
+			} else {
+				if (parseInt(n, 10) * Math.pow(10, i) > 1000) {
+					return g(n, i-3);
+				}
+				return letters[parseInt(n, 10) * Math.pow(10, i)];
+			}
+		});
+
+		if (str) {
+			return num.reduce(function(o,t){
+				return o + t;
+			}, 0);
+		} else {
+			num = num.reverse().join('').replace(/יה/g,'טו').replace(/יו/g,'טז').split('');
+
+			if (num.length === 1) {
+				num.push("'");
+			} else if (num.length > 1) {
+				num.splice(-1, 0, '"');
+			}
+
+			return num.join('');
+		}
+	}
+
+	if (typeof module !== 'undefined') {
+		module.exports = gematriya;
+	} else {
+		window.gematriya = gematriya;
+	}
+})();
+},{}],10:[function(require,module,exports){
 /*
  (c) 2011-2014, Vladimir Agafonkin
  SunCalc is a JavaScript library for calculating sun/mooon position and light phases.
@@ -3209,7 +3251,7 @@ if (typeof define === 'function' && define.amd) {
 
 }());
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -3536,7 +3578,7 @@ Sedra.prototype.abs = function(absDate) {
 };
 
 module.exports = Sedra;
-},{"./common":3,"./hdate":6}],11:[function(require,module,exports){
+},{"./common":3,"./hdate":6}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

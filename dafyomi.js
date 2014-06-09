@@ -25,7 +25,9 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
-var c = require('./common'), greg = require('./greg');
+var c = require('./common'),
+	greg = require('./greg'),
+	gematriya = require('gematriya');
 
 var shas = [
 	// sname, aname, hname, blatt
@@ -138,5 +140,5 @@ exports.dafyomi = function(gregdate) {
 };
 
 exports.dafname = function(daf, o) {
-	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? c.gematriya(daf.blatt) : daf.blatt);
+	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? gematriya(daf.blatt) : daf.blatt);
 };

@@ -28,7 +28,8 @@
 var c = require('./common'),
 	greg = require('./greg'),
 	suncalc = require('suncalc'),
-	cities = require('./cities');
+	cities = require('./cities'),
+	gematriya = require('gematriya');
 
 suncalc.addTime(-16.1, 'alot_hashachar', 0);
 suncalc.addTime(-11.5, 'misheyakir', 0);
@@ -282,9 +283,9 @@ HDate[prototype][abs] = function abs() {
 };
 
 HDate[prototype].toString = function toString(o) {
-	return c.LANG([this[getDate](), null, c.gematriya(this[getDate]())], o) + ' ' +
+	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
-		c.LANG([this[getFullYear](), null, c.gematriya(this[getFullYear]())], o);
+		c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
 };
 
 HDate[prototype].getMonthName = function getMonthName(o) {

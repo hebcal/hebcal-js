@@ -28,7 +28,8 @@
 		"hebcaljs": "bin/hebcal.js"
 	},
 	"dependencies": {
-		"suncalc": ""
+		"suncalc": "",
+		"gematriya": ""
 	},
 	"devDependencies": {
 		"hrtimer": ""

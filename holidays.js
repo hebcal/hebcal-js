@@ -25,7 +25,9 @@
 
 	The JavaScript code was completely rewritten in 2014 by Eyal Schachter.
  */
-var c = require('./common'), HDate = require('./hdate');
+var c = require('./common'),
+	HDate = require('./hdate'),
+	gematriya = require('gematriya');
 
 var __cache = {};
 
@@ -45,7 +47,7 @@ var dayOnOrBefore = c.dayOnOrBefore,
 	Shabbos = 'Shabbos';
 
 function Chanukah(day) {
-	return ['Chanukah: Candle ' + day, 0, 'חנוכה: נר ' + c.gematriya(day)];
+	return ['Chanukah: Candle ' + day, 0, 'חנוכה: נר ' + gematriya(day)];
 }
 
 function CHM(desc) {
@@ -53,11 +55,11 @@ function CHM(desc) {
 }
 
 function Sukkot(day) {
-	return ['Sukkot: ' + day, 'Succos: ' + day, 'סוכות יום ' + c.gematriya(day)];
+	return ['Sukkot: ' + day, 'Succos: ' + day, 'סוכות יום ' + gematriya(day)];
 }
 
 function Pesach(day) {
-	return ['Pesach: ' + day, 0, 'פסח יום ' + c.gematriya(day)];
+	return ['Pesach: ' + day, 0, 'פסח יום ' + gematriya(day)];
 }
 
 var USER_EVENT          = 1,

@@ -32,7 +32,8 @@ var c = require('./common'),
 	dafyomi = require('./dafyomi'),
 	cities = require('./cities'),
 	greg = require('./greg'),
-	EventEmitter = require('events').EventEmitter;
+	EventEmitter = require('events').EventEmitter,
+	gematriya = require('gematriya');
 
 // for minifying optimizations
 var prototype = 'prototype',
@@ -290,7 +291,7 @@ Hebcal.cities = cities;
 
 Hebcal.range = c.range;
 
-Hebcal.gematriya = c.gematriya;
+Hebcal.gematriya = gematriya;
 
 Hebcal.holidays = c.filter(holidays, ['masks', 'Event']); // not year(), atzmaut()
 
