@@ -42,7 +42,6 @@ var dayOnOrBefore = c.dayOnOrBefore,
 	SAT = days.SAT,
 	getDay = 'getDay',
 	abs = 'abs',
-	push = 'push',
 	Shabbat = 'Shabbat',
 	Shabbos = 'Shabbos';
 
@@ -162,7 +161,23 @@ exports.year = function(year) {
 		pesach = new HDate(15, NISAN, year),
 		tmpDate;
 
-	var h = [ // standard holidays that don't shift based on year
+	var h = {};
+
+	function add(ev) {
+		if (Array.isArray(ev)) {
+			ev.forEach(function(e){
+				add(e);
+			});
+		} else {
+			if (h[ev.date]) {
+				h[ev.date].push(ev);
+			} else {
+				h[ev.date] = [ev];
+			}
+		}
+	}
+
+	add([ // standard holidays that don't shift based on year
 		new Event(
 			RH,
 			['Rosh Hashana 1', 0, 'ראש השנה א\''],
@@ -405,26 +420,26 @@ exports.year = function(year) {
 			['Erev Rosh Hashana', 0, 'ערב ראש השנה'],
 			LIGHT_CANDLES
 		)
-	];
+	]);
 
 	tmpDate = new HDate(10, months.TEVET, year);
 	if (tmpDate[getDay]() == SAT) {
 		tmpDate = tmpDate.next();
 	}
-	h[push](new Event(
+	add(new Event(
 		tmpDate,
 		["Asara B'Tevet", 0, 'עשרה בטבת'],
 		0
 	));
 
 	if (c.LEAP(year)) {
-		h[push](new Event(
+		add(new Event(
 			new HDate(14, months.ADAR_I, year),
 			['Purim Katan', 0, 'פורים קטן'],
 			0
 		));
 
-		h[push](new Event(
+		add(new Event(
 			new HDate(15, months.ADAR_I, year),
 			['Shushan Purim Katan', 0, 'שושן פורים קטן'],
 			0
@@ -446,17 +461,17 @@ exports.year = function(year) {
 			tmpDate = tmpDate.next();
 		}
 
-		h[push](new Event(
+		add(new Event(
 			tmpDate,
 			['Yom HaShoah', 0, 'יום השואה'],
 			0
 		));
 	}
 
-	h = h.concat(atzmaut(year));
+	add(atzmaut(year));
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
-		h[push](new Event(
+		add(new Event(
 			new HDate(29, months.IYYAR, year),
 			['Yom Yerushalayim', 0, 'יום ירושלים'],
 			0
@@ -467,7 +482,7 @@ exports.year = function(year) {
 	if (tmpDate[getDay]() == SAT) {
 		tmpDate = tmpDate.next();
 	}
-	h[push](new Event(
+	add(new Event(
 		tmpDate,
 		["Shiva-Asar B'Tamuz", 0, "צום יז' בתמוז"],
 		0
@@ -478,38 +493,38 @@ exports.year = function(year) {
 		tmpDate = tmpDate.next();
 	}
 
-	h[push](new Event(
+	add(new Event(
 		new HDate(dayOnOrBefore(SAT, tmpDate[abs]())),
 		[Shabbat + ' Chazon', Shabbos + ' Chazon', 'שבת חזון'],
 		0
 	));
 
-	h[push](new Event(
+	add(new Event(
 		tmpDate.prev(),
 		["Erev Tish'a B'Av", 0, 'ערב תשעה באב'],
 		0
 	));
 
-	h[push](new Event(
+	add(new Event(
 		tmpDate,
 		["Tish'a B'Av", 0, 'תשעה באב'],
 		0
 	));
 
-	h[push](new Event(
+	add(new Event(
 		new HDate(dayOnOrBefore(SAT, tmpDate[abs]() + 7)),
 		[Shabbat + ' Nachamu', Shabbos + ' Nachamu', 'שבת נחמו'],
 		0
 	));
 
 	for (var day = 6; day < c.daysInYear(year); day += 7) {
-		h[push](new Event(
+		add(new Event(
 			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
 			[Shabbat, Shabbos, 'שבת'],
 			YOM_TOV_ENDS
 		));
 
-		h[push](new Event(
+		add(new Event(
 			new HDate(dayOnOrBefore(days.FRI, new HDate(1, TISHREI, year)[abs]() + day)),
 			['Erev ' + Shabbat, 'Erev ' + Shabbos, 'ערב שבת'],
 			LIGHT_CANDLES
@@ -519,19 +534,19 @@ exports.year = function(year) {
 	for (var month = 1; month <= c.MONTH_CNT(year); month++) {
 		if ((month == NISAN ? c.daysInMonth(c.MONTH_CNT(year - 1), year - 1) :
 				c.daysInMonth(month - 1, year)) == 30) {
-			h[push](new Event(
+			add(new Event(
 				new HDate(1, month, year),
 				['Rosh Chodesh 2', 0, "ראש חודש ב'"],
 				0
 			));
 
-			h[push](new Event(
+			add(new Event(
 				new HDate(30, month - 1, year),
 				['Rosh Chodesh 1', 0, "ראש חודש א'"],
 				0
 			));
 		} else if (month !== TISHREI) {
-			h[push](new Event(
+			add(new Event(
 				new HDate(1, month, year),
 				['Rosh Chodesh', 0, 'ראש חודש'],
 				0
@@ -542,7 +557,7 @@ exports.year = function(year) {
 			continue;
 		}
 
-		h[push](new Event(
+		add(new Event(
 			new HDate(29, month, year).onOrBefore(SAT),
 			[Shabbat + ' Mevarchim', Shabbos + ' Mevorchim', 'שבת מברכים'],
 			0

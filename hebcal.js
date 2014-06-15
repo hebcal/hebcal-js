@@ -96,7 +96,7 @@ function Hebcal(year, month) {
 				return m;
 			}, this);
 
-			this.holidays = [].concat.apply([], this.months[map](function(m){return m.holidays}));
+			this.holidays = holidays.year(year);
 		} else {
 			throw new TE('month to Hebcal is not a valid type');
 		}
@@ -352,9 +352,9 @@ Hebcal[Month] = function Month(month, year) {
 
 	this[length] = this.days[length];
 
-	this.holidays = holidays.year(year).filter(function(h){
-		return h.date[getMonth]() === month;
-	}, this);
+	this.holidays = c.filter(holidays.year(year), function(h){
+		return h[0].date[getMonth]() == month;
+	});
 
 	defProp(this, 'il', getset(function(){
 		return this[getDay](1).il;
@@ -558,12 +558,13 @@ HDate[prototype].getSedra = (function(){
 HDate[prototype].getParsha = HDate[prototype].getSedra;
 
 HDate[prototype].holidays = function(all) {
-	return this[getYearObject]().holidays.filter(function(h){
-		return this.isSameDate(h.date) && (all ? true : !h.routine() && h.is(this));
-	}, this)[map](function(h){
-		h.date.setLocation(this);
+	var me = this, days = me[getYearObject]().holidays[me];
+	return days ? days.filter(function(h){
+		return all ? true : !h.routine() && h.is(me);
+	})[map](function(h){
+		h.date.setLocation(me);
 		return h;
-	}, this);
+	}) : [];
 };
 
 ['candleLighting', 'havdalah'].forEach(function(prop){
