@@ -100,7 +100,7 @@ function listCities() {
 }
 exports.listCities = listCities;
 
-exports.addCity = function addCity(city, info) {
+exports.addCity = function(city, info) {
 	if (!Array.isArray(info)) {
 		throw new TypeError('adding non-array city');
 	}
@@ -118,7 +118,7 @@ exports.addCity = function addCity(city, info) {
 	cities[city] = info;
 };
 
-exports.nearest = function nearest(lat, lon) {
+exports.nearest = function(lat, lon) {
 	if (Array.isArray(lat)) {
 		lat = (lat[0] * 60 + lat[1]) / 60;
 	}

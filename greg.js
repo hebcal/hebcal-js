@@ -34,7 +34,7 @@ var floor = Math.floor,
 tMonthLengths[2]++;
 monthLengths.push(tMonthLengths);
 
-exports.daysInMonth = function daysInMonth(month, year) { // 1 based months
+exports.daysInMonth = function(month, year) { // 1 based months
 	return monthLengths[+LEAP(year)][month];
 };
 
@@ -54,7 +54,7 @@ exports.monthNames = [
 	'December'
 ];
 
-exports.lookupMonthNum = function lookupMonthNum(month) {
+exports.lookupMonthNum = function(month) {
 	return new Date(month + ' 1').getMonth() + 1;
 };
 
@@ -78,7 +78,7 @@ function LEAP (year) {
 }
 exports.LEAP = LEAP;
 
-exports.greg2abs = function greg2abs(date) { // "absolute date"
+exports.greg2abs = function(date) { // "absolute date"
 	var year = date.getFullYear() - 1;
 	return (dayOfYear(date) + // days this year
 			365 * year + // + days in prior years
@@ -94,7 +94,7 @@ exports.greg2abs = function greg2abs(date) { // "absolute date"
  * Clamen, Software--Practice and Experience, Volume 23, Number 4
  * (April, 1993), pages 383-404 for an explanation.
  */
-exports.abs2greg = function abs2greg(theDate) {
+exports.abs2greg = function(theDate) {
 // calculations copied from original JS code
 
 	var d0 = theDate - 1;

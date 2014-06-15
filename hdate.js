@@ -164,51 +164,51 @@ function fixMonth(date) {
 	}
 }
 
-HDate[prototype][getFullYear] = function getFullYear() {
+HDate[prototype][getFullYear] = function() {
 	return this.year;
 };
 
-HDate[prototype].isLeapYear = function isLeapYear() {
+HDate[prototype].isLeapYear = function() {
 	return c.LEAP(this.year);
 };
 
-HDate[prototype][getMonth] = function getMonth() {
+HDate[prototype][getMonth] = function() {
 	return this.month;
 };
 
-HDate[prototype].getTishreiMonth = function getTishreiMonth() {
+HDate[prototype].getTishreiMonth = function() {
 	return (this[getMonth]() + MONTH_CNT(this[getFullYear]()) - 6) % MONTH_CNT(this[getFullYear]());
 };
 
-HDate[prototype].daysInMonth = function daysInMonth() {
+HDate[prototype].daysInMonth = function() {
 	return daysInMonth(this[getMonth](), this[getFullYear]());
 };
 
-HDate[prototype][getDate] = function getDate() {
+HDate[prototype][getDate] = function() {
 	return this.day;
 };
 
-HDate[prototype].getDay = function getDay() {
+HDate[prototype].getDay = function() {
 	return this.greg().getDay();
 };
 
-HDate[prototype].setFullYear = function setFullYear(year) {
+HDate[prototype].setFullYear = function(year) {
 	this.year = year;
 	fix(this);
 	return this;
 };
 
-HDate[prototype].setMonth = function setMonth(month) {
+HDate[prototype].setMonth = function(month) {
 	this.month = c.monthNum(month);
 	fix(this);
 	return this;
 };
 
-HDate[prototype].setTishreiMonth = function setTishreiMonth(month) {
+HDate[prototype].setTishreiMonth = function(month) {
 	return this.setMonth((month + 6) % MONTH_CNT(this[getFullYear]()) || 13);
 };
 
-HDate[prototype].setDate = function setDate(date) {
+HDate[prototype].setDate = function(date) {
 	this.day = date;
 	fix(this);
 	return this;
@@ -270,33 +270,33 @@ function abs2hebrew(d) {
 	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 
-HDate[prototype].greg = function toGreg() {
+HDate[prototype].greg = function() {
 	return greg.abs2greg(hebrew2abs(this));
 };
 
-HDate[prototype].gregEve = function gregEve() {
+HDate[prototype].gregEve = function() {
 	return this.prev().sunset();
 };
 
-HDate[prototype][abs] = function abs() {
+HDate[prototype][abs] = function() {
 	return hebrew2abs(this);
 };
 
-HDate[prototype].toString = function toString(o) {
+HDate[prototype].toString = function(o) {
 	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
 		c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
 };
 
-HDate[prototype].getMonthName = function getMonthName(o) {
+HDate[prototype].getMonthName = function(o) {
 	return c.LANG(c.monthNames[+this.isLeapYear()][this[getMonth]()], o);
 };
 
-HDate[prototype].setCity = function setCity(city) {
+HDate[prototype].setCity = function(city) {
 	return this.setLocation(cities.getCity(city));
 };
 
-HDate[prototype].setLocation = function setLocation(lat, lon) {
+HDate[prototype].setLocation = function(lat, lon) {
 	if (typeof lat == 'object' && !Array.isArray(lat)) {
 		lon = lat.long;
 		lat = lat.lat;

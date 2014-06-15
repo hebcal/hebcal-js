@@ -8,6 +8,8 @@ version 2.2.0 alpha (2014-05-12)
 	Add Month().molad()
 	Change names of internal methods to be shorter
 	Don't include entire README in package.json (NPM will do it)
+	Speed optimization for HDate().holidays()
+	Remove function names (most debuggers can figure it out)
 
 version 2.1.2 (2014-04-04 [5 Nisan 5774])
 	Fix sourcemap links

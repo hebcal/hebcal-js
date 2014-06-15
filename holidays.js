@@ -89,7 +89,7 @@ function Event(date, desc, mask) {
 	this.LIGHT_CANDLES_TZEIS = !!( mask & LIGHT_CANDLES_TZEIS  );
 }
 
-Event.prototype.is = function is(date, il) {
+Event.prototype.is = function(date, il) {
 	date = new HDate(date);
 	if (arguments.length < 2) {
 		//il = Event.isIL;
@@ -107,7 +107,7 @@ Event.prototype.is = function is(date, il) {
 	return true;
 };
 
-Event.prototype.masks = function mask() {
+Event.prototype.masks = function() {
 	return (this.USER_EVENT          && USER_EVENT)    |
 		   (this.LIGHT_CANDLES       && LIGHT_CANDLES) |
 		   (this.YOM_TOV_ENDS        && YOM_TOV_ENDS)  |
@@ -116,11 +116,11 @@ Event.prototype.masks = function mask() {
 		   (this.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS);
 };
 
-Event.prototype.getDesc = function getDesc(o) {
+Event.prototype.getDesc = function(o) {
 	return c.LANG(this.desc, o);
 };
 
-Event.prototype.candleLighting = function candleLighting() {
+Event.prototype.candleLighting = function() {
 	if (this.LIGHT_CANDLES) {
 		return new Date(this.date.sunset() - (Event.candleLighting * 60 * 1000));
 	} else if (this.LIGHT_CANDLES_TZEIS) {
@@ -129,7 +129,7 @@ Event.prototype.candleLighting = function candleLighting() {
 	return null;
 };
 
-Event.prototype.havdalah = function havdalah() {
+Event.prototype.havdalah = function() {
 	if (this.YOM_TOV_ENDS) {
 		return new Date(this.date.sunset().getTime() + (Event.havdalah * 60 * 1000));
 	}

@@ -74,7 +74,7 @@ exports.days = {
 	SAT: 6
 };
 
-exports.LANG = function LANGUAGE(str, opts){
+exports.LANG = function(str, opts){
 	return opts == 'h' && str[2] || (opts == 'a' && str[1] || str[0]);
 };
 
@@ -83,11 +83,11 @@ function LEAP(x) {
 }
 exports.LEAP = LEAP;
 
-exports.MONTH_CNT = function MONTH_CNT(x) {
+exports.MONTH_CNT = function(x) {
 	return 12 + LEAP(x); // boolean is cast to 1 or 0
 };
 
-exports.daysInMonth = function daysInMonth(month, year) {
+exports.daysInMonth = function(month, year) {
 	return 30 - (month == months.IYYAR ||
 	month == months.TAMUZ || 
 	month == months.ELUL ||
@@ -98,13 +98,13 @@ exports.daysInMonth = function daysInMonth(month, year) {
 	(month == months.KISLEV && shrtKis(year)));
 };
 
-exports.monthNum = function monthNum(month) {
+exports.monthNum = function(month) {
 	return typeof month === 'number' ? month :
 		month[charCodeAt](0) >= 1488 && month[charCodeAt](0) <= 1514 && /('|")/.test(month) ? gematriya(month) :
 			month[charCodeAt](0) >= 48 && month[charCodeAt](0) <= 57 /* number */ ? parseInt(month, 10) : monthFromName(month);
 };
 
-exports.dayYearNum = function dayYearNum(str) {
+exports.dayYearNum = function(str) {
 	return typeof str === 'number' ? str :
 		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
 };
@@ -262,11 +262,11 @@ exports.monthFromName = monthFromName;
  * date d, and applying it to d+7 gives the DAYNAME following absolute date d.
 
 **/
-exports.dayOnOrBefore = function dayOnOrBefore(day_of_week, absdate) {
+exports.dayOnOrBefore = function(day_of_week, absdate) {
 	return absdate - ((absdate - day_of_week) % 7);
 };
 
-exports.map = function map(self, fun, thisp) {
+exports.map = function(self, fun, thisp) {
 	// originally written for http://github.com/Scimonster/localbrowse
 	if (self === null || typeof fun != 'function') {
 		throw new TypeError();
@@ -359,7 +359,7 @@ function filter(self, fun, thisp) {
 }
 exports.filter = filter;
 
-exports.range = function range(start, end, step) {
+exports.range = function(start, end, step) {
 	step = step || 1;
 	if (step < 0) {
 		step = 0 - step;
