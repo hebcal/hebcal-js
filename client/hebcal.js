@@ -1923,9 +1923,9 @@ HDate[prototype].tachanun = (function() {
 	function tachanun() {
 		var checkNext = !arguments[0];
 
-		var year = this[getYearObject](), y = this[getFullYear]();
+		var year = this[getYearObject](), y = year.year;
 
-		var all = __cache.il[year.year] === this.il && __cache.all[year.year] || (__cache.all[year.year] = year[find]('Rosh Chodesh').concat(
+		var all = __cache.il[y] === this.il && __cache.all[y] || (__cache.all[y] = year[find]('Rosh Chodesh').concat(
 			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
 			year[find](15 + 33, NISAN), // Lag Baomer
 			year[find](c.range(1, 8 - this.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
@@ -1938,16 +1938,16 @@ HDate[prototype].tachanun = (function() {
 			year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
 		)[map](function(d){
 			return d.abs();
-		})), some = __cache.il[year.year] === this.il && __cache.some[year.year] || (__cache.some[year.year] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
+		})), some = __cache.il[y] === this.il && __cache.some[y] || (__cache.some[y] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
 			year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
 			year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
 			year[find](14, months.IYYAR), // Pesach Sheini
-			holidays.atzmaut(y)[1] || [], // Yom HaAtzma'ut, which changes based on day of week
+			holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
 			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
 		)[map](function(d){
 			return d.abs();
 		}));
-		__cache.il[year.year] = this.il;
+		__cache.il[y] = this.il;
 
 		all = all.indexOf(this.abs()) > -1;
 		some = some.indexOf(this.abs()) > -1;
@@ -1978,25 +1978,25 @@ HDate[prototype].hallel = (function() {
 	};
 
 	function hallel() {
-		var year = this[getYearObject]();
+		var year = this[getYearObject](), y = year.year;
 
-		var whole = __cache.il[year.year] == this.il && __cache.whole[year.year] || (__cache.whole[year.year] = [].concat(
+		var whole = __cache.il[y] == this.il && __cache.whole[y] || (__cache.whole[y] = [].concat(
 			year[find](c.range(25, 33), months.KISLEV), // Chanukah
 			year[find]([15, this.il ? null : 16], NISAN), // First day(s) of Pesach
 			year[find]('Shavuot'),
 			year[find]('Sukkot'),
-			holidays.atzmaut(y)[1] || [], // Yom HaAtzma'ut, which changes based on day of week
+			holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
 			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
 		)[map](function(d){
 			return d.abs();
 		}));
-		var half = __cache.il[year.year] == this.il && __cache.half[year.year] || (__cache.half[year.year] = [].concat(
+		var half = __cache.il[y] == this.il && __cache.half[y] || (__cache.half[y] = [].concat(
 			year[find]('Rosh Chodesh').filter(function(rc){return rc[getMonth]() != TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
 			year[find](c.range(17 - this.il, 23 - this.il), NISAN) // Last six days of Pesach
 		)[map](function(d){
 			return d.abs();
 		}));
-		__cache.il[year.year] = this.il;
+		__cache.il[y] = this.il;
 
 		return (whole.indexOf(this.abs()) > -1 && WHOLE) || (half.indexOf(this.abs()) > -1 && HALF) || NONE;
 	}
@@ -2741,7 +2741,7 @@ exports.year = function(year) {
 		));
 	}
 
-	h = h.concat(atzamaut(year));
+	h = h.concat(atzmaut(year));
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
 		h[push](new Event(
@@ -2840,7 +2840,7 @@ exports.year = function(year) {
 	return __cache[year] = h;
 };
 
-function atzamaut(year) {
+function atzmaut(year) {
 	if (year >= 5708) { // Yom HaAtzma'ut only celebrated after 1948
 		var tmpDate = new HDate(1, months.IYYAR, year), pesach = new HDate(15, NISAN, year);
 
@@ -2868,7 +2868,7 @@ function atzamaut(year) {
 	}
 	return [];
 }
-exports.atzamaut = atzamaut;
+exports.atzmaut = atzmaut;
 
 },{"./common":3,"./hdate":6,"gematriya":9}],9:[function(require,module,exports){
 /*
@@ -3550,20 +3550,20 @@ types['1721'] = types['170'];
 
 
 Sedra.prototype.get = function(hDate) {
-	return this.abs(hDate.abs());
+	return abs(this, hDate.abs());
 };
 
 // returns an array describing the parsha on the first Saturday on or after absdate
-Sedra.prototype.abs = function(absDate) {
+function abs(year, absDate) {
 
 	// find the first saturday on or after today's date
 	var absDate = c.dayOnOrBefore(6, absDate + 6);
 	
-	var weekNum = (absDate - this.first_saturday) / 7;
-	var index = this.theSedraArray[weekNum];
+	var weekNum = (absDate - year.first_saturday) / 7;
+	var index = year.theSedraArray[weekNum];
 	
 	if (undefined == index) {
-		return (new Sedra(this.year + 1, this.il)).getFromDate(absDate); // must be next year
+		return abs(new Sedra(year.year + 1, year.il), absDate); // must be next year
 	}
 	if (typeof index == 'object') {
 		// Shabbat has a chag. Return a description

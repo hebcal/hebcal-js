@@ -296,20 +296,20 @@ types['1721'] = types['170'];
 
 
 Sedra.prototype.get = function(hDate) {
-	return this.abs(hDate.abs());
+	return abs(this, hDate.abs());
 };
 
 // returns an array describing the parsha on the first Saturday on or after absdate
-Sedra.prototype.abs = function(absDate) {
+function abs(year, absDate) {
 
 	// find the first saturday on or after today's date
 	var absDate = c.dayOnOrBefore(6, absDate + 6);
 	
-	var weekNum = (absDate - this.first_saturday) / 7;
-	var index = this.theSedraArray[weekNum];
+	var weekNum = (absDate - year.first_saturday) / 7;
+	var index = year.theSedraArray[weekNum];
 	
 	if (undefined == index) {
-		return (new Sedra(this.year + 1, this.il)).getFromDate(absDate); // must be next year
+		return abs(new Sedra(year.year + 1, year.il), absDate); // must be next year
 	}
 	if (typeof index == 'object') {
 		// Shabbat has a chag. Return a description

@@ -453,7 +453,7 @@ exports.year = function(year) {
 		));
 	}
 
-	h = h.concat(atzamaut(year));
+	h = h.concat(atzmaut(year));
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
 		h[push](new Event(
@@ -552,7 +552,7 @@ exports.year = function(year) {
 	return __cache[year] = h;
 };
 
-function atzamaut(year) {
+function atzmaut(year) {
 	if (year >= 5708) { // Yom HaAtzma'ut only celebrated after 1948
 		var tmpDate = new HDate(1, months.IYYAR, year), pesach = new HDate(15, NISAN, year);
 
@@ -580,4 +580,4 @@ function atzamaut(year) {
 	}
 	return [];
 }
-exports.atzamaut = atzamaut;
+exports.atzmaut = atzmaut;
