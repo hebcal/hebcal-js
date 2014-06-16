@@ -78,27 +78,28 @@ exports.masks = {
 };
 
 function Event(date, desc, mask) {
-	this.date = new HDate(date);
-	this.desc = typeof desc != 'object' ? [desc] : desc;
+	var me = this;
+	me.date = new HDate(date);
+	me.desc = typeof desc != 'object' ? [desc] : desc;
 
-	this.USER_EVENT          = !!( mask & USER_EVENT           );
-	this.LIGHT_CANDLES       = !!( mask & LIGHT_CANDLES        );
-	this.YOM_TOV_ENDS        = !!( mask & YOM_TOV_ENDS         );
-	this.CHUL_ONLY           = !!( mask & CHUL_ONLY            );
-	this.IL_ONLY             = !!( mask & IL_ONLY              );
-	this.LIGHT_CANDLES_TZEIS = !!( mask & LIGHT_CANDLES_TZEIS  );
+	me.USER_EVENT          = !!( mask & USER_EVENT           );
+	me.LIGHT_CANDLES       = !!( mask & LIGHT_CANDLES        );
+	me.YOM_TOV_ENDS        = !!( mask & YOM_TOV_ENDS         );
+	me.CHUL_ONLY           = !!( mask & CHUL_ONLY            );
+	me.IL_ONLY             = !!( mask & IL_ONLY              );
+	me.LIGHT_CANDLES_TZEIS = !!( mask & LIGHT_CANDLES_TZEIS  );
 }
 
 Event.prototype.is = function(date, il) {
-	date = new HDate(date);
+	date = new HDate(date), myDate = this.date;
 	if (arguments.length < 2) {
 		//il = Event.isIL;
 		il = date.il;
 	}
-	if (date.getDate() != this.date.getDate() || date.getMonth() != this.date.getMonth()) {
+	if (date.getDate() != myDate.getDate() || date.getMonth() != myDate.getMonth()) {
 		return false;
 	}
-	if (date.getFullYear() != this.date.getFullYear()) {
+	if (date.getFullYear() != myDate.getFullYear()) {
 		return false;
 	}
 	if (il && this.CHUL_ONLY || !il && this.IL_ONLY) {
@@ -108,12 +109,13 @@ Event.prototype.is = function(date, il) {
 };
 
 Event.prototype.masks = function() {
-	return (this.USER_EVENT          && USER_EVENT)    |
-		   (this.LIGHT_CANDLES       && LIGHT_CANDLES) |
-		   (this.YOM_TOV_ENDS        && YOM_TOV_ENDS)  |
-		   (this.CHUL_ONLY           && CHUL_ONLY)     |
-		   (this.IL_ONLY             && IL_ONLY)       |
-		   (this.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS);
+	var me = this;
+	return (me.USER_EVENT          && USER_EVENT)    |
+		   (me.LIGHT_CANDLES       && LIGHT_CANDLES) |
+		   (me.YOM_TOV_ENDS        && YOM_TOV_ENDS)  |
+		   (me.CHUL_ONLY           && CHUL_ONLY)     |
+		   (me.IL_ONLY             && IL_ONLY)       |
+		   (me.LIGHT_CANDLES_TZEIS && LIGHT_CANDLES_TZEIS);
 };
 
 Event.prototype.getDesc = function(o) {
@@ -176,6 +178,8 @@ exports.year = function(year) {
 			}
 		}
 	}
+
+	Object.defineProperty(h, 'add', {value: add});
 
 	add([ // standard holidays that don't shift based on year
 		new Event(

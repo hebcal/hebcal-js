@@ -36,14 +36,10 @@ var c = require('./common'),
 	gematriya = require('gematriya');
 
 // for minifying optimizations
-var prototype = 'prototype',
-	defProp = Object.defineProperty,
+var defProp = Object.defineProperty,
 	TE = TypeError,
 	find = 'find',
 	strings = 'strings',
-	Month = 'Month',
-	GregYear = 'GregYear',
-	GregMonth = 'GregMonth',
 	getYearObject = 'getYearObject',
 	map = 'map',
 	getDay = 'getDay',
@@ -55,7 +51,12 @@ var prototype = 'prototype',
 	prev = 'prev',
 	months = c.months,
 	TISHREI = months.TISHREI,
-	NISAN = months.NISAN;
+	NISAN = months.NISAN,
+	HebcalProto = Hebcal.prototype,
+	MonthProto = Month.prototype,
+	GregYearProto = GregYear.prototype,
+	GregMonthProto = GregMonth.prototype,
+	HDateProto = HDate.prototype;
 
 function getset(g, s) {
 	return {
@@ -77,13 +78,14 @@ function extend(base, into) {
 // Main Hebcal function
 
 function Hebcal(year, month) {
+	var me = this; // whenever this is done, it is for optimizations.
 	if (!year) {
 		year = (new HDate())[getFullYear](); // this year;
 	}
 	if (typeof year !== 'number') {
 		throw new TE('year to Hebcal() is not a number');
 	}
-	this.year = year;
+	me.year = year;
 	if (month) {
 		if (typeof month == 'string') {
 			month = c.monthFromName(month);
@@ -93,17 +95,17 @@ function Hebcal(year, month) {
 		}
 
 		if (Array.isArray(month)) {
-			this.months = month[map](function(i){
-				var m = new Hebcal[Month](i, year);
+			me.months = month[map](function(i){
+				var m = new Month(i, year);
 				defProp(m, '__year', {
 					configurable: true,
 					writable: true,
-					value: this
+					value: me
 				});
 				return m;
-			}, this);
+			});
 
-			this.holidays = holidays.year(year);
+			me.holidays = holidays.year(year);
 		} else {
 			throw new TE('month to Hebcal is not a valid type');
 		}
@@ -111,142 +113,145 @@ function Hebcal(year, month) {
 		return new Hebcal(year, c.range(1, c.MONTH_CNT(year)));
 	}
 
-	this[length] = c.daysInYear(year);
+	me[length] = c.daysInYear(year);
 
-	defProp(this, 'il', getset(function() {
-		return this[getMonth](1).il;
+	defProp(me, 'il', getset(function() {
+		return me[getMonth](1).il;
 	}, function(il) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.il = il;
 		});
 	}));
 
-	defProp(this, 'lat', getset(function() {
-		return this[getMonth](1).lat;
+	defProp(me, 'lat', getset(function() {
+		return me[getMonth](1).lat;
 	}, function(lat) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.lat = lat;
 		});
 	}));
-	defProp(this, 'long', getset(function() {
-		return this[getMonth](1).long;
+	defProp(me, 'long', getset(function() {
+		return me[getMonth](1).long;
 	}, function(lon) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.long = lon;
 		});
 	}));
 }
 
-Hebcal[prototype][isLeapYear] = HDate[prototype][isLeapYear];
+HebcalProto[isLeapYear] = HDateProto[isLeapYear];
 
-Hebcal[prototype].setCity = function(city) {
+HebcalProto.setCity = function(city) {
 	this.months.forEach(function(m){
 		m.setCity(city);
 	});
 	return this;
 };
 
-Hebcal[prototype].setLocation = function(lat, lon) {
+HebcalProto.setLocation = function(lat, lon) {
 	this.months.forEach(function(m){
 		m.setLocation(lat, lon);
 	});
 	return this;
 };
 
-Hebcal[prototype][next] = function() {
+HebcalProto[next] = function() {
 	return new Hebcal(this.year + 1);
 };
 
-Hebcal[prototype][prev] = function() {
+HebcalProto[prev] = function() {
 	return new Hebcal(this.year - 1);
 };
 
-Hebcal[prototype][getMonth] = function(month) {
+HebcalProto[getMonth] = function(month) {
+	var months = this.months;
 	month = c.monthNum(month);
 	if (month > this.months[length]) {
-		return this[next]()[getMonth](month - this.months[length]);
+		return this[next]()[getMonth](month - months[length]);
 	}
-	return this.months[month > 0 ? month - 1 : this.months[length] + month];
+	return months[month > 0 ? month - 1 : months[length] + month];
 };
 
-Hebcal[prototype][getDay] = function(day) {
-	if (day > this[length]) {
+HebcalProto[getDay] = function(day) {
+	var me = this;
+	if (day > me[length]) {
 		return null;
 	}
 	if (day < 0) {
-		return this[getDay](this[length] - day);
+		return me[getDay](me[length] - day);
 	}
-	var rosh = this[find](29, months.ELUL)[0].abs() + 1 - this[find](1, NISAN)[0].abs(); // number of days between Nisan and Tishrei
+	var rosh = me[find](29, months.ELUL)[0].abs() + 1 - me[find](1, NISAN)[0].abs(); // number of days between Nisan and Tishrei
 	if (day <= rosh) {
-		return this[getMonth](NISAN)[getDay](day);
+		return me[getMonth](NISAN)[getDay](day);
 	}
-	return this[getMonth](TISHREI)[getDay](day - rosh);
+	return me[getMonth](TISHREI)[getDay](day - rosh);
 };
 
-Hebcal[prototype].days = function() {
+HebcalProto.days = function() {
 	return [].concat.apply([], this.months[map](function(m){
 		return m.days;
 	}));
 };
 
-Hebcal[prototype][map] = function() {
+HebcalProto[map] = function() {
 	return [][map].apply(this.days(), arguments);
 };
 
-Hebcal[prototype].filter = function() {
+HebcalProto.filter = function() {
 	return [].filter.apply(this.days(), arguments);
 };
 
-Hebcal[prototype].addHoliday = function(holiday) {
+HebcalProto.addHoliday = function(holiday) {
 	if (!(holiday instanceof holidays.Event)) {
 		throw new TE('non-Event passed to addHoliday()');
 	}
-	this.holidays.push(holiday);
+	this.holidays.add(holiday);
 	return this;
 };
 
-Hebcal[prototype].findParsha = function(parsha, o) {
+HebcalProto.findParsha = function(parsha, o) {
 	var days = this.filter(function(d){
 		return d.getSedra(o).indexOf(parsha) + 1;
 	});
 	return days[days[length] - 1];
 };
-Hebcal[prototype].findSedra = Hebcal[prototype].findParsha;
+HebcalProto.findSedra = HebcalProto.findParsha;
 
-Hebcal[prototype][find] = function find_f(day, month) {
+HebcalProto[find] = function find_f(day, month) {
+	var me = this;
 	if (arguments[length] === 1) {
 		if (typeof day == 'string') {
-			return find_f[strings].call(this, day);
+			return find_f[strings].call(me, day);
 		} else if (Array.isArray(day)) {
 			return [].concat.apply([], day[map](function(d){
-				return this[find][Array.isArray(d) ? 'apply' : 'call'](this, d);
-			}, this));
+				return me[find][Array.isArray(d) ? 'apply' : 'call'](me, d);
+			}));
 		} else if (day instanceof HDate) {
-			return this[find](day.getDate(), day[getMonth]());
+			return me[find](day.getDate(), day[getMonth]());
 		} else if (day instanceof Date) {
-			return this[find](new HDate(day));
+			return me[find](new HDate(day));
 		}
-	} else if (arguments[length] === 2) {
-		if (month instanceof Hebcal[Month]) {
+	} else if (arguments[length] == 2) {
+		if (month instanceof Month) {
 			return month[find](day);
 		} else if (Array.isArray(month)) {
 			return [].concat.apply([], month[map](function(m){
-				return this[find](day, m);
-			}, this));
+				return me[find](day, m);
+			}));
 		} else if (typeof month == 'string') {
-			return this[find](day, c.monthNum(month));
+			return me[find](day, c.monthNum(month));
 		} else if (typeof month == 'number') {
-			return this[find](day, this[getMonth](month));
+			return me[find](day, me[getMonth](month));
 		}
 	}
 	return [];
 };
-Hebcal[prototype][find][strings] = function strings(str) {
-	var split = str.split(/\s+/);
+HebcalProto[find][strings] = function strings(str) {
+	var split = str.split(/\s+/), func = strings[str.replace(/\s/g, '_').toLowerCase()];
 	if (!split[length]) {
 		return [];
-	} else if (strings[str.replace(/\s/g, '_').toLowerCase()]) {
-		return strings[str.replace(/\s/g, '_').toLowerCase()].call(this);
+	} else if (func) {
+		return func.call(this);
 	}
 	try {
 		return this[find](new HDate(str));
@@ -254,41 +259,41 @@ Hebcal[prototype][find][strings] = function strings(str) {
 		return split[length] - 1 ? this[find].apply(this, split) : [];
 	}
 };
-Hebcal[prototype][find][strings].rosh_chodesh = function() {
+HebcalProto[find][strings].rosh_chodesh = function() {
 	return this[find]('Rosh Chodesh', c.range(1, this.months[length]));
 };
-Hebcal[prototype][find][strings].holidays = function() {
+HebcalProto[find][strings].holidays = function() {
 	return [].concat.apply([], this.holidays[map](function(h){
 		return this[find](h.date);
 	}, this));
 };
-Hebcal[prototype][find][strings].omer = function() {
+HebcalProto[find][strings].omer = function() {
 	return this[find](c.range(15+1, 15+49), NISAN);
 };
-Hebcal[prototype][find][strings].today = function() {
+HebcalProto[find][strings].today = function() {
 	return this[find](new HDate());
 };
-Hebcal[prototype][find][strings].yesterday = function() {
+HebcalProto[find][strings].yesterday = function() {
 	return [this[find]('today')[0][prev]()];
 };
-Hebcal[prototype][find][strings].tomorrow = function() {
+HebcalProto[find][strings].tomorrow = function() {
 	return [this[find]('today')[0][next]()];
 };
-Hebcal[prototype][find][strings].pesach = function() {
+HebcalProto[find][strings].pesach = function() {
 	return this[find](c.range(15, 15+8-this.il), NISAN);
 };
-Hebcal[prototype][find][strings].sukkot = function() {
+HebcalProto[find][strings].sukkot = function() {
 	return this[find](c.range(15, 15+9-this.il), TISHREI);
 };
-Hebcal[prototype][find][strings].succot = Hebcal[prototype][find][strings].succos = Hebcal[prototype][find][strings].sukkos = Hebcal[prototype][find][strings].sukkot;
-Hebcal[prototype][find][strings].shavuot = function() {
+HebcalProto[find][strings].succot = HebcalProto[find][strings].succos = HebcalProto[find][strings].sukkos = HebcalProto[find][strings].sukkot;
+HebcalProto[find][strings].shavuot = function() {
 	return this[find](c.range(6, 7-this.il), months.SIVAN);
 };
-Hebcal[prototype][find][strings].shavuos = Hebcal[prototype][find][strings].shavuot;
-Hebcal[prototype][find][strings].rosh_hashana = function() {
+HebcalProto[find][strings].shavuos = HebcalProto[find][strings].shavuot;
+HebcalProto[find][strings].rosh_hashana = function() {
 	return this[find](c.range(1, 2), TISHREI);
 };
-Hebcal[prototype][find][strings].rosh_hashanah = Hebcal[prototype][find][strings].rosh_hashana;
+HebcalProto[find][strings].rosh_hashanah = HebcalProto[find][strings].rosh_hashana;
 
 // Hebcal properties
 
@@ -336,7 +341,8 @@ defProp(Hebcal, 'havdalah', getset(function(){
 
 // Months
 
-Hebcal[Month] = function(month, year) {
+function Month(month, year) {
+	var me = this;
 	month = c.monthNum(month);
 	if (typeof month != 'number') {
 		throw new TE('month to Hebcal.Month is not a valid type');
@@ -344,114 +350,119 @@ Hebcal[Month] = function(month, year) {
 	if (typeof year != 'number') {
 		throw new TE('year to Hebcal.Month is not a number');
 	}
-	this.month = month;
-	this.year = year;
+	me.month = month;
+	me.year = year;
 
-	this.days = c.range(1, c.daysInMonth(month, year))[map](function(i){
+	me.days = c.range(1, c.daysInMonth(month, year))[map](function(i){
 		var d = new HDate(i, month, year);
 		defProp(d, '__month', {
 			configurable: true,
 			writable: true,
-			value: this
+			value: me
 		});
 		return d;
-	}, this);
+	});
 
-	this[length] = this.days[length];
+	me[length] = me.days[length];
 
-	this.holidays = c.filter(holidays.year(year), function(h){
+	me.holidays = c.filter(holidays.year(year), function(h){
 		return h[0].date[getMonth]() == month;
 	});
 
-	defProp(this, 'il', getset(function(){
-		return this[getDay](1).il;
+	defProp(me, 'il', getset(function(){
+		return me[getDay](1).il;
 	}, function(il){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.il = il;
 		});
 	}));
 
-	defProp(this, 'lat', getset(function(){
-		return this[getDay](1).lat;
+	defProp(me, 'lat', getset(function(){
+		return me[getDay](1).lat;
 	}, function(lat){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.lat = lat;
 		});
 	}));
-	defProp(this, 'long', getset(function(){
-		return this[getDay](1).long;
+	defProp(me, 'long', getset(function(){
+		return me[getDay](1).long;
 	}, function(lon){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.long = lon;
 		});
 	}));
 
-	return this;
+	return me;
 };
 
-Hebcal[Month][prototype][isLeapYear] = HDate[prototype][isLeapYear];
+Hebcal.Month = Month;
 
-Hebcal[Month][prototype][prev] = function() {
-	if (this.month === 1) { // Nisan
-		return this[getYearObject]()[getMonth](-1);
-	} else if (this.month === TISHREI) {
-		return this[getYearObject]()[prev]()[getMonth](months.ELUL);
+MonthProto[isLeapYear] = HDateProto[isLeapYear];
+
+MonthProto[prev] = function() {
+	var me = this, year = me[getYearObject]();
+	if (me.month === 1) { // Nisan
+		return year[getMonth](-1);
+	} else if (me.month === TISHREI) {
+		return year[prev]()[getMonth](months.ELUL);
 	} else {
-		return this[getYearObject]()[getMonth](this.month - 1);
+		return year[getMonth](me.month - 1);
 	}
 };
 
-Hebcal[Month][prototype][next] = function() {
-	if (this.month === c.MONTH_CNT(this.year)) { // Adar
-		return this[getYearObject]()[getMonth](1);
-	} else if (this.month === months.ELUL) {
-		return this[getYearObject]()[next]()[getMonth](TISHREI);
+MonthProto[next] = function() {
+	var me = this, year = me[getYearObject]();
+	if (me.month === c.MONTH_CNT(me.year)) { // Adar
+		return year[getMonth](1);
+	} else if (me.month === months.ELUL) {
+		return year[next]()[getMonth](TISHREI);
 	} else {
-		return this[getYearObject]()[getMonth](this.month + 1);
+		return year[getMonth](me.month + 1);
 	}
 };
 
-Hebcal[Month][prototype][getDay] = function(day) {
+MonthProto[getDay] = function(day) {
+	var days = this.days;
 	day = c.dayYearNum(day);
-	if (day > this.days[length]) {
-		return this[next]()[getDay](day - this.days[length]);
+	if (day > days[length]) {
+		return this[next]()[getDay](day - days[length]);
 	}
-	return this.days[day > 0 ? day - 1 : this.days[length] + day];
+	return days[day > 0 ? day - 1 : days[length] + day];
 };
 
-Hebcal[Month][prototype][getYearObject] = function() {
+MonthProto[getYearObject] = function() {
 	return this.__year || new Hebcal(this.year);
 };
 
-Hebcal[Month][prototype].getName = function(o) {
+MonthProto.getName = function(o) {
 	return c.LANG(c.monthNames[+this[isLeapYear]()][this.month], o);
 };
 
-Hebcal[Month][prototype].rosh_chodesh = function() {
+MonthProto.rosh_chodesh = function() {
 	var prevMonth = this[prev]();
-	return prevMonth[length] === 30 ? [prevMonth[getDay](-1), this[getDay](1)] : [this[getDay](1)];
+	return prevMonth[length] == 30 ? [prevMonth[getDay](-1), this[getDay](1)] : [this[getDay](1)];
 };
 
-Hebcal[Month][prototype].setCity = function(city) {
+MonthProto.setCity = function(city) {
 	this.days.forEach(function(d){
 		d.setCity(city);
 	});
 	return this;
 };
 
-Hebcal[Month][prototype].setLocation = function(lat, lon) {
+MonthProto.setLocation = function(lat, lon) {
 	this.days.forEach(function(d){
 		d.setLocation(lat, lon);
 	});
 	return this;
 };
 
-Hebcal[Month][prototype][map] = function() {
+MonthProto[map] = function() {
 	return [][map].apply(this.days, arguments);
 };
 
-Hebcal[Month][prototype].molad = function() {
-	var retMolad = {}, year, m_elapsed, p_elapsed, h_elapsed, parts, m_adj;
+MonthProto.molad = function() {
+	var retMolad = {}, year, m_elapsed, p_elapsed, h_elapsed, parts, m_adj, toInt = parseInt;
 
     m_adj = this.month - 7;
 	year = this.year - 1;
@@ -459,24 +470,24 @@ Hebcal[Month][prototype].molad = function() {
 		m_adj += c.MONTH_CNT(year + 1);
 	}
 
-    m_elapsed = parseInt(m_adj +
+    m_elapsed = toInt(m_adj +
         235 * (year / 19)/* +
         12 * (year % 19) +
         (((year % 19) * 7) + 1) / 19*/);
 
-    p_elapsed = parseInt(204 + (793 * (m_elapsed % 1080)));
+    p_elapsed = toInt(204 + (793 * (m_elapsed % 1080)));
 
-    h_elapsed = parseInt(5 + (12 * m_elapsed) +
+    h_elapsed = toInt(5 + (12 * m_elapsed) +
         793 * (m_elapsed / 1080)/* +
         p_elapsed / 1080*/ -
         6);
 
-    parts = parseInt((p_elapsed % 1080) + 1080 * (h_elapsed % 24));
+    parts = toInt((p_elapsed % 1080) + 1080 * (h_elapsed % 24));
 
-    retMolad.doy = new HDate(parseInt(1 + 29 * m_elapsed + h_elapsed / 24)).getDay();
+    retMolad.doy = new HDate(toInt(1 + 29 * m_elapsed + h_elapsed / 24)).getDay();
     retMolad.hour = Math.round(h_elapsed % 24);
-    var chalakim = parseInt(parts % 1080);
-    retMolad.minutes = parseInt(chalakim / 18);
+    var chalakim = toInt(parts % 1080);
+    retMolad.minutes = toInt(chalakim / 18);
     retMolad.chalakim = chalakim % 18;
     var day = this.prev().find('shabbat_mevarchim')[0].onOrAfter(retMolad.doy).greg();
     day.setHours(retMolad.hour);
@@ -487,25 +498,27 @@ Hebcal[Month][prototype].molad = function() {
     return retMolad;
 };
 
-Hebcal[Month][prototype][find] = function find_f(day) {
-	if (typeof day === 'number') {
-		return [this[getDay](day)];
-	} else if (typeof day === 'string') {
-		return find_f[strings].call(this, day);
+MonthProto[find] = function find_f(day) {
+	var me = this;
+	if (typeof day == 'number') {
+		return [me[getDay](day)];
+	} else if (typeof day == 'string') {
+		return find_f[strings].call(me, day);
 	} else if (Array.isArray(day)) {
 		return [].concat.apply([], day[map](function(d){
-			return this[find](d);
-		}, this));
-	} else if (day instanceof HDate && day[getFullYear]() === this.year && day[getMonth]() === this.month) {
-		return this[find](day.getDate());
+			return me[find](d);
+		}));
+	} else if (day instanceof HDate && day[getFullYear]() == me.year && day[getMonth]() == me.month) {
+		return me[find](day.getDate());
 	} else if (day instanceof Date) {
-		return this[find](new HDate(day));
+		return me[find](new HDate(day));
 	}
 	return [];
 };
-Hebcal[Month][prototype][find][strings] = function strings(str) {
-	if (strings[str.replace(/\s/g, '_').toLowerCase()]) {
-		return strings[str.replace(/\s/g, '_').toLowerCase()].call(this);
+MonthProto[find][strings] = function strings(str) {
+	var func = strings[str.replace(/\s/g, '_').toLowerCase()];
+	if (func) {
+		return func.call(this);
 	}
 	try {
 		return this[find](new HDate(str));
@@ -514,32 +527,32 @@ Hebcal[Month][prototype][find][strings] = function strings(str) {
 		return num ? this[find](num) : [];
 	}
 };
-Hebcal[Month][prototype][find][strings].rosh_chodesh = function() {
+MonthProto[find][strings].rosh_chodesh = function() {
 	return this.rosh_chodesh();
 };
-Hebcal[Month][prototype][find][strings].shabbat_mevarchim = function() {
+MonthProto[find][strings].shabbat_mevarchim = function() {
 	return this.month === months.ELUL ? [] : // No birchat hachodesh in Elul
 		this[find](this[getDay](29).onOrBefore(c.days.SAT));
 };
-Hebcal[Month][prototype][find][strings].shabbos_mevarchim = Hebcal[Month][prototype][find][strings].shabbos_mevorchim = Hebcal[Month][prototype][find][strings].shabbat_mevarchim;
+MonthProto[find][strings].shabbos_mevarchim = MonthProto[find][strings].shabbos_mevorchim = MonthProto[find][strings].shabbat_mevarchim;
 
 // HDate days
 
 Hebcal.HDate = HDate;
 
-HDate[prototype].getMonthObject = function() {
-	return this.__month || new Hebcal[Month](this[getMonth](), this[getFullYear]());
+HDateProto.getMonthObject = function() {
+	return this.__month || new Month(this[getMonth](), this[getFullYear]());
 };
 
-HDate[prototype][getYearObject] = function() {
+HDateProto[getYearObject] = function() {
 	return this.getMonthObject()[getYearObject]();
 };
 
 (function(){
 	var orig = {}; // slightly less overhead when using unaffiliated HDate()s
 	[prev, next].forEach(function(func){
-		orig[func] = HDate[prototype][func];
-		HDate[prototype][func] = function() {
+		orig[func] = HDateProto[func];
+		HDateProto[func] = function() {
 			var day = orig[func].call(this);
 			if (!this.__month) {
 				return day;
@@ -549,7 +562,7 @@ HDate[prototype][getYearObject] = function() {
 	});
 })();
 
-HDate[prototype].getSedra = (function(){
+HDateProto.getSedra = (function(){
 	var __cache = {};
 
 	return function(o) {
@@ -562,9 +575,9 @@ HDate[prototype].getSedra = (function(){
 		});
 	}
 })();
-HDate[prototype].getParsha = HDate[prototype].getSedra;
+HDateProto.getParsha = HDateProto.getSedra;
 
-HDate[prototype].holidays = function(all) {
+HDateProto.holidays = function(all) {
 	var me = this, days = me[getYearObject]().holidays[me];
 	return days ? days.filter(function(h){
 		return all ? true : !h.routine() && h.is(me);
@@ -575,10 +588,10 @@ HDate[prototype].holidays = function(all) {
 };
 
 ['candleLighting', 'havdalah'].forEach(function(prop){
-	HDate[prototype][prop] = function(){
-		var hd = this.holidays(true).filter(function(h){
-			return h.is(this);
-		}, this);
+	HDateProto[prop] = function(){
+		var me = this, hd = me.holidays(true).filter(function(h){
+			return h.is(me);
+		}, me);
 		if (hd.length) {
 			hd = c.filter(hd.map(function(h){
 				return h[prop]();
@@ -588,19 +601,20 @@ HDate[prototype].holidays = function(all) {
 	};
 });
 
-HDate[prototype].omer = function() {
-	if (this.greg().getTime() > new HDate(15, NISAN, this[getFullYear]()).greg().getTime() &&
-		this.greg().getTime() < new HDate( 6, months.SIVAN, this[getFullYear]()).greg().getTime()) {
-		return this.abs() - new HDate(16, NISAN, this[getFullYear]()).abs() + 1;
+HDateProto.omer = function() {
+	var me = this, greg = me.greg().getTime(), year = me[getFullYear]();
+	if (greg > new HDate(15, NISAN, year).greg().getTime() &&
+		greg < new HDate( 6, months.SIVAN, year).greg().getTime()) {
+		return me.abs() - new HDate(16, NISAN, year).abs() + 1;
 	}
 	return 0;
 };
 
-HDate[prototype].dafyomi = function(o) {
+HDateProto.dafyomi = function(o) {
 	return dafyomi.dafname(dafyomi.dafyomi(this.greg()), o);
 };
 
-HDate[prototype].tachanun = (function() {
+HDateProto.tachanun = (function() {
 	var NONE      = tachanun.NONE      = 0,
 		MINCHA    = tachanun.MINCHA    = 1,
 		SHACHARIT = tachanun.SHACHARIT = 2,
@@ -613,24 +627,24 @@ HDate[prototype].tachanun = (function() {
 	};
 
 	function tachanun() {
-		var checkNext = !arguments[0];
+		var checkNext = !arguments[0], me = this;
 
-		var year = this[getYearObject](), y = year.year;
+		var year = me[getYearObject](), y = year.year;
 
-		var all = __cache.il[y] === this.il && __cache.all[y] || (__cache.all[y] = year[find]('Rosh Chodesh').concat(
+		var all = __cache.il[y] === me.il && __cache.all[y] || (__cache.all[y] = year[find]('Rosh Chodesh').concat(
 			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
 			year[find](15 + 33, NISAN), // Lag Baomer
-			year[find](c.range(1, 8 - this.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+			year[find](c.range(1, 8 - me.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
 			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
 			year[find](-1, months.ELUL), // Erev Rosh Hashanah
 			year[find]([1, 2], TISHREI), // Rosh Hashanah
-			year[find](c.range(9, 24 - this.il), TISHREI), // Erev Yom Kippur thru Isru Chag
+			year[find](c.range(9, 24 - me.il), TISHREI), // Erev Yom Kippur thru Isru Chag
 			year[find](c.range(25, 33), months.KISLEV), // Chanukah
 			year[find](15, months.SHVAT), // Tu B'shvat
 			year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
 		)[map](function(d){
 			return d.abs();
-		})), some = __cache.il[y] === this.il && __cache.some[y] || (__cache.some[y] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
+		})), some = __cache.il[y] === me.il && __cache.some[y] || (__cache.some[y] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
 			year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
 			year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
 			year[find](14, months.IYYAR), // Pesach Sheini
@@ -639,26 +653,26 @@ HDate[prototype].tachanun = (function() {
 		)[map](function(d){
 			return d.abs();
 		}));
-		__cache.il[y] = this.il;
+		__cache.il[y] = me.il;
 
-		all = all.indexOf(this.abs()) > -1;
-		some = some.indexOf(this.abs()) > -1;
+		all = all.indexOf(me.abs()) > -1;
+		some = some.indexOf(me.abs()) > -1;
 
 		if (all) {
 			return NONE;
 		}
-		var ret = (!some && ALL_CONGS) | (this[getDay]() != 6 && SHACHARIT);
+		var ret = (!some && ALL_CONGS) | (me[getDay]() != 6 && SHACHARIT);
 		if (checkNext) {
-			ret |= ((this[next]().tachanun(true) & SHACHARIT) && MINCHA);
+			ret |= ((me[next]().tachanun(true) & SHACHARIT) && MINCHA);
 		} else {
-			ret |= (this[getDay]() != 5 && MINCHA);
+			ret |= (me[getDay]() != 5 && MINCHA);
 		}
 		return ret == ALL_CONGS ? NONE : ret;
 	}
 	return tachanun;
 })();
 
-HDate[prototype].hallel = (function() {
+HDateProto.hallel = (function() {
 	var NONE  = hallel.NONE  = 0,
 		HALF  = hallel.HALF  = 1,
 		WHOLE = hallel.WHOLE = 2;
@@ -670,11 +684,11 @@ HDate[prototype].hallel = (function() {
 	};
 
 	function hallel() {
-		var year = this[getYearObject](), y = year.year;
+		var me = this, year = me[getYearObject](), y = year.year;
 
-		var whole = __cache.il[y] == this.il && __cache.whole[y] || (__cache.whole[y] = [].concat(
+		var whole = __cache.il[y] == me.il && __cache.whole[y] || (__cache.whole[y] = [].concat(
 			year[find](c.range(25, 33), months.KISLEV), // Chanukah
-			year[find]([15, this.il ? null : 16], NISAN), // First day(s) of Pesach
+			year[find]([15, me.il ? null : 16], NISAN), // First day(s) of Pesach
 			year[find]('Shavuot'),
 			year[find]('Sukkot'),
 			holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
@@ -682,15 +696,15 @@ HDate[prototype].hallel = (function() {
 		)[map](function(d){
 			return d.abs();
 		}));
-		var half = __cache.il[y] == this.il && __cache.half[y] || (__cache.half[y] = [].concat(
+		var half = __cache.il[y] == me.il && __cache.half[y] || (__cache.half[y] = [].concat(
 			year[find]('Rosh Chodesh').filter(function(rc){return rc[getMonth]() != TISHREI}), // Rosh Chodesh, but not Rosh Hashanah
-			year[find](c.range(17 - this.il, 23 - this.il), NISAN) // Last six days of Pesach
+			year[find](c.range(17 - me.il, 23 - me.il), NISAN) // Last six days of Pesach
 		)[map](function(d){
 			return d.abs();
 		}));
-		__cache.il[y] = this.il;
+		__cache.il[y] = me.il;
 
-		return (whole.indexOf(this.abs()) > -1 && WHOLE) || (half.indexOf(this.abs()) > -1 && HALF) || NONE;
+		return (whole.indexOf(me.abs()) > -1 && WHOLE) || (half.indexOf(me.abs()) > -1 && HALF) || NONE;
 	}
 	return hallel;
 })();
@@ -754,7 +768,8 @@ HDate[prototype].hallel = (function() {
 
 // Gregorian years
 
-Hebcal[GregYear] = function GregYear(year, month) {
+function GregYear(year, month) {
+	var me = this;
 	if (!year) {
 		year = (new Date)[getFullYear]();
 	}
@@ -767,7 +782,7 @@ Hebcal[GregYear] = function GregYear(year, month) {
 	if (typeof year !== 'number') {
 		throw new TE('year to Hebcal.GregYear() is not a number');
 	}
-	this.year = year;
+	me.year = year;
 
 	if (month) {
 		if (typeof month === 'string') { // month name
@@ -778,15 +793,15 @@ Hebcal[GregYear] = function GregYear(year, month) {
 		}
 
 		if (Array.isArray(month)) {
-			this.months = month[map](function(i){
-				var m = new Hebcal[GregMonth](i, year);
+			me.months = month[map](function(i){
+				var m = new GregMonth(i, year);
 				defProp(m, '__year', {
 					configurable: true,
 					writable: true,
-					value: this
+					value: me
 				});
 				return m;
-			}, this);
+			});
 		} else {
 			throw new TE('month to Hebcal.GregYear() is not a valid type');
 		}
@@ -794,7 +809,7 @@ Hebcal[GregYear] = function GregYear(year, month) {
 		return new GregYear(year, c.range(1, 12));
 	}
 
-	this.hebyears = [].concat.apply([], this.months[map](function(m){
+	me.hebyears = [].concat.apply([], me.months[map](function(m){
 		return m.hebmonths[map](function(hm){
 			return hm.year;
 		});
@@ -802,77 +817,88 @@ Hebcal[GregYear] = function GregYear(year, month) {
 		return arr.indexOf(val) === i; // keep unique values only
 	});
 
-	this.holidays = c.filter(holidays.year(this.hebyears[0]), function(h){
-		return h[0].date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+	me.holidays = c.filter(holidays.year(me.hebyears[0]), function(h){
+		return h[0].date.greg()[getFullYear]() === year && me.months.filter(function(m){ // don't keep ones that are out of bounds
 			return m.month === h[0].date.greg()[getMonth]() + 1;
 		})[length];
-	}, this);
-	if (this.hebyears[1]) {
-		extend(this.holidays, c.filter(holidays.year(this.hebyears[1]), function(h){
-			return h[0].date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+	});
+	if (me.hebyears[1]) {
+		extend(me.holidays, c.filter(holidays.year(me.hebyears[1]), function(h){
+			return h[0].date.greg()[getFullYear]() === year && me.months.filter(function(m){ // don't keep ones that are out of bounds
 				return m.month === h[0].date.greg()[getMonth]() + 1;
 			})[length];
-		}, this));
+		}));
 	}
 
-	this[length] = 365 + greg.LEAP(year);
+	me[length] = 365 + greg.LEAP(year);
 
-	defProp(this, 'il', getset(function() {
-		return this[getMonth](1).il;
+	defProp(me, 'il', getset(function() {
+		return me[getMonth](1).il;
 	}, function(il) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.il = il;
 		});
 	}));
 
-	defProp(this, 'lat', getset(function() {
-		return this[getMonth](1).lat;
+	defProp(me, 'lat', getset(function() {
+		return me[getMonth](1).lat;
 	}, function(lat) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.lat = lat;
 		});
 	}));
-	defProp(this, 'long', getset(function() {
-		return this[getMonth](1).long;
+	defProp(me, 'long', getset(function() {
+		return me[getMonth](1).long;
 	}, function(lon) {
-		this.months.forEach(function(m){
+		me.months.forEach(function(m){
 			m.long = lon;
 		});
 	}));
 
-	return this;
+	return me;
 };
 
-Hebcal[GregYear][prototype][isLeapYear] = function() {
-	return this[length] === 366;
+Hebcal.GregYear = GregYear;
+
+GregYearProto[isLeapYear] = function() {
+	return this[length] == 366;
 };
 
-Hebcal[GregYear][prototype].setCity = Hebcal[prototype].setCity;
-Hebcal[GregYear][prototype].setLocation = Hebcal[prototype].setLocation;
+GregYearProto.setCity = HebcalProto.setCity;
+GregYearProto.setLocation = HebcalProto.setLocation;
 
-Hebcal[GregYear][prototype][next] = function() {
-	return new Hebcal[GregYear](this.year + 1);
+GregYearProto[next] = function() {
+	return new GregYear(this.year + 1);
 };
 
-Hebcal[GregYear][prototype][prev] = function() {
-	return new Hebcal[GregYear](this.year - 1);
+GregYearProto[prev] = function() {
+	return new GregYear(this.year - 1);
 };
 
-Hebcal[GregYear][prototype][getMonth] = function(month) {
-	month = typeof month === 'number' ? month : greg.lookupMonthNum(month);
-	if (month > this.months[length]) {
-		return this[next]()[getMonth](month - this.months[length]);
+GregYearProto[getMonth] = function(month) {
+	var months = this.months
+	month = typeof month == 'number' ? month : greg.lookupMonthNum(month);
+	if (month > months[length]) {
+		return this[next]()[getMonth](month - months[length]);
 	}
-	return this.months[month > 0 ? month - 1 : this.months[length] + month];
+	return months[month > 0 ? month - 1 : months[length] + month];
 };
 
-Hebcal[GregYear][prototype].days = Hebcal[prototype].days;
-Hebcal[GregYear][prototype][map] = Hebcal[prototype][map];
-Hebcal[GregYear][prototype].filter = Hebcal[prototype].filter;
+extend(GregYearProto, {
+	days: HebcalProto.days,
+	map: HebcalProto[map],
+	filter: HebcalProto.filter,
+	addHoliday: HebcalProto.addHoliday,
+});
 
-Hebcal[GregYear][prototype].addHoliday = Hebcal[prototype].addHoliday;
+/*GregYearProto.days = HebcalProto.days;
+GregYearProto[map] = HebcalProto[map];
+GregYearProto.filter = HebcalProto.filter;
 
-Hebcal[GregMonth] = function(month, year) {
+GregYearProto.addHoliday = HebcalProto.addHoliday;*/
+
+function GregMonth(month, year) {
+	var me = this;
 	if (typeof month == 'string') {
 		month = greg.lookupMonthNum(month);
 	}
@@ -883,59 +909,61 @@ Hebcal[GregMonth] = function(month, year) {
 		throw new TE('year to Hebcal.GregMonth is not a number');
 	}
 
-	this.year = year;
-	this.month = month;
+	me.year = year;
+	me.month = month;
 
-	this.days = c.range(1, greg.daysInMonth(month, year))[map](function(i){
+	me.days = c.range(1, greg.daysInMonth(month, year))[map](function(i){
 		var d = new HDate(new Date(year, month - 1, i));
 		defProp(d, '__gregmonth', {
 			configurable: true,
 			writable: true,
-			value: this
+			value: me
 		});
 		return d;
-	}, this);
-
-	this[length] = this.days[length];
-
-	this.hebmonths = [
-		{month: this[getDay]( 1)[getMonth](), year: this[getDay]( 1)[getFullYear]()},
-		{month: this[getDay](-1)[getMonth](), year: this[getDay](-1)[getFullYear]()}
-	].filter(function(val, i, arr){
-		return i === 0 || val.month !== arr[0].month;
 	});
 
-	defProp(this, 'il', getset(function(){
-		return this[getDay](1).il;
+	me[length] = me.days[length];
+
+	me.hebmonths = [
+		{month: me[getDay]( 1)[getMonth](), year: me[getDay]( 1)[getFullYear]()},
+		{month: me[getDay](-1)[getMonth](), year: me[getDay](-1)[getFullYear]()}
+	].filter(function(val, i, arr){
+		return i === 0 || val.month != arr[0].month;
+	});
+
+	defProp(me, 'il', getset(function(){
+		return me[getDay](1).il;
 	}, function(il){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.il = il;
 		});
 	}));
 
-	defProp(this, 'lat', getset(function(){
-		return this[getDay](1).lat;
+	defProp(me, 'lat', getset(function(){
+		return me[getDay](1).lat;
 	}, function(lat){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.lat = lat;
 		});
 	}));
-	defProp(this, 'long', getset(function(){
-		return this[getDay](1).long;
+	defProp(me, 'long', getset(function(){
+		return me[getDay](1).long;
 	}, function(lon){
-		this.days.forEach(function(d){
+		me.days.forEach(function(d){
 			d.long = lon;
 		});
 	}));
 
-	return this;
+	return me;
 };
 
-Hebcal[GregMonth][prototype][isLeapYear] = function() {
+Hebcal.GregMonth = GregMonth;
+
+GregMonthProto[isLeapYear] = function() {
 	return greg.LEAP(this.year);
 };
 
-Hebcal[GregMonth][prototype][prev] = function() {
+GregMonthProto[prev] = function() {
 	if (this.month === 1) {
 		return this[getYearObject]()[prev]()[getMonth](-1);
 	} else {
@@ -943,35 +971,35 @@ Hebcal[GregMonth][prototype][prev] = function() {
 	}
 };
 
-Hebcal[GregMonth][prototype][next] = function() {
+GregMonthProto[next] = function() {
 	return this[getYearObject]()[getMonth](this.month + 1);
 };
 
-Hebcal[GregMonth][prototype][getDay] = function(day) {
+GregMonthProto[getDay] = function(day) {
 	if (day > this.days[length]) {
 		return this[next]()[getDay](day - this.days[length]);
 	}
 	return this.days[day > 0 ? day - 1 : this.days[length] + day];
 };
 
-Hebcal[GregMonth][prototype][getYearObject] = function() {
-	return this.__year || new Hebcal[GregYear](this.year);
+GregMonthProto[getYearObject] = function() {
+	return this.__year || new GregYear(this.year);
 };
 
-Hebcal[GregMonth][prototype].getName = function() {
+GregMonthProto.getName = function() {
 	return greg.monthNames[this.month];
 };
 
-Hebcal[GregMonth][prototype].setCity = Hebcal[Month][prototype].setCity;
-Hebcal[GregMonth][prototype].setLocation = Hebcal[Month][prototype].setLocation;
+GregMonthProto.setCity = MonthProto.setCity;
+GregMonthProto.setLocation = MonthProto.setLocation;
 
-Hebcal[GregMonth][prototype][map] = Hebcal[Month][prototype][map];
+GregMonthProto[map] = MonthProto[map];
 
-HDate[prototype].getGregMonthObject = function() {
-	return this.__gregmonth || new Hebcal[GregMonth](this.greg()[getMonth]() + 1, this.greg()[getFullYear]());
+HDateProto.getGregMonthObject = function() {
+	return this.__gregmonth || new GregMonth(this.greg()[getMonth]() + 1, this.greg()[getFullYear]());
 };
 
-HDate[prototype].getGregYearObject = function() {
+HDateProto.getGregYearObject = function() {
 	return this.getGregMonthObject()[getYearObject]();
 };
 

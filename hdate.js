@@ -37,8 +37,7 @@ suncalc.addTime(-10.2, 'misheyakir_machmir', 0);
 suncalc.addTime(-8.5, 0, 'tzeit');
 
 // for minifying optimizations
-var prototype = 'prototype',
-	getFullYear = 'getFullYear',
+var getFullYear = 'getFullYear',
 	getMonth = 'getMonth',
 	getDate = 'getDate',
 	getTime = 'getTime',
@@ -48,14 +47,16 @@ var prototype = 'prototype',
 	TISHREI = months.TISHREI,
 	MONTH_CNT = c.MONTH_CNT,
 	daysInMonth = c.daysInMonth,
-	dayOnOrBefore = c.dayOnOrBefore;
+	dayOnOrBefore = c.dayOnOrBefore,
+	prototype = HDate.prototype;
 
 function HDate(day, month, year) {
+	var me = this;
 	switch (arguments.length) {
 		case 0:
 			return new HDate(new Date());
 		case 1:
-			if (typeof day === 'undefined') {
+			if (typeof day == 'undefined') {
 				return new HDate();
 			} else if (day instanceof Date) {
 				// we were passed a Gregorian date, so convert it
@@ -69,7 +70,7 @@ function HDate(day, month, year) {
 				d.il = day.il;
 				d.setLocation(d.lat, d.long);
 				return d;
-			} else if (typeof day === 'string') {
+			} else if (typeof day == 'string') {
 				switch (day.toLowerCase().trim()) {
 					case 'today':
 						return new HDate();
@@ -80,35 +81,35 @@ function HDate(day, month, year) {
 				}
 				if (/\s/.test(day)) {
 					var s = day.split(/\s+/);
-					if (s.length === 2) {
+					if (s.length == 2) {
 						return new HDate(s[0], s[1]);
-					} else if (s.length === 3) {
+					} else if (s.length == 3) {
 						return new HDate(s[0], s[1], s[2]);
-					} else if (s.length === 4) { // should only be if s[1] is Adar
+					} else if (s.length == 4) { // should only be if s[1] is Adar
 						if (/i/i.test(s[2])) { // Using I[I] syntax
 							s[2] = s[2].length;
 						} // otherwise using 1|2 syntax
 						return new HDate(s[0], s[1] + s[2], s[3]);
 					}
 				}
-			} else if (typeof day === 'number') { // absolute date
+			} else if (typeof day == 'number') { // absolute date
 				return abs2hebrew(day);
 			}
 			throw new TypeError('HDate called with bad argument');
 		case 2:
 			return new HDate(day, month, (new HDate)[getFullYear]());
 		case 3:
-			this.day = this.month = 1;
-			this.year = c.dayYearNum(year);
+			me.day = me.month = 1;
+			me.year = c.dayYearNum(year);
 
-			this.setMonth(c.monthNum(month));
-			this.setDate(c.dayYearNum(day));
+			me.setMonth(c.monthNum(month));
+			me.setDate(c.dayYearNum(day));
 			break;
 		default:
 			throw new TypeError('HDate called with bad arguments');
 	}
 
-	return this.setLocation.apply(this, HDate.defaultLocation);
+	return me.setLocation.apply(me, HDate.defaultLocation);
 }
 
 HDate.defaultLocation = [0, 0];
@@ -164,51 +165,51 @@ function fixMonth(date) {
 	}
 }
 
-HDate[prototype][getFullYear] = function() {
+prototype[getFullYear] = function() {
 	return this.year;
 };
 
-HDate[prototype].isLeapYear = function() {
+prototype.isLeapYear = function() {
 	return c.LEAP(this.year);
 };
 
-HDate[prototype][getMonth] = function() {
+prototype[getMonth] = function() {
 	return this.month;
 };
 
-HDate[prototype].getTishreiMonth = function() {
+prototype.getTishreiMonth = function() {
 	return (this[getMonth]() + MONTH_CNT(this[getFullYear]()) - 6) % MONTH_CNT(this[getFullYear]());
 };
 
-HDate[prototype].daysInMonth = function() {
+prototype.daysInMonth = function() {
 	return daysInMonth(this[getMonth](), this[getFullYear]());
 };
 
-HDate[prototype][getDate] = function() {
+prototype[getDate] = function() {
 	return this.day;
 };
 
-HDate[prototype].getDay = function() {
+prototype.getDay = function() {
 	return this.greg().getDay();
 };
 
-HDate[prototype].setFullYear = function(year) {
+prototype.setFullYear = function(year) {
 	this.year = year;
 	fix(this);
 	return this;
 };
 
-HDate[prototype].setMonth = function(month) {
+prototype.setMonth = function(month) {
 	this.month = c.monthNum(month);
 	fix(this);
 	return this;
 };
 
-HDate[prototype].setTishreiMonth = function(month) {
+prototype.setTishreiMonth = function(month) {
 	return this.setMonth((month + 6) % MONTH_CNT(this[getFullYear]()) || 13);
 };
 
-HDate[prototype].setDate = function(date) {
+prototype.setDate = function(date) {
 	this.day = date;
 	fix(this);
 	return this;
@@ -219,23 +220,23 @@ HDate[prototype].setDate = function(date) {
    The absolute date is the number of days elapsed since the (imaginary)
    Gregorian date Sunday, December 31, 1 BC. */
 function hebrew2abs(d) {
-	var m, tempabs = d[getDate]();
+	var m, tempabs = d[getDate](), year = d[getFullYear]();
 	
 	if (d[getMonth]() < TISHREI) {
-		for (m = TISHREI; m <= MONTH_CNT(d[getFullYear]()); m++) {
-			tempabs += daysInMonth(m, d[getFullYear]());
+		for (m = TISHREI; m <= MONTH_CNT(year); m++) {
+			tempabs += daysInMonth(m, year);
 		}
 
 		for (m = months.NISAN; m < d[getMonth](); m++) {
-			tempabs += daysInMonth(m, d[getFullYear]());
+			tempabs += daysInMonth(m, year);
 		}
 	} else {
 		for (m = TISHREI; m < d[getMonth](); m++) {
-			tempabs += daysInMonth(m, d[getFullYear]());
+			tempabs += daysInMonth(m, year);
 		}
 	}
 	
-	return c.hebElapsedDays(d[getFullYear]()) - 1373429 + tempabs;
+	return c.hebElapsedDays(year) - 1373429 + tempabs;
 }
 
 function abs2hebrew(d) {
@@ -255,7 +256,7 @@ function abs2hebrew(d) {
 		year++;
 	}
 
-	if (year >= 4635 && year < 10666) {
+	if (year > 4634 && year < 10666) {
 		// optimize search
 		month = mmap[gregdate[getMonth]()];
 	} else {
@@ -270,33 +271,33 @@ function abs2hebrew(d) {
 	return hebdate.setLocation.apply(hebdate.setDate(d - hebrew2abs(hebdate.setDate(1)) + 1), HDate.defaultLocation);
 }
 
-HDate[prototype].greg = function() {
+prototype.greg = function() {
 	return greg.abs2greg(hebrew2abs(this));
 };
 
-HDate[prototype].gregEve = function() {
+prototype.gregEve = function() {
 	return this.prev().sunset();
 };
 
-HDate[prototype][abs] = function() {
+prototype[abs] = function() {
 	return hebrew2abs(this);
 };
 
-HDate[prototype].toString = function(o) {
+prototype.toString = function(o) {
 	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o) + ' ' +
 		this.getMonthName(o) + ' ' +
 		c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
 };
 
-HDate[prototype].getMonthName = function(o) {
+prototype.getMonthName = function(o) {
 	return c.LANG(c.monthNames[+this.isLeapYear()][this[getMonth]()], o);
 };
 
-HDate[prototype].setCity = function(city) {
+prototype.setCity = function(city) {
 	return this.setLocation(cities.getCity(city));
 };
 
-HDate[prototype].setLocation = function(lat, lon) {
+prototype.setLocation = function(lat, lon) {
 	if (typeof lat == 'object' && !Array.isArray(lat)) {
 		lon = lat.long;
 		lat = lat.lat;
@@ -321,7 +322,7 @@ HDate[prototype].setLocation = function(lat, lon) {
 	this.lat = lat;
 	this.long = lon;
 
-	this.il = cities.getCity(cities.nearest(this.lat, this.long))[2];
+	this.il = cities.getCity(cities.nearest(lat, lon))[2];
 
 	return this;
 };
@@ -330,28 +331,28 @@ function suntime(hdate) {
 	return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long);
 }
 
-HDate[prototype].sunrise = function() {
+prototype.sunrise = function() {
 	return suntime(this).sunrise;
 };
 
-HDate[prototype].sunset = function() {
+prototype.sunset = function() {
 	return suntime(this).sunset;
 };
 
-HDate[prototype][hour] = function() {
+prototype[hour] = function() {
 	return (this.sunset() - this.sunrise()) / 12; // ms in hour
 };
 
-HDate[prototype].hourMins = function() {
+prototype.hourMins = function() {
 	// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
 	return this[hour]() / (1000 * 60);
 };
 
-HDate[prototype].nightHour = function() {
+prototype.nightHour = function() {
 	return (this.sunrise() - this.gregEve()) / 12; // ms in hour
 };
 
-HDate[prototype].nightHourMins = function() {
+prototype.nightHourMins = function() {
 	// hour in ms / (1000 ms in s * 60 s in m) = mins in halachic hour
 	return this.nightHour() / (1000 * 60);
 };
@@ -405,7 +406,7 @@ var zemanim = {
 	}
 };
 
-HDate[prototype].getZemanim = function() {
+prototype.getZemanim = function() {
 	return c.map(zemanim, function(z){
 		return z(this);
 	}, this);
@@ -415,20 +416,20 @@ HDate.addZeman = function(zeman, func) {
 	zemanim[zeman] = func;
 };
 
-HDate[prototype].next = function() {
+prototype.next = function() {
 	return abs2hebrew(this.abs() + 1);
 };
 
-HDate[prototype].prev = function() {
+prototype.prev = function() {
 	return abs2hebrew(this.abs() - 1);
 };
 
-HDate[prototype].isSameDate = function(other) {
+prototype.isSameDate = function(other) {
 	if (other instanceof HDate) {
-		if (other[getFullYear]() === -1) {
+		if (other[getFullYear]() == -1) {
 			other = new HDate(other).setFullYear(this[getFullYear]());
 		}
-		return this[abs]() === other[abs]();
+		return this[abs]() == other[abs]();
 	}
 	return false;
 };
@@ -437,23 +438,23 @@ function onOrBefore(day, t, offset) {
 	return new HDate(dayOnOrBefore(day, t[abs]() + offset));
 }
 
-HDate[prototype].before = function(day) {
+prototype.before = function(day) {
 	return onOrBefore(day, this, -1);
 };
 
-HDate[prototype].onOrBefore = function(day) {
+prototype.onOrBefore = function(day) {
 	return onOrBefore(day, this, 0);
 };
 
-HDate[prototype].nearest = function(day) {
+prototype.nearest = function(day) {
 	return onOrBefore(day, this, 3);
 };
 
-HDate[prototype].onOrAfter = function(day) {
+prototype.onOrAfter = function(day) {
 	return onOrBefore(day, this, 6);
 };
 
-HDate[prototype].after = function(day) {
+prototype.after = function(day) {
 	return onOrBefore(day, this, 7);
 };
 
