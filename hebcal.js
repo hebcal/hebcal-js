@@ -67,6 +67,13 @@ function getset(g, s) {
 	};
 }
 
+function extend(base, into) {
+	for (var i in into) {
+		base[i] = into[i];
+	}
+	return base;
+}
+
 // Main Hebcal function
 
 function Hebcal(year, month) {
@@ -795,15 +802,15 @@ Hebcal[GregYear] = function GregYear(year, month) {
 		return arr.indexOf(val) === i; // keep unique values only
 	});
 
-	this.holidays = holidays.year(this.hebyears[0]).filter(function(h){
-		return h.date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
-			return m.month === h.date.greg()[getMonth]() + 1;
+	this.holidays = c.filter(holidays.year(this.hebyears[0]), function(h){
+		return h[0].date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+			return m.month === h[0].date.greg()[getMonth]() + 1;
 		})[length];
 	}, this);
 	if (this.hebyears[1]) {
-		this.holidays = this.holidays.concat(holidays.year(this.hebyears[1]).filter(function(h){
-			return h.date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
-				return m.month === h.date.greg()[getMonth]() + 1;
+		extend(this.holidays, c.filter(holidays.year(this.hebyears[1]), function(h){
+			return h[0].date.greg()[getFullYear]() === year && this.months.filter(function(m){ // don't keep ones that are out of bounds
+				return m.month === h[0].date.greg()[getMonth]() + 1;
 			})[length];
 		}, this));
 	}
