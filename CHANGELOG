@@ -1,4 +1,4 @@
-version 2.2.0 alpha (2014-05-12)
+version 2.2.0 alpha (2014-06-22)
 	Add Event().routine() method
 	Always set event based on years
 	Remove holidays.IGNORE_YEAR
@@ -10,6 +10,7 @@ version 2.2.0 alpha (2014-05-12)
 	Don't include entire README in package.json (NPM will do it)
 	Speed optimization for HDate().holidays()
 	Remove function names (most debuggers can figure it out)
+	Fix bug with candlelighting being one day off
 
 version 2.1.2 (2014-04-04 [5 Nisan 5774])
 	Fix sourcemap links

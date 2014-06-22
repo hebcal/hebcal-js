@@ -1908,7 +1908,7 @@ HDateProto.holidays = function(all) {
 	HDateProto[prop] = function(){
 		var me = this, hd = me.holidays(true).filter(function(h){
 			return h.is(me);
-		}, me);
+		});
 		if (hd.length) {
 			hd = c.filter(hd.map(function(h){
 				return h[prop]();
@@ -2448,10 +2448,11 @@ Event.prototype.getDesc = function(o) {
 };
 
 Event.prototype.candleLighting = function() {
+	var date = this.date.next();
 	if (this.LIGHT_CANDLES) {
-		return new Date(this.date.sunset() - (Event.candleLighting * 60 * 1000));
+		return new Date(date.sunset() - (Event.candleLighting * 60 * 1000));
 	} else if (this.LIGHT_CANDLES_TZEIS) {
-		return this.date.getZemanim().tzeit;
+		return date.getZemanim().tzeit;
 	}
 	return null;
 };

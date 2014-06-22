@@ -591,7 +591,7 @@ HDateProto.holidays = function(all) {
 	HDateProto[prop] = function(){
 		var me = this, hd = me.holidays(true).filter(function(h){
 			return h.is(me);
-		}, me);
+		});
 		if (hd.length) {
 			hd = c.filter(hd.map(function(h){
 				return h[prop]();
