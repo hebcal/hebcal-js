@@ -20,7 +20,7 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.1.2. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.2.0 alpha.
+The version documented here is 2.2.0 beta.
 
 ## Releases
 
@@ -28,7 +28,7 @@ The version documented here is 2.2.0 alpha.
 * 2.1.0 - 2014-03-16 (14 Adar 2 5774 [Purim])
 * 2.1.1 - 2014-04-04 (5 Nisan 5774)
 * 2.1.2 (current) - 2014-04-04 (5 Nisan 5774)
-* 2.2.0 (current alpha) - 2014-05-12
+* 2.2.0 (current beta) - 2014-06-23
 
 ## Contributors
 
@@ -66,7 +66,7 @@ Methods that fetch a value from this array expect one of the following strings: 
 Hebcal is not too particular about month names, and only checks up to the second letter. That means that, despite being totally incorrect, "cheese" will return the same value as "cheshvan". Month names work in both Hebrew and English.
 
 Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, Adar (1, 2).
-ניסו, אייר, סיון, תמוז, אב, אלול, תשרי, חשון, כסלב, טבת, שבט, אדר (1, 2).
+ניסן, אייר, סיון, תמוז, אב, אלול, תשרי, חשון, כסלב, טבת, שבט, אדר (1, 2).
 
 ### Sun times
 
@@ -90,7 +90,7 @@ Be forewarned: the ordering of properties/methods in this documentation is almos
 
 ## Command line interface
 
-Hebcal JS (as of v2.1) also provides a simple CLI. It's mainly for just testing output. If you really need an advanced CLI, use the [main Hebcal code](https://github.com/hebcal/hebcal/tree/master/c).
+Hebcal JS (as of v2.1) also provides a simple CLI. It's mainly for just testing output. If you really need an advanced CLI, use the [main Hebcal code](https://github.com/hebcal/hebcal).
 
 You can access this CLI by installing Hebcal JS globally from NPM:
 
@@ -139,7 +139,11 @@ Array of `Hebcal.Month`s. Is not intended to be used directly, but rather with t
 
 #### `Hebcal.prototype.holidays`
 
-Array of holidays, as `Hebcal.holidays.Event`s, for the represented year. Can be used directly. (Not actually a prototype value.)
+v2.2 and later: An object, with keys as `HDate` strings, and values are arrays of `Hebcal.holidays.Event`s. It is not recommended to use this object directly. Instead, use `HDate().holidays()` for fetching and `Hebcal().addHoliday()` for adding.
+
+BEFORE v2.2: Array of holidays, as `Hebcal.holidays.Event`s, for the represented year.
+
+Not actually a prototype value.
 
 #### `Hebcal.prototype.length`
 
@@ -366,7 +370,7 @@ masks.LIGHT_CANDLES_TZEIS = 32;
 
 A constant to be passed to both `Date` and `Hebcal.HDate` constructors. It means run this holiday every year, not just one specific year. It is automatically applied to Gregorian dates.
 
-This is **obsolete** as of Hebcal JS 2.2.0.
+This is **removed** as of Hebcal JS 2.2.0.
 
 ### `new Hebcal.holidays.Event(date, desc[, masks])`
 
@@ -814,7 +818,7 @@ Returns an object containing halachik times (zemanim) for the day. Each property
 
 * `chatzot` (calculated as sunrise + six hours)
 * `chatzot_night` (calculated as sunset + six hours)
-* `alot_hashachar` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx)) (Before v2.2.0 it was called `alot_hashacher`. The misspelling is kept for backwards capability, but will likely be removed eventually.)
+* `alot_hashachar` (calculated as when the sun is at -16.1 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/degrees.aspx)) (Before v2.2.0 it was called `alot_hashacher`. The misspelling is kept for backwards capability, but will be removed eventually.)
 * `misheyakir` (calculated as when the sun is at -11.5 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `misheyakir_machmir` (calculated as when the sun is at -10.2 degrees, as per [MyZmanim.com](http://www.myzmanim.com/read/sources.aspx))
 * `neitz_hachama` (the same as sunrise, but allows an event to be fired (added 2.1))
@@ -838,7 +842,9 @@ Return a `Date` object with the havdalah time for that day, or `null` if there i
 
 ### `Hebcal.HDate.prototype.next()`
 
-Return tomorrow. Or rather, an `HDate` representing the next day.
+Return tomorrow. Be patient, unless it's a second until sunset.
+
+Just kidding. Returns an `HDate` representing the next day.
 
 If part of a `Hebcal()` year, return the day from the year. Otherwise, return a new object. (The difference is mainly with location, and back-reference to the month/year).
 

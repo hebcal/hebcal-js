@@ -1,5 +1,6 @@
-version 2.2.0 alpha (2014-06-22)
+version 2.2.0 beta (2014-06-23)
 	Add Event().routine() method
+	Default HDate().holidays() to not return routine events
 	Always set event based on years
 	Remove holidays.IGNORE_YEAR
 	Fix bug with giving a name to HDate().setMonth()
@@ -8,6 +9,7 @@ version 2.2.0 alpha (2014-06-22)
 	Add Month().molad()
 	Change names of internal methods to be shorter
 	Don't include entire README in package.json (NPM will do it)
+	Change Hebcal().holidays to an object instead of array
 	Speed optimization for HDate().holidays()
 	Remove function names (most debuggers can figure it out)
 	Fix bug with candlelighting being one day off
