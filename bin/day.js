@@ -135,17 +135,16 @@ module.exports = function(opts) {
 
 	if (opts.candles) {
 		(function(){
-			var h = day.holidays(),
-				candles = Hebcal.filter(h.map(function(h){return h.candleLighting()}), true),
-				havdalah = Hebcal.filter(h.map(function(h){return h.havdalah()}), true),
+			var candles = day.candleLighting(),
+				havdalah = day.havdalah(),
 				tmp;
 
-			if (candles.length) {
-				tmp = candles[0].toTimeString();
+			if (candles) {
+				tmp = candles.toTimeString();
 				echo.candles = 'Candle Lighting: ' + tmp.slice(0, tmp.indexOf('(') - 1);
 			}
-			if (havdalah.length) {
-				tmp = havdalah[0].toTimeString();
+			if (havdalah) {
+				tmp = havdalah.toTimeString();
 				echo.havdalah = 'Havdalah: ' + tmp.slice(0, tmp.indexOf('(') - 1);
 			}
 		})();
