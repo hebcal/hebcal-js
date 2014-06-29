@@ -13,6 +13,7 @@ version 2.2.0 beta (2014-06-23)
 	Speed optimization for HDate().holidays()
 	Remove function names (most debuggers can figure it out)
 	Fix bug with candlelighting being one day off
+	Don't automatically move day after sunset (was causing too many issues)
 
 version 2.1.2 (2014-04-04 [5 Nisan 5774])
 	Fix sourcemap links

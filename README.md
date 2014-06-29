@@ -639,7 +639,8 @@ var day = new Hebcal.HDate();`
 
 If 1 argument is passed:
 
-* Gregorian `Date`: An `HDate` object representing that date. If the date is after sunset, it is the next day.
+* Gregorian `Date`: An `HDate` object representing that date.
+  * Before v2.2: If the date is after sunset, it is the next day.
 * `HDate`: Clone the object.
 * String: Split the string by whitespace, and parse that.
 * Number: Number of days since December 31, 1 BCE.

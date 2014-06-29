@@ -916,9 +916,9 @@ function HDate(day, month, year) {
 			} else if (day instanceof Date) {
 				// we were passed a Gregorian date, so convert it
 				var d = abs2hebrew(greg.greg2abs(day));
-				if (d.sunset() < day) {
+				/*if (d.sunset() < day) {
 					d = d.next();
-				}
+				}*/
 				return d;
 			} else if (day instanceof HDate) {
 				var d = new HDate(day[getDate](), day[getMonth](), day[getFullYear]());
