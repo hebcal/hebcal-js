@@ -1,4 +1,4 @@
-version 2.2.0 beta (2014-06-23)
+version 2.2.0 (2014-06-29 [1 Tamuz 5774])
 	Add Event().routine() method
 	Default HDate().holidays() to not return routine events
 	Always set event based on years

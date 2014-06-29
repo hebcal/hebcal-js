@@ -20,15 +20,15 @@ $ npm install hebcal
 Hebcal JS is currently at version 2.1.2. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.2.0 beta.
+The version documented here is 2.2.0.
 
 ## Releases
 
 * 2.0.0 - 2014-02-18 (19 Adar 1 5774)
 * 2.1.0 - 2014-03-16 (14 Adar 2 5774 [Purim])
 * 2.1.1 - 2014-04-04 (5 Nisan 5774)
-* 2.1.2 (current) - 2014-04-04 (5 Nisan 5774)
-* 2.2.0 (current beta) - 2014-06-23
+* 2.1.2 - 2014-04-04 (5 Nisan 5774)
+* 2.2.0 (current) - 2014-06-29 (1 Tamuz 5774)
 
 ## Contributors
 
