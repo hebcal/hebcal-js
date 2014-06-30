@@ -134,7 +134,7 @@ exports.nearest = function(lat, lon) {
 	}
 
 	return listCities().map(function(city){
-		var i = getCity(city);
+		var i = cities[city];
 		return {
 			name: city,
 			dist: Math.sqrt( Math.pow(Math.abs(i[0] - lat), 2) + Math.pow(Math.abs(i[1] - lon), 2) )
