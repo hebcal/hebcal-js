@@ -1883,7 +1883,7 @@ HDateProto.getSedra = (function(){
 HDateProto.getParsha = HDateProto.getSedra;
 
 HDateProto.holidays = function(all) {
-	var me = this, days = me[getYearObject]().holidays[me];
+	var me = this, days = me.getMonthObject().holidays[me];
 	return days ? days.filter(function(h){
 		return all ? true : !h.routine() && h.is(me);
 	})[map](function(h){

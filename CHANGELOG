@@ -1,3 +1,6 @@
+version 2.2.1 alpha (2014-06-30)
+	Major speed optimization for HDate().holidays()
+
 version 2.2.0 (2014-06-29 [1 Tamuz 5774])
 	Add Event().routine() method
 	Default HDate().holidays() to not return routine events
