@@ -57,7 +57,7 @@ This is where every property and method is listed.
 
 ### Descriptions
 
-Sometimes a "description array" will be mentioned. This is an array with between 1 and 3 properties: `[Sfardit pronounciation[, Ashkenazis pronounciation[, Hebrew spelling]]]`.
+Sometimes a "description array" will be mentioned. This is an array with between 1 and 3 properties: `[Sfardit pronunciation[, Ashkenazis pronunciation[, Hebrew spelling]]]`.
 
 Methods that fetch a value from this array expect one of the following strings: "a" for Ashkenazis, "h", for Hebrew, and anything else for Sfardit.
 
