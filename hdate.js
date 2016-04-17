@@ -418,11 +418,11 @@ HDate.addZeman = function(zeman, func) {
 };
 
 prototype.next = function() {
-	return abs2hebrew(this.abs() + 1);
+	return abs2hebrew(this.abs() + 1).setLocation(this.lat, this.long);
 };
 
 prototype.prev = function() {
-	return abs2hebrew(this.abs() - 1);
+	return abs2hebrew(this.abs() - 1).setLocation(this.lat, this.long);
 };
 
 prototype.isSameDate = function(other) {
