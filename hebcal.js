@@ -210,8 +210,11 @@ HebcalProto.addHoliday = function(holiday) {
 };
 
 HebcalProto.findParsha = function(parsha, o) {
+	var langs = o ? [o] : ['s','a','h']; // FIXME: abstract this away somewhere
 	var days = this.filter(function(d){
-		return d.getSedra(o).indexOf(parsha) + 1;
+		return Math.max.apply(null, langs.map(function(l){
+			return d.getSedra(l).indexOf(parsha) + 1;
+		}));
 	});
 	return days[days[length] - 1];
 };

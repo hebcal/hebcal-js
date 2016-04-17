@@ -303,12 +303,12 @@ Sedra.prototype.get = function(hDate) {
 function abs(year, absDate) {
 
 	// find the first saturday on or after today's date
-	var absDate = c.dayOnOrBefore(6, absDate + 6);
-	
+	absDate = c.dayOnOrBefore(6, absDate + 6);
+
 	var weekNum = (absDate - year.first_saturday) / 7;
 	var index = year.theSedraArray[weekNum];
-	
-	if (undefined == index) {
+
+	if (undefined === index) {
 		return abs(new Sedra(year.year + 1, year.il), absDate); // must be next year
 	}
 	if (typeof index == 'object') {
@@ -318,9 +318,9 @@ function abs(year, absDate) {
 	if (index >= 0) {
 		return [parshiot[index]];
 	}
-	
+
 	index = D(index); // undouble the parsha
 	return [parshiot[index], parshiot[index + 1]];
-};
+}
 
 module.exports = Sedra;
