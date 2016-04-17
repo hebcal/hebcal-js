@@ -726,6 +726,9 @@ HDateProto.hallel = (function() {
 		refreshInterval = ms;
 		if (ms) {
 			refresh = setInterval(checkTimes, ms);
+			if (refresh.unref) {
+				refresh.unref(); // don't keep the process open
+			}
 		}
 	}));
 
