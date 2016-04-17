@@ -17,10 +17,10 @@ $ npm install hebcal
 
 ...and include Hebcal with `var Hebcal = require('hebcal');`
 
-Hebcal JS is currently at version 2.1.2. It is approximately equivalent to Hebcal C 3.15.
+Hebcal JS is currently at version 2.2.1. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.2.0.
+The version documented here is 2.2.1.
 
 ## Releases
 
@@ -28,11 +28,12 @@ The version documented here is 2.2.0.
 * 2.1.0 - 2014-03-16 (14 Adar 2 5774 [Purim])
 * 2.1.1 - 2014-04-04 (5 Nisan 5774)
 * 2.1.2 - 2014-04-04 (5 Nisan 5774)
-* 2.2.0 (current) - 2014-06-29 (1 Tamuz 5774)
+* 2.2.0 - 2014-06-29 (1 Tamuz 5774)
+* 2.2.1 - 2016-04-17 (9 Nisan 5776)
 
 ## Contributors
 
-Hebcal JS was ported from C by Eyal Schachter.
+Hebcal JS was ported from C by Eyal Schachter (Scimonster).
 
 The original C and JavaScript code was written by Danny Sadinoff, with contributions by Michael J. Radwin.
 
@@ -251,6 +252,8 @@ See `Hebcal.holidays` for more information on creating an event.
 #### `Hebcal.prototype.findSedra(parsha, o)`
 
 Find the Shabbat on which a given parsha is read. The parsha name (first argument) should correspond to the language string ('s', 'a', or 'h') in the second argument. If no second argument is provided, the parsha should be in Sfardit.
+
+As of v2.2.1, the language string is ignored and checks all languages by default.
 
 This method was added in v2.1.
 
@@ -1286,4 +1289,4 @@ A shortcut for `month.days.map(mapFunc, [thisArg])`.
 
 That's it! You now know everything there is to know about Hebcal JavaScript! Good luck with whatever you choose to do with it!
 
-If you have any other requests for features, drop me an issue or even a pull request.
+If you have any other requests for features, just create an issue or even a pull request.

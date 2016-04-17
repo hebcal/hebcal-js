@@ -157,10 +157,12 @@ function fixMonth(date) {
 	}
 	if (date.month < 1) {
 		date.month += MONTH_CNT(date.year);
+		date.year -= 1;
 		fix(date);
 	}
 	if (date.month > MONTH_CNT(date.year)) {
 		date.month -= MONTH_CNT(date.year);
+		date.year += 1;
 		fix(date);
 	}
 }
@@ -178,7 +180,8 @@ prototype[getMonth] = function() {
 };
 
 prototype.getTishreiMonth = function() {
-	return (this[getMonth]() + MONTH_CNT(this[getFullYear]()) - 6) % MONTH_CNT(this[getFullYear]());
+	var nummonths = MONTH_CNT(this[getFullYear]());
+	return (this[getMonth]() + nummonths - 6) % nummonths || nummonths;
 };
 
 prototype.daysInMonth = function() {
@@ -221,7 +224,7 @@ prototype.setDate = function(date) {
    Gregorian date Sunday, December 31, 1 BC. */
 function hebrew2abs(d) {
 	var m, tempabs = d[getDate](), year = d[getFullYear]();
-	
+
 	if (d[getMonth]() < TISHREI) {
 		for (m = TISHREI; m <= MONTH_CNT(year); m++) {
 			tempabs += daysInMonth(m, year);
@@ -235,7 +238,7 @@ function hebrew2abs(d) {
 			tempabs += daysInMonth(m, year);
 		}
 	}
-	
+
 	return c.hebElapsedDays(year) - 1373429 + tempabs;
 }
 
@@ -248,10 +251,10 @@ function abs2hebrew(d) {
 	if (d >= 10555144) {
 		throw new RangeError("parameter to abs2hebrew " + d + " out of range");
 	}
-	
+
 	gregdate = greg.abs2greg(d);
 	hebdate = new HDate(1, TISHREI, (year = 3760 + gregdate[getFullYear]()));
-	
+
 	while (d >= hebrew2abs(hebdate.setFullYear(year + 1))) {
 		year++;
 	}
@@ -417,11 +420,11 @@ HDate.addZeman = function(zeman, func) {
 };
 
 prototype.next = function() {
-	return abs2hebrew(this.abs() + 1);
+	return abs2hebrew(this.abs() + 1).setLocation(this.lat, this.long);
 };
 
 prototype.prev = function() {
-	return abs2hebrew(this.abs() - 1);
+	return abs2hebrew(this.abs() - 1).setLocation(this.lat, this.long);
 };
 
 prototype.isSameDate = function(other) {

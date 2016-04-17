@@ -209,9 +209,12 @@ HebcalProto.addHoliday = function(holiday) {
 	return this;
 };
 
-HebcalProto.findParsha = function(parsha, o) {
+HebcalProto.findParsha = function(parsha) {
+	var langs = o ? [o] : ['s','a','h']; // FIXME: abstract this away somewhere
 	var days = this.filter(function(d){
-		return d.getSedra(o).indexOf(parsha) + 1;
+		return Math.max.apply(null, langs.map(function(l){
+			return d.getSedra(l).indexOf(parsha) + 1;
+		}));
 	});
 	return days[days[length] - 1];
 };
@@ -723,6 +726,9 @@ HDateProto.hallel = (function() {
 		refreshInterval = ms;
 		if (ms) {
 			refresh = setInterval(checkTimes, ms);
+			if (refresh.unref) {
+				refresh.unref(); // don't keep the process open
+			}
 		}
 	}));
 
