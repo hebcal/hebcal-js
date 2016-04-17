@@ -1,3 +1,10 @@
+version 2.2.1 (2016-04-17 [9 Nisan 5776])
+	Copy lat and long properties when using HDate().next() and prev()
+	Make Hebcal().findParsha() not care about spelling format
+	Fix HDate().getTishreiMonth() returning 0 in Elul
+	HDate().setMonth() will wrap the year
+	Tell Node not to keep the process open while listening for events
+
 version 2.2.0 (2014-06-29 [1 Tamuz 5774])
 	Add Event().routine() method
 	Default HDate().holidays() to not return routine events

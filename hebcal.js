@@ -209,7 +209,7 @@ HebcalProto.addHoliday = function(holiday) {
 	return this;
 };
 
-HebcalProto.findParsha = function(parsha, o) {
+HebcalProto.findParsha = function(parsha) {
 	var langs = o ? [o] : ['s','a','h']; // FIXME: abstract this away somewhere
 	var days = this.filter(function(d){
 		return Math.max.apply(null, langs.map(function(l){
