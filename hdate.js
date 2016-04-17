@@ -157,10 +157,12 @@ function fixMonth(date) {
 	}
 	if (date.month < 1) {
 		date.month += MONTH_CNT(date.year);
+		date.year -= 1;
 		fix(date);
 	}
 	if (date.month > MONTH_CNT(date.year)) {
 		date.month -= MONTH_CNT(date.year);
+		date.year += 1;
 		fix(date);
 	}
 }
