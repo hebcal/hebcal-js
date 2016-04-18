@@ -1,3 +1,6 @@
+version 2.2.1.1 (2016-04-18 [10 Nisan 5776])
+	Fix little bug caused by last-minute change breaking findParsha()
+
 version 2.2.1 (2016-04-17 [9 Nisan 5776])
 	Copy lat and long properties when using HDate().next() and prev()
 	Make Hebcal().findParsha() not care about spelling format
