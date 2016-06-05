@@ -215,4 +215,4 @@ try {
 		throw e;
 	}
 }
-process.kill();
+process.exit();
