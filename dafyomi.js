@@ -59,7 +59,7 @@ var shas = [
 	[ "Shevuot",        "Shevuos",          "שבועות",        49  ],
 	[ "Avodah Zarah",   0,                  "עבודה זרה",     76  ],
 	[ "Horayot",        "Horayos",          "הוריות",         14  ],
-	[ "Zevachim",       0,                  "זבכים",         120 ],
+	[ "Zevachim",       0,                  "זבחים",         120 ],
 	[ "Menachot",       "Menachos",         "מנחות",         110 ],
 	[ "Chullin",        0,                  "חולין",          142 ],
 	[ "Bechorot",       "Bechoros",         "בכורות",         61  ],
