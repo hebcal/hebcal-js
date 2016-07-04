@@ -145,7 +145,7 @@ module.exports = function(opts) {
 				}
 				if (day.hallel && day.hallel.val == 0) {
 					delete day.hallel;
-				}	
+				}
 			}
 			var e = '';
 			for (i in day) {
@@ -207,5 +207,5 @@ if (main) {
 			throw e;
 		}
 	}
-	process.kill();
+	process.exit();
 }

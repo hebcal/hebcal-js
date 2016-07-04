@@ -187,5 +187,5 @@ if (main) {
 			throw e;
 		}
 	}
-	process.kill();
+	process.exit();
 }
