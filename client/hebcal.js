@@ -659,7 +659,7 @@ var shas = [
 	[ "Temurah",        0,                  "תמורה",         34  ],
 	[ "Keritot",        "Kerisos",          "כריתות",         28  ],
 	[ "Meilah",         0,                  "מעילה",         22  ],
-	[ "Kinnim",         0,                  "כינים",          4   ],
+	[ "Kinnim",         0,                  "קנים",          4   ],
 	[ "Tamid",          0,                  "תמיד",          10  ],
 	[ "Midot",          "Midos",            "מידות",          4   ],
 	[ "Niddah",         0,                  "נידה",           73  ]
@@ -686,7 +686,7 @@ exports.dafyomi = function(gregdate) {
 		dno = (cday - nsday) % 2711;
 	} else { // old cycle
 		cno = 1 + ( (cday - osday) / 2702 );
-		dno = (cday - osday) / 2702;
+		dno = (cday - osday) % 2702;
 	}
 
 	// Find the daf taking note that the cycle changed slightly after cycle 7.
