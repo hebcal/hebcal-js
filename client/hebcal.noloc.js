@@ -1,4 +1,4 @@
-;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -577,7 +577,7 @@ exports.range = function(start, end, step) {
 	}
 	return arr;
 };
-},{"gematriya":9}],4:[function(require,module,exports){
+},{"gematriya":10}],4:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -639,7 +639,7 @@ var shas = [
 	[ "Shevuot",        "Shevuos",          "שבועות",        49  ],
 	[ "Avodah Zarah",   0,                  "עבודה זרה",     76  ],
 	[ "Horayot",        "Horayos",          "הוריות",         14  ],
-	[ "Zevachim",       0,                  "זבכים",         120 ],
+	[ "Zevachim",       0,                  "זבחים",         120 ],
 	[ "Menachot",       "Menachos",         "מנחות",         110 ],
 	[ "Chullin",        0,                  "חולין",          142 ],
 	[ "Bechorot",       "Bechoros",         "בכורות",         61  ],
@@ -722,7 +722,7 @@ exports.dafyomi = function(gregdate) {
 exports.dafname = function(daf, o) {
 	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? gematriya(daf.blatt) : daf.blatt);
 };
-},{"./common":3,"./greg":5,"gematriya":9}],5:[function(require,module,exports){
+},{"./common":3,"./greg":5,"gematriya":10}],5:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -1000,10 +1000,12 @@ function fixMonth(date) {
 	}
 	if (date.month < 1) {
 		date.month += MONTH_CNT(date.year);
+		date.year -= 1;
 		fix(date);
 	}
 	if (date.month > MONTH_CNT(date.year)) {
 		date.month -= MONTH_CNT(date.year);
+		date.year += 1;
 		fix(date);
 	}
 }
@@ -1021,7 +1023,8 @@ prototype[getMonth] = function() {
 };
 
 prototype.getTishreiMonth = function() {
-	return (this[getMonth]() + MONTH_CNT(this[getFullYear]()) - 6) % MONTH_CNT(this[getFullYear]());
+	var nummonths = MONTH_CNT(this[getFullYear]());
+	return (this[getMonth]() + nummonths - 6) % nummonths || nummonths;
 };
 
 prototype.daysInMonth = function() {
@@ -1064,7 +1067,7 @@ prototype.setDate = function(date) {
    Gregorian date Sunday, December 31, 1 BC. */
 function hebrew2abs(d) {
 	var m, tempabs = d[getDate](), year = d[getFullYear]();
-	
+
 	if (d[getMonth]() < TISHREI) {
 		for (m = TISHREI; m <= MONTH_CNT(year); m++) {
 			tempabs += daysInMonth(m, year);
@@ -1078,7 +1081,7 @@ function hebrew2abs(d) {
 			tempabs += daysInMonth(m, year);
 		}
 	}
-	
+
 	return c.hebElapsedDays(year) - 1373429 + tempabs;
 }
 
@@ -1091,10 +1094,10 @@ function abs2hebrew(d) {
 	if (d >= 10555144) {
 		throw new RangeError("parameter to abs2hebrew " + d + " out of range");
 	}
-	
+
 	gregdate = greg.abs2greg(d);
 	hebdate = new HDate(1, TISHREI, (year = 3760 + gregdate[getFullYear]()));
-	
+
 	while (d >= hebrew2abs(hebdate.setFullYear(year + 1))) {
 		year++;
 	}
@@ -1260,11 +1263,11 @@ HDate.addZeman = function(zeman, func) {
 };
 
 prototype.next = function() {
-	return abs2hebrew(this.abs() + 1);
+	return abs2hebrew(this.abs() + 1).setLocation(this.lat, this.long);
 };
 
 prototype.prev = function() {
-	return abs2hebrew(this.abs() - 1);
+	return abs2hebrew(this.abs() - 1).setLocation(this.lat, this.long);
 };
 
 prototype.isSameDate = function(other) {
@@ -1302,7 +1305,8 @@ prototype.after = function(day) {
 };
 
 module.exports = HDate;
-},{"./cities":1,"./common":3,"./greg":5,"gematriya":9,"suncalc":10}],7:[function(require,module,exports){
+
+},{"./cities":1,"./common":3,"./greg":5,"gematriya":10,"suncalc":11}],7:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -1515,8 +1519,11 @@ HebcalProto.addHoliday = function(holiday) {
 };
 
 HebcalProto.findParsha = function(parsha, o) {
+	var langs = o ? [o] : ['s','a','h']; // FIXME: abstract this away somewhere
 	var days = this.filter(function(d){
-		return d.getSedra(o).indexOf(parsha) + 1;
+		return Math.max.apply(null, langs.map(function(l){
+			return d.getSedra(l).indexOf(parsha) + 1;
+		}));
 	});
 	return days[days[length] - 1];
 };
@@ -2028,6 +2035,9 @@ HDateProto.hallel = (function() {
 		refreshInterval = ms;
 		if (ms) {
 			refresh = setInterval(checkTimes, ms);
+			if (refresh.unref) {
+				refresh.unref(); // don't keep the process open
+			}
 		}
 	}));
 
@@ -2310,7 +2320,7 @@ HDateProto.getGregYearObject = function() {
 
 module.exports = Hebcal;
 
-},{"./cities":1,"./common":3,"./dafyomi":4,"./greg":5,"./hdate":6,"./holidays":8,"./sedra":11,"events":12,"gematriya":9}],8:[function(require,module,exports){
+},{"./cities":1,"./common":3,"./dafyomi":4,"./greg":5,"./hdate":6,"./holidays":8,"./sedra":12,"events":9,"gematriya":10}],8:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -2915,7 +2925,311 @@ function atzmaut(year) {
 }
 exports.atzmaut = atzmaut;
 
-},{"./common":3,"./hdate":6,"gematriya":9}],9:[function(require,module,exports){
+},{"./common":3,"./hdate":6,"gematriya":10}],9:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],10:[function(require,module,exports){
 /*
  * Convert numbers to gematriya representation, and vice-versa.
  *
@@ -2993,7 +3307,7 @@ exports.atzmaut = atzmaut;
 
 		num = num.map(function g(n,i){
 			if (str) {
-				return numbers[n] < numbers[num[i - 1]] && numbers[n] < 100 ? numbers[n] * 1000 : numbers[n];
+				return limit && numbers[n] < numbers[num[i - 1]] && numbers[n] < 100 ? numbers[n] * 1000 : numbers[n];
 			} else {
 				if (parseInt(n, 10) * Math.pow(10, i) > 1000) {
 					return g(n, i-3);
@@ -3025,14 +3339,15 @@ exports.atzmaut = atzmaut;
 		window.gematriya = gematriya;
 	}
 })();
-},{}],10:[function(require,module,exports){
+
+},{}],11:[function(require,module,exports){
 /*
- (c) 2011-2014, Vladimir Agafonkin
- SunCalc is a JavaScript library for calculating sun/mooon position and light phases.
+ (c) 2011-2015, Vladimir Agafonkin
+ SunCalc is a JavaScript library for calculating sun/moon position and light phases.
  https://github.com/mourner/suncalc
 */
 
-(function () { "use strict";
+(function () { 'use strict';
 
 // shortcuts for easier to read formulas
 
@@ -3054,59 +3369,52 @@ var dayMs = 1000 * 60 * 60 * 24,
     J1970 = 2440588,
     J2000 = 2451545;
 
-function toJulian(date) {
-    return date.valueOf() / dayMs - 0.5 + J1970;
-}
-function fromJulian(j) {
-    return new Date((j + 0.5 - J1970) * dayMs);
-}
-function toDays(date) {
-    return toJulian(date) - J2000;
-}
+function toJulian(date) { return date.valueOf() / dayMs - 0.5 + J1970; }
+function fromJulian(j)  { return new Date((j + 0.5 - J1970) * dayMs); }
+function toDays(date)   { return toJulian(date) - J2000; }
 
 
 // general calculations for position
 
 var e = rad * 23.4397; // obliquity of the Earth
 
-function getRightAscension(l, b) {
-    return atan(sin(l) * cos(e) - tan(b) * sin(e), cos(l));
-}
-function getDeclination(l, b) {
-    return asin(sin(b) * cos(e) + cos(b) * sin(e) * sin(l));
-}
-function getAzimuth(H, phi, dec) {
-    return atan(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi));
-}
-function getAltitude(H, phi, dec) {
-    return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H));
-}
-function getSiderealTime(d, lw) {
-    return rad * (280.16 + 360.9856235 * d) - lw;
-}
+function rightAscension(l, b) { return atan(sin(l) * cos(e) - tan(b) * sin(e), cos(l)); }
+function declination(l, b)    { return asin(sin(b) * cos(e) + cos(b) * sin(e) * sin(l)); }
 
+function azimuth(H, phi, dec)  { return atan(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi)); }
+function altitude(H, phi, dec) { return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H)); }
+
+function siderealTime(d, lw) { return rad * (280.16 + 360.9856235 * d) - lw; }
+
+function astroRefraction(h) {
+    if (h < 0) // the following formula works for positive altitudes only.
+        h = 0; // if h = -0.08901179 a div/0 would occur.
+
+    // formula 16.4 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
+    // 1.02 / tan(h + 10.26 / (h + 5.10)) h in degrees, result in arc minutes -> converted to rad:
+    return 0.0002967 / Math.tan(h + 0.00312536 / (h + 0.08901179));
+}
 
 // general sun calculations
 
-function getSolarMeanAnomaly(d) {
-    return rad * (357.5291 + 0.98560028 * d);
-}
-function getEquationOfCenter(M) {
-    return rad * (1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M));
-}
-function getEclipticLongitude(M, C) {
-    var P = rad * 102.9372; // perihelion of the Earth
+function solarMeanAnomaly(d) { return rad * (357.5291 + 0.98560028 * d); }
+
+function eclipticLongitude(M) {
+
+    var C = rad * (1.9148 * sin(M) + 0.02 * sin(2 * M) + 0.0003 * sin(3 * M)), // equation of center
+        P = rad * 102.9372; // perihelion of the Earth
+
     return M + C + P + PI;
 }
-function getSunCoords(d) {
 
-    var M = getSolarMeanAnomaly(d),
-        C = getEquationOfCenter(M),
-        L = getEclipticLongitude(M, C);
+function sunCoords(d) {
+
+    var M = solarMeanAnomaly(d),
+        L = eclipticLongitude(M);
 
     return {
-        dec: getDeclination(L, 0),
-        ra: getRightAscension(L, 0)
+        dec: declination(L, 0),
+        ra: rightAscension(L, 0)
     };
 }
 
@@ -3122,25 +3430,25 @@ SunCalc.getPosition = function (date, lat, lng) {
         phi = rad * lat,
         d   = toDays(date),
 
-        c  = getSunCoords(d),
-        H  = getSiderealTime(d, lw) - c.ra;
+        c  = sunCoords(d),
+        H  = siderealTime(d, lw) - c.ra;
 
     return {
-        azimuth: getAzimuth(H, phi, c.dec),
-        altitude: getAltitude(H, phi, c.dec)
+        azimuth: azimuth(H, phi, c.dec),
+        altitude: altitude(H, phi, c.dec)
     };
 };
 
 
 // sun times configuration (angle, morning name, evening name)
 
-var times = [
-    [-0.83, 'sunrise',       'sunset'      ],
-    [ -0.3, 'sunriseEnd',    'sunsetStart' ],
-    [   -6, 'dawn',          'dusk'        ],
-    [  -12, 'nauticalDawn',  'nauticalDusk'],
-    [  -18, 'nightEnd',      'night'       ],
-    [    6, 'goldenHourEnd', 'goldenHour'  ]
+var times = SunCalc.times = [
+    [-0.833, 'sunrise',       'sunset'      ],
+    [  -0.3, 'sunriseEnd',    'sunsetStart' ],
+    [    -6, 'dawn',          'dusk'        ],
+    [   -12, 'nauticalDawn',  'nauticalDusk'],
+    [   -18, 'nightEnd',      'night'       ],
+    [     6, 'goldenHourEnd', 'goldenHour'  ]
 ];
 
 // adds a custom time to the times config
@@ -3154,17 +3462,19 @@ SunCalc.addTime = function (angle, riseName, setName) {
 
 var J0 = 0.0009;
 
-function getJulianCycle(d, lw) {
-    return Math.round(d - J0 - lw / (2 * PI));
-}
-function getApproxTransit(Ht, lw, n) {
-    return J0 + (Ht + lw) / (2 * PI) + n;
-}
-function getSolarTransitJ(ds, M, L) {
-    return J2000 + ds + 0.0053 * sin(M) - 0.0069 * sin(2 * L);
-}
-function getHourAngle(h, phi, d) {
-    return acos((sin(h) - sin(phi) * sin(d)) / (cos(phi) * cos(d)));
+function julianCycle(d, lw) { return Math.round(d - J0 - lw / (2 * PI)); }
+
+function approxTransit(Ht, lw, n) { return J0 + (Ht + lw) / (2 * PI) + n; }
+function solarTransitJ(ds, M, L)  { return J2000 + ds + 0.0053 * sin(M) - 0.0069 * sin(2 * L); }
+
+function hourAngle(h, phi, d) { return acos((sin(h) - sin(phi) * sin(d)) / (cos(phi) * cos(d))); }
+
+// returns set time for the given sun altitude
+function getSetJ(h, lw, phi, dec, n, M, L) {
+
+    var w = hourAngle(h, phi, dec),
+        a = approxTransit(w, lw, n);
+    return solarTransitJ(a, M, L);
 }
 
 
@@ -3172,29 +3482,20 @@ function getHourAngle(h, phi, d) {
 
 SunCalc.getTimes = function (date, lat, lng) {
 
-    var lw  = rad * -lng,
+    var lw = rad * -lng,
         phi = rad * lat,
-        d   = toDays(date),
 
-        n  = getJulianCycle(d, lw),
-        ds = getApproxTransit(0, lw, n),
+        d = toDays(date),
+        n = julianCycle(d, lw),
+        ds = approxTransit(0, lw, n),
 
-        M = getSolarMeanAnomaly(ds),
-        C = getEquationOfCenter(M),
-        L = getEclipticLongitude(M, C),
+        M = solarMeanAnomaly(ds),
+        L = eclipticLongitude(M),
+        dec = declination(L, 0),
 
-        dec = getDeclination(L, 0),
+        Jnoon = solarTransitJ(ds, M, L),
 
-        Jnoon = getSolarTransitJ(ds, M, L);
-
-
-    // returns set time for the given sun altitude
-    function getSetJ(h) {
-        var w = getHourAngle(h, phi, dec),
-            a = getApproxTransit(w, lw, n);
-
-        return getSolarTransitJ(a, M, L);
-    }
+        i, len, time, Jset, Jrise;
 
 
     var result = {
@@ -3202,12 +3503,10 @@ SunCalc.getTimes = function (date, lat, lng) {
         nadir: fromJulian(Jnoon - 0.5)
     };
 
-    var i, len, time, angle, morningName, eveningName, Jset, Jrise;
-
     for (i = 0, len = times.length; i < len; i += 1) {
         time = times[i];
 
-        Jset = getSetJ(time[0] * rad);
+        Jset = getSetJ(time[0] * rad, lw, phi, dec, n, M, L);
         Jrise = Jnoon - (Jset - Jnoon);
 
         result[time[1]] = fromJulian(Jrise);
@@ -3220,7 +3519,7 @@ SunCalc.getTimes = function (date, lat, lng) {
 
 // moon calculations, based on http://aa.quae.nl/en/reken/hemelpositie.html formulas
 
-function getMoonCoords(d) { // geocentric ecliptic coordinates of the moon
+function moonCoords(d) { // geocentric ecliptic coordinates of the moon
 
     var L = rad * (218.316 + 13.176396 * d), // ecliptic longitude
         M = rad * (134.963 + 13.064993 * d), // mean anomaly
@@ -3231,8 +3530,8 @@ function getMoonCoords(d) { // geocentric ecliptic coordinates of the moon
         dt = 385001 - 20905 * cos(M);  // distance to the moon in km
 
     return {
-        ra: getRightAscension(l, b),
-        dec: getDeclination(l, b),
+        ra: rightAscension(l, b),
+        dec: declination(l, b),
         dist: dt
     };
 }
@@ -3243,38 +3542,39 @@ SunCalc.getMoonPosition = function (date, lat, lng) {
         phi = rad * lat,
         d   = toDays(date),
 
-        c = getMoonCoords(d),
-        H = getSiderealTime(d, lw) - c.ra,
-        h = getAltitude(H, phi, c.dec);
+        c = moonCoords(d),
+        H = siderealTime(d, lw) - c.ra,
+        h = altitude(H, phi, c.dec),
+        // formula 14.1 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
+        pa = atan(sin(H), tan(phi) * cos(c.dec) - sin(c.dec) * cos(H));
 
-    // altitude correction for refraction
-    h = h + rad * 0.017 / tan(h + rad * 10.26 / (h + rad * 5.10));
+    h = h + astroRefraction(h); // altitude correction for refraction
 
     return {
-        azimuth: getAzimuth(H, phi, c.dec),
+        azimuth: azimuth(H, phi, c.dec),
         altitude: h,
-        distance: c.dist
+        distance: c.dist,
+        parallacticAngle: pa
     };
 };
 
 
 // calculations for illumination parameters of the moon,
 // based on http://idlastro.gsfc.nasa.gov/ftp/pro/astro/mphase.pro formulas and
-// Chapter 48 of "Astronomical Algorithms" 2nd edition by Jean Meeus
-// (Willmann-Bell, Richmond) 1998.
+// Chapter 48 of "Astronomical Algorithms" 2nd edition by Jean Meeus (Willmann-Bell, Richmond) 1998.
 
 SunCalc.getMoonIllumination = function (date) {
 
-    var d = toDays(date),
-        s = getSunCoords(d),
-        m = getMoonCoords(d),
+    var d = toDays(date || new Date()),
+        s = sunCoords(d),
+        m = moonCoords(d),
 
         sdist = 149598000, // distance from Earth to Sun in km
 
         phi = acos(sin(s.dec) * sin(m.dec) + cos(s.dec) * cos(m.dec) * cos(s.ra - m.ra)),
         inc = atan(sdist * sin(phi), m.dist - sdist * cos(phi)),
         angle = atan(cos(s.dec) * sin(s.ra - m.ra), sin(s.dec) * cos(m.dec) -
-               cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra));
+                cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra));
 
     return {
         fraction: (1 + cos(inc)) / 2,
@@ -3284,19 +3584,75 @@ SunCalc.getMoonIllumination = function (date) {
 };
 
 
-// export as AMD module / Node module / browser variable
-
-if (typeof define === 'function' && define.amd) {
-    define(SunCalc);
-} else if (typeof module !== 'undefined') {
-    module.exports = SunCalc;
-} else {
-    window.SunCalc = SunCalc;
+function hoursLater(date, h) {
+    return new Date(date.valueOf() + h * dayMs / 24);
 }
+
+// calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
+
+SunCalc.getMoonTimes = function (date, lat, lng, inUTC) {
+    var t = new Date(date);
+    if (inUTC) t.setUTCHours(0, 0, 0, 0);
+    else t.setHours(0, 0, 0, 0);
+
+    var hc = 0.133 * rad,
+        h0 = SunCalc.getMoonPosition(t, lat, lng).altitude - hc,
+        h1, h2, rise, set, a, b, xe, ye, d, roots, x1, x2, dx;
+
+    // go in 2-hour chunks, each time seeing if a 3-point quadratic curve crosses zero (which means rise or set)
+    for (var i = 1; i <= 24; i += 2) {
+        h1 = SunCalc.getMoonPosition(hoursLater(t, i), lat, lng).altitude - hc;
+        h2 = SunCalc.getMoonPosition(hoursLater(t, i + 1), lat, lng).altitude - hc;
+
+        a = (h0 + h2) / 2 - h1;
+        b = (h2 - h0) / 2;
+        xe = -b / (2 * a);
+        ye = (a * xe + b) * xe + h1;
+        d = b * b - 4 * a * h1;
+        roots = 0;
+
+        if (d >= 0) {
+            dx = Math.sqrt(d) / (Math.abs(a) * 2);
+            x1 = xe - dx;
+            x2 = xe + dx;
+            if (Math.abs(x1) <= 1) roots++;
+            if (Math.abs(x2) <= 1) roots++;
+            if (x1 < -1) x1 = x2;
+        }
+
+        if (roots === 1) {
+            if (h0 < 0) rise = i + x1;
+            else set = i + x1;
+
+        } else if (roots === 2) {
+            rise = i + (ye < 0 ? x2 : x1);
+            set = i + (ye < 0 ? x1 : x2);
+        }
+
+        if (rise && set) break;
+
+        h0 = h2;
+    }
+
+    var result = {};
+
+    if (rise) result.rise = hoursLater(t, rise);
+    if (set) result.set = hoursLater(t, set);
+
+    if (!rise && !set) result[ye > 0 ? 'alwaysUp' : 'alwaysDown'] = true;
+
+    return result;
+};
+
+
+// export as Node module / AMD module / browser variable
+if (typeof exports === 'object' && typeof module !== 'undefined') module.exports = SunCalc;
+else if (typeof define === 'function' && define.amd) define(SunCalc);
+else window.SunCalc = SunCalc;
 
 }());
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
 	Copyright (C) 1994-2004  Danny Sadinoff
@@ -3602,12 +3958,12 @@ Sedra.prototype.get = function(hDate) {
 function abs(year, absDate) {
 
 	// find the first saturday on or after today's date
-	var absDate = c.dayOnOrBefore(6, absDate + 6);
-	
+	absDate = c.dayOnOrBefore(6, absDate + 6);
+
 	var weekNum = (absDate - year.first_saturday) / 7;
 	var index = year.theSedraArray[weekNum];
-	
-	if (undefined == index) {
+
+	if (undefined === index) {
 		return abs(new Sedra(year.year + 1, year.il), absDate); // must be next year
 	}
 	if (typeof index == 'object') {
@@ -3617,318 +3973,12 @@ function abs(year, absDate) {
 	if (index >= 0) {
 		return [parshiot[index]];
 	}
-	
+
 	index = D(index); // undouble the parsha
 	return [parshiot[index], parshiot[index + 1]];
-};
+}
 
 module.exports = Sedra;
-},{"./common":3,"./hdate":6}],12:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        throw TypeError('Uncaught, unspecified "error" event.');
-      }
-      return false;
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        len = arguments.length;
-        args = new Array(len - 1);
-        for (i = 1; i < len; i++)
-          args[i - 1] = arguments[i];
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    len = arguments.length;
-    args = new Array(len - 1);
-    for (i = 1; i < len; i++)
-      args[i - 1] = arguments[i];
-
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  var ret;
-  if (!emitter._events || !emitter._events[type])
-    ret = 0;
-  else if (isFunction(emitter._events[type]))
-    ret = 1;
-  else
-    ret = emitter._events[type].length;
-  return ret;
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}]},{},[2])
-
-
+},{"./common":3,"./hdate":6}]},{},[2])
 //# sourceMappingURL=hebcal.noloc.js.map
