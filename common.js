@@ -106,7 +106,7 @@ exports.monthNum = function(month) {
 
 exports.dayYearNum = function(str) {
 	return typeof str === 'number' ? str :
-		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
+		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str, 5) : parseInt(str, 10);
 };
 
 /* Days from sunday prior to start of Hebrew calendar to mean
