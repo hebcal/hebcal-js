@@ -89,9 +89,9 @@ exports.MONTH_CNT = function(x) {
 
 exports.daysInMonth = function(month, year) {
 	return 30 - (month == months.IYYAR ||
-	month == months.TAMUZ || 
+	month == months.TAMUZ ||
 	month == months.ELUL ||
-	month == months.TEVET || 
+	month == months.TEVET ||
 	month == months.ADAR_II ||
 	(month == months.ADAR_I && !LEAP(year)) ||
 	(month == months.CHESHVAN && !lngChesh(year)) ||
@@ -106,26 +106,26 @@ exports.monthNum = function(month) {
 
 exports.dayYearNum = function(str) {
 	return typeof str === 'number' ? str :
-		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str, 5) : parseInt(str, 10);
+		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str, true) : parseInt(str, 10);
 };
 
 /* Days from sunday prior to start of Hebrew calendar to mean
-   conjunction of Tishrei in Hebrew YEAR 
+   conjunction of Tishrei in Hebrew YEAR
  */
 function hebElapsedDays(hYear){
 	// borrowed from original JS
 	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
 		12 * ((hYear - 1) % 19) +
 		Math.floor(((((hYear - 1) % 19) * 7) + 1) / 19);
-	
+
 	var p_elapsed = 204 + (793 * (m_elapsed % 1080));
-	
+
 	var h_elapsed = 5 + (12 * m_elapsed) +
 		793 * Math.floor(m_elapsed / 1080) +
 		Math.floor(p_elapsed / 1080);
-	
+
 	var parts = (p_elapsed % 1080) + 1080 * (h_elapsed % 24);
-	
+
 	var day = 1 + 29 * m_elapsed + Math.floor(h_elapsed / 24);
 	var alt_day = day + ((parts >= 19440) ||
 		((2 == (day % 7)) && (parts >= 9924) && !(LEAP (hYear))) ||
@@ -165,7 +165,7 @@ function monthFromName(c) {
 	C        Cheshvan
 	K        Kislev
 	1        1Adar
-	2        2Adar   
+	2        2Adar
 	Si Sh     Sivan, Shvat
 	Ta Ti Te Tamuz, Tishrei, Tevet
 	Av Ad    Av, Adar
