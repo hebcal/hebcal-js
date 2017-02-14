@@ -626,6 +626,7 @@ HDateProto.tachanun = (function() {
 	var __cache = {
 		all: {},
 		some: {},
+		yes_prev: {},
 		il: {}
 	};
 
@@ -634,38 +635,54 @@ HDateProto.tachanun = (function() {
 
 		var year = me[getYearObject](), y = year.year;
 
-		var all = __cache.il[y] === me.il && __cache.all[y] || (__cache.all[y] = year[find]('Rosh Chodesh').concat(
-			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
-			year[find](15 + 33, NISAN), // Lag Baomer
-			year[find](c.range(1, 8 - me.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
-			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
-			year[find](-1, months.ELUL), // Erev Rosh Hashanah
-			year[find]([1, 2], TISHREI), // Rosh Hashanah
-			year[find](c.range(9, 24 - me.il), TISHREI), // Erev Yom Kippur thru Isru Chag
-			year[find](c.range(25, 33), months.KISLEV), // Chanukah
-			year[find](15, months.SHVAT), // Tu B'shvat
-			year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
-		)[map](function(d){
-			return d.abs();
-		})), some = __cache.il[y] === me.il && __cache.some[y] || (__cache.some[y] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
-			year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
-			year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
-			year[find](14, months.IYYAR), // Pesach Sheini
-			holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
-			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
-		)[map](function(d){
-			return d.abs();
-		}));
-		__cache.il[y] = me.il;
+		function mapAbs(arr) {
+			return arr[map](function(d){
+				return d.abs();
+			});
+		}
+
+		var all, some, yes_prev;
+		if (__cache.il[y] === me.il) {
+			all = __cache.all[y];
+			some = __cache.some[y];
+			yes_prev = __cache.yes_prev[y];
+		} else {
+			all = __cache.all[y] = mapAbs(year[find]('Rosh Chodesh').concat(
+				year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
+				year[find](15 + 33, NISAN), // Lag Baomer
+				year[find](c.range(1, 8 - me.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+				year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
+				year[find](-1, months.ELUL), // Erev Rosh Hashanah
+				year[find]([1, 2], TISHREI), // Rosh Hashanah
+				year[find](c.range(9, 24 - me.il), TISHREI), // Erev Yom Kippur thru Isru Chag
+				year[find](c.range(25, 33), months.KISLEV), // Chanukah
+				year[find](15, months.SHVAT), // Tu B'shvat
+				year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
+			));
+			some = __cache.some[y] = mapAbs([].concat( // Don't care if it overlaps days in all, because all takes precedence
+				year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
+				year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
+				year[find](14, months.IYYAR), // Pesach Sheini
+				holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
+				y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
+			));
+			yes_prev = __cache.yes_prev[y] = mapAbs([].concat( // tachanun is said on the previous day at mincha
+				year[find](-1, months.ELUL), // Erev Rosh Hashanah
+				year[find](9, months.TISHREI), // Erev Yom Kippur
+				year[find](14, months.IYYAR) // Pesach Sheini
+			));
+			__cache.il[y] = me.il;
+		}
 
 		all = all.indexOf(me.abs()) > -1;
 		some = some.indexOf(me.abs()) > -1;
+		yes_prev = yes_prev.indexOf(me.abs()+1) > -1;
 
 		if (all) {
 			return NONE;
 		}
 		var ret = (!some && ALL_CONGS) | (me[getDay]() != 6 && SHACHARIT);
-		if (checkNext) {
+		if (checkNext && !yes_prev) {
 			ret |= ((me[next]().tachanun(true) & SHACHARIT) && MINCHA);
 		} else {
 			ret |= (me[getDay]() != 5 && MINCHA);
