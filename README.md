@@ -17,10 +17,10 @@ $ npm install hebcal
 
 ...and include Hebcal with `var Hebcal = require('hebcal');`
 
-Hebcal JS is currently at version 2.2.1. It is approximately equivalent to Hebcal C 3.15.
+Hebcal JS is currently at version 2.2.3. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.2.1.
+The version documented here is 2.2.3.
 
 ## Releases
 
@@ -30,12 +30,16 @@ The version documented here is 2.2.1.
 * 2.1.2 - 2014-04-04 (5 Nisan 5774)
 * 2.2.0 - 2014-06-29 (1 Tamuz 5774)
 * 2.2.1 - 2016-04-17 (9 Nisan 5776)
+* 2.2.2 - 2016-04-18 (10 Nisan 5776)
+* 2.2.3 - 2017-02-14 (18 Shvat 5777)
 
 ## Contributors
 
 Hebcal JS was ported from C by Eyal Schachter (Scimonster).
 
 The original C and JavaScript code was written by Danny Sadinoff, with contributions by Michael J. Radwin.
+
+Various other people have made contributions on GitHub.
 
 ## License / Distribution
 

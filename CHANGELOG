@@ -1,3 +1,13 @@
+version 2.2.3 (2017-02-14 [18 Shvat 5777])
+	Daf Yomi- renamed Hebrew names for Gmara according to Shas Vilna [gnudles]
+	Daf Yomi- fixed errors in cycles 1-7 ... (division instead of modulo) [gnudles]
+	Fix typo in Daf Yomi [asafbe]
+	Don't crash on each startup [dredozubov]
+	Fix year parsing from hebrew [ilyagelman]
+	Write build script in JavaScript
+	Tachanun is said at Mincha on 8 Tishrei -- return 7
+	Don't blow up calculating molad for Tishrei
+
 version 2.2.2 (2016-04-18 [10 Nisan 5776])
 	Fix little bug caused by last-minute change breaking findParsha()
 
