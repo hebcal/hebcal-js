@@ -492,7 +492,7 @@ MonthProto.molad = function() {
     var chalakim = toInt(parts % 1080);
     retMolad.minutes = toInt(chalakim / 18);
     retMolad.chalakim = chalakim % 18;
-    var day = this.prev().find('shabbat_mevarchim')[0].onOrAfter(retMolad.doy).greg();
+    var day = this.prev().find.strings.shabbat_mevarchim._calc.call(this)[0].onOrAfter(retMolad.doy).greg();
     day.setHours(retMolad.hour);
     day.setMinutes(retMolad.minutes);
     day.setSeconds(retMolad.chalakim * 3.33);
@@ -533,9 +533,12 @@ MonthProto[find][strings] = function strings(str) {
 MonthProto[find][strings].rosh_chodesh = function() {
 	return this.rosh_chodesh();
 };
-MonthProto[find][strings].shabbat_mevarchim = function() {
+MonthProto[find][strings].shabbat_mevarchim = function sm() {
 	return this.month === months.ELUL ? [] : // No birchat hachodesh in Elul
-		this[find](this[getDay](29).onOrBefore(c.days.SAT));
+		sm._calc.call(this);
+};
+MonthProto[find][strings].shabbat_mevarchim._calc = function() {
+	return this[find](this[getDay](29).onOrBefore(c.days.SAT));
 };
 MonthProto[find][strings].shabbos_mevarchim = MonthProto[find][strings].shabbos_mevorchim = MonthProto[find][strings].shabbat_mevarchim;
 
