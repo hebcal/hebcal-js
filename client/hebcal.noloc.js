@@ -289,9 +289,9 @@ exports.MONTH_CNT = function(x) {
 
 exports.daysInMonth = function(month, year) {
 	return 30 - (month == months.IYYAR ||
-	month == months.TAMUZ || 
+	month == months.TAMUZ ||
 	month == months.ELUL ||
-	month == months.TEVET || 
+	month == months.TEVET ||
 	month == months.ADAR_II ||
 	(month == months.ADAR_I && !LEAP(year)) ||
 	(month == months.CHESHVAN && !lngChesh(year)) ||
@@ -306,26 +306,26 @@ exports.monthNum = function(month) {
 
 exports.dayYearNum = function(str) {
 	return typeof str === 'number' ? str :
-		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str) : parseInt(str, 10);
+		str[charCodeAt](0) >= 1488 && str[charCodeAt](0) <= 1514 ? gematriya(str, true) : parseInt(str, 10);
 };
 
 /* Days from sunday prior to start of Hebrew calendar to mean
-   conjunction of Tishrei in Hebrew YEAR 
+   conjunction of Tishrei in Hebrew YEAR
  */
 function hebElapsedDays(hYear){
 	// borrowed from original JS
 	var m_elapsed = 235 * Math.floor((hYear - 1) / 19) +
 		12 * ((hYear - 1) % 19) +
 		Math.floor(((((hYear - 1) % 19) * 7) + 1) / 19);
-	
+
 	var p_elapsed = 204 + (793 * (m_elapsed % 1080));
-	
+
 	var h_elapsed = 5 + (12 * m_elapsed) +
 		793 * Math.floor(m_elapsed / 1080) +
 		Math.floor(p_elapsed / 1080);
-	
+
 	var parts = (p_elapsed % 1080) + 1080 * (h_elapsed % 24);
-	
+
 	var day = 1 + 29 * m_elapsed + Math.floor(h_elapsed / 24);
 	var alt_day = day + ((parts >= 19440) ||
 		((2 == (day % 7)) && (parts >= 9924) && !(LEAP (hYear))) ||
@@ -365,7 +365,7 @@ function monthFromName(c) {
 	C        Cheshvan
 	K        Kislev
 	1        1Adar
-	2        2Adar   
+	2        2Adar
 	Si Sh     Sivan, Shvat
 	Ta Ti Te Tamuz, Tishrei, Tevet
 	Av Ad    Av, Adar
@@ -577,6 +577,7 @@ exports.range = function(start, end, step) {
 	}
 	return arr;
 };
+
 },{"gematriya":10}],4:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
@@ -613,7 +614,7 @@ var shas = [
 	// sname, aname, hname, blatt
 	[ "Berachot",       "Berachos",         "ברכות",         64  ],
 	[ "Shabbat",        "Shabbos",          "שבת",          157 ],
-	[ "Eruvin",         "Eruvin",           "ערובין",         105 ],
+	[ "Eruvin",         "Eruvin",           "עירובין",         105 ],
 	[ "Pesachim",       0,                  "פסחים",         121 ],
 	[ "Shekalim",       0,                  "שקלים",         22  ],
 	[ "Yoma",           0,                  "יומא",           88  ],
@@ -647,10 +648,10 @@ var shas = [
 	[ "Temurah",        0,                  "תמורה",         34  ],
 	[ "Keritot",        "Kerisos",          "כריתות",         28  ],
 	[ "Meilah",         0,                  "מעילה",         22  ],
-	[ "Kinnim",         0,                  "כינים",          4   ],
+	[ "Kinnim",         0,                  "קנים",          4   ],
 	[ "Tamid",          0,                  "תמיד",          10  ],
-	[ "Midot",          "Midos",            "מידות",          4   ],
-	[ "Niddah",         0,                  "נידה",           73  ]
+	[ "Midot",          "Midos",            "מדות",          4   ],
+	[ "Niddah",         0,                  "נדה",           73  ]
 ].map(function(m){
 	return {name: m.slice(0,3), blatt: m[3]};
 });
@@ -674,7 +675,7 @@ exports.dafyomi = function(gregdate) {
 		dno = (cday - nsday) % 2711;
 	} else { // old cycle
 		cno = 1 + ( (cday - osday) / 2702 );
-		dno = (cday - osday) / 2702;
+		dno = (cday - osday) % 2702;
 	}
 
 	// Find the daf taking note that the cycle changed slightly after cycle 7.
@@ -722,6 +723,7 @@ exports.dafyomi = function(gregdate) {
 exports.dafname = function(daf, o) {
 	return c.LANG(daf.name, o) + ' ' + (o === 'h' ? gematriya(daf.blatt) : daf.blatt);
 };
+
 },{"./common":3,"./greg":5,"gematriya":10}],5:[function(require,module,exports){
 /*
 	Hebcal - A Jewish Calendar Generator
@@ -1801,7 +1803,7 @@ MonthProto.molad = function() {
     var chalakim = toInt(parts % 1080);
     retMolad.minutes = toInt(chalakim / 18);
     retMolad.chalakim = chalakim % 18;
-    var day = this.prev().find('shabbat_mevarchim')[0].onOrAfter(retMolad.doy).greg();
+    var day = this.prev().find.strings.shabbat_mevarchim._calc.call(this)[0].onOrAfter(retMolad.doy).greg();
     day.setHours(retMolad.hour);
     day.setMinutes(retMolad.minutes);
     day.setSeconds(retMolad.chalakim * 3.33);
@@ -1842,9 +1844,12 @@ MonthProto[find][strings] = function strings(str) {
 MonthProto[find][strings].rosh_chodesh = function() {
 	return this.rosh_chodesh();
 };
-MonthProto[find][strings].shabbat_mevarchim = function() {
+MonthProto[find][strings].shabbat_mevarchim = function sm() {
 	return this.month === months.ELUL ? [] : // No birchat hachodesh in Elul
-		this[find](this[getDay](29).onOrBefore(c.days.SAT));
+		sm._calc.call(this);
+};
+MonthProto[find][strings].shabbat_mevarchim._calc = function() {
+	return this[find](this[getDay](29).onOrBefore(c.days.SAT));
 };
 MonthProto[find][strings].shabbos_mevarchim = MonthProto[find][strings].shabbos_mevorchim = MonthProto[find][strings].shabbat_mevarchim;
 
@@ -1935,6 +1940,7 @@ HDateProto.tachanun = (function() {
 	var __cache = {
 		all: {},
 		some: {},
+		yes_prev: {},
 		il: {}
 	};
 
@@ -1943,38 +1949,54 @@ HDateProto.tachanun = (function() {
 
 		var year = me[getYearObject](), y = year.year;
 
-		var all = __cache.il[y] === me.il && __cache.all[y] || (__cache.all[y] = year[find]('Rosh Chodesh').concat(
-			year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
-			year[find](15 + 33, NISAN), // Lag Baomer
-			year[find](c.range(1, 8 - me.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
-			year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
-			year[find](-1, months.ELUL), // Erev Rosh Hashanah
-			year[find]([1, 2], TISHREI), // Rosh Hashanah
-			year[find](c.range(9, 24 - me.il), TISHREI), // Erev Yom Kippur thru Isru Chag
-			year[find](c.range(25, 33), months.KISLEV), // Chanukah
-			year[find](15, months.SHVAT), // Tu B'shvat
-			year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
-		)[map](function(d){
-			return d.abs();
-		})), some = __cache.il[y] === me.il && __cache.some[y] || (__cache.some[y] = [].concat( // Don't care if it overlaps days in all, because all takes precedence
-			year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
-			year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
-			year[find](14, months.IYYAR), // Pesach Sheini
-			holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
-			y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
-		)[map](function(d){
-			return d.abs();
-		}));
-		__cache.il[y] = me.il;
+		function mapAbs(arr) {
+			return arr[map](function(d){
+				return d.abs();
+			});
+		}
+
+		var all, some, yes_prev;
+		if (__cache.il[y] === me.il) {
+			all = __cache.all[y];
+			some = __cache.some[y];
+			yes_prev = __cache.yes_prev[y];
+		} else {
+			all = __cache.all[y] = mapAbs(year[find]('Rosh Chodesh').concat(
+				year[find](c.range(1, c.daysInMonth(NISAN, y)), NISAN), // all of Nisan
+				year[find](15 + 33, NISAN), // Lag Baomer
+				year[find](c.range(1, 8 - me.il), months.SIVAN), // Rosh Chodesh Sivan thru Isru Chag
+				year[find]([9, 15], months.AV), // Tisha B'av and Tu B'av
+				year[find](-1, months.ELUL), // Erev Rosh Hashanah
+				year[find]([1, 2], TISHREI), // Rosh Hashanah
+				year[find](c.range(9, 24 - me.il), TISHREI), // Erev Yom Kippur thru Isru Chag
+				year[find](c.range(25, 33), months.KISLEV), // Chanukah
+				year[find](15, months.SHVAT), // Tu B'shvat
+				year[find]([14, 15], year[isLeapYear]() ? [months.ADAR_I, months.ADAR_II] : months.ADAR_I) // Purim/Shushan Purim + Katan
+			));
+			some = __cache.some[y] = mapAbs([].concat( // Don't care if it overlaps days in all, because all takes precedence
+				year[find](c.range(1, 13), months.SIVAN), // Until 14 Sivan
+				year[find](c.range(20, 31), TISHREI), // Until after Rosh Chodesh Cheshvan
+				year[find](14, months.IYYAR), // Pesach Sheini
+				holidays.atzmaut(y)[1].date || [], // Yom HaAtzma'ut, which changes based on day of week
+				y >= 5727 ? year[find](29, months.IYYAR) : [] // Yom Yerushalayim
+			));
+			yes_prev = __cache.yes_prev[y] = mapAbs([].concat( // tachanun is said on the previous day at mincha
+				year[find](-1, months.ELUL), // Erev Rosh Hashanah
+				year[find](9, months.TISHREI), // Erev Yom Kippur
+				year[find](14, months.IYYAR) // Pesach Sheini
+			));
+			__cache.il[y] = me.il;
+		}
 
 		all = all.indexOf(me.abs()) > -1;
 		some = some.indexOf(me.abs()) > -1;
+		yes_prev = yes_prev.indexOf(me.abs()+1) > -1;
 
 		if (all) {
 			return NONE;
 		}
 		var ret = (!some && ALL_CONGS) | (me[getDay]() != 6 && SHACHARIT);
-		if (checkNext) {
+		if (checkNext && !yes_prev) {
 			ret |= ((me[next]().tachanun(true) & SHACHARIT) && MINCHA);
 		} else {
 			ret |= (me[getDay]() != 5 && MINCHA);
