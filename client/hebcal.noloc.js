@@ -2009,6 +2009,15 @@ HDateProto.tachanun = (function() {
 	return tachanun;
 })();
 
+HDateProto.tachanun_uf = function(){
+	var ret = this.tachanun();
+	return {
+		shacharit: !!(ret & this.tachanun.SHACHARIT),
+		mincha: !!(ret & this.tachanun.MINCHA),
+		all_congs: !!(ret & this.tachanun.ALL_CONGS)
+	};
+};
+
 HDateProto.hallel = (function() {
 	var NONE  = hallel.NONE  = 0,
 		HALF  = hallel.HALF  = 1,

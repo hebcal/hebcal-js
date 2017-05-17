@@ -960,7 +960,7 @@ new Hebcal.HDate(15, 'elul', 5772).dafyomi('a') // Berachos 30
 
 ### `Hebcal.HDate.prototype.tachanun()`
 
-Return a bitmask containing information on what Tachanun (or Tzidchatcha on Shabbat) is said on that day.
+Return a bitmask containing information on what Tachanun (or Tzidchatcha on Shabbat) is said on that day. For an explanation of how this works, see [issue #38](https://github.com/hebcal/hebcal-js/issues/38#issuecomment-300735615).
 
 Tachanun is not said on Rosh Chodesh, the month of Nisan, Lag Baomer, Rosh Chodesh Sivan until Isru Chag, Tisha B'av, 15 Av, Erev Rosh Hashanah, Rosh Hashanah, Erev Yom Kippur until after Simchat Torah, Chanukah, Tu B'shvat, Purim and Shushan Purim, and Purim and Shushan Purim Katan.
 
@@ -983,6 +983,20 @@ These bitmasks are also available as properties of the function:
 * `tachanun.ALL_CONGS = 4`
 
 However, due to the lengthliness of typing `Hebcal.HDate.prototype.tachanun.*BITMASK*`, it may be easier to just use the values directly.
+
+### `Hebcal.HDate.prototype.tachanun_uf()`
+
+*New as of v2.2.4*
+
+Return a user-friendly representation of tachanun(). An object with Boolean properties {shacharit, mincha, all_congs}.
+
+```js
+new Hebcal.HDate('1 Tishrei').tachanun_uf() // { shacharit: false, mincha: false, all_congs: false }
+new Hebcal.HDate('25 Tishrei').tachanun_uf() // { shacharit: true, mincha: true, all_congs: false }
+new Hebcal.HDate('6 Cheshvan').tachanun_uf() // { shacharit: true, mincha: true, all_congs: true }
+new Hebcal.HDate().onOrAfter(5).tachanun_uf() // Friday: { shacharit: true, mincha: false, all_congs: true }
+new Hebcal.HDate().onOrAfter(6).tachanun_uf() // Shabbat: { shacharit: false, mincha: true, all_congs: true }
+```
 
 ### `Hebcal.HDate.prototype.hallel()`
 
