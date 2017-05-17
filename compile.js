@@ -33,7 +33,7 @@ function minify(inFile, outFile, inSourceMap, outSourceMap) {
         inSourceMap: inSourceMap,
         outSourceMap: outSourceMap,
         sourceRoot: github,
-        mangle: false,
+        mangle: true,
         warnings: true
     });
     fs.writeFileSync(outFile, minHeader + removeLocalPath(result.code));
