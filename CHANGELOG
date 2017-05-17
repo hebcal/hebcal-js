@@ -1,3 +1,8 @@
+version 2.2.4 (2017-05-17 [21 Iyyar 5777])
+	Fixed previous date issue with suncalc workaround [ybudweiser]
+	Add HDate.tachanun_uf() function
+	Mangle variable names in minified JS
+
 version 2.2.3 (2017-02-14 [18 Shvat 5777])
 	Daf Yomi- renamed Hebrew names for Gmara according to Shas Vilna [gnudles]
 	Daf Yomi- fixed errors in cycles 1-7 ... (division instead of modulo) [gnudles]
