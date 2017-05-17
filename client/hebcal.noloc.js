@@ -1176,7 +1176,9 @@ prototype.setLocation = function(lat, lon) {
 };
 
 function suntime(hdate) {
-	return suncalc.getTimes(hdate.greg(), hdate.lat, hdate.long);
+	//reset the date to midday before calling suncalc api
+	//https://github.com/mourner/suncalc/issues/11
+	return suncalc.getTimes(new Date(hdate.greg().getFullYear(), hdate.greg().getMonth(), hdate.greg().getDate(), 12, 0, 0, 0, 0), hdate.lat, hdate.long);
 }
 
 prototype.sunrise = function() {
