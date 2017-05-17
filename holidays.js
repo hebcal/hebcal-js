@@ -123,7 +123,7 @@ Event.prototype.getDesc = function(o) {
 };
 
 Event.prototype.candleLighting = function() {
-	var date = this.date.next();
+	var date = this.date;
 	if (this.LIGHT_CANDLES) {
 		return new Date(date.sunset() - (Event.candleLighting * 60 * 1000));
 	} else if (this.LIGHT_CANDLES_TZEIS) {
