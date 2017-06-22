@@ -31,8 +31,8 @@
 		"build": "node compile.js"
 	},
 	"dependencies": {
-		"suncalc": "",
-		"gematriya": ""
+		"suncalc": "^1.8.0",
+		"gematriya": "^1.0.1"
 	},
 	"devDependencies": {
 		"browserify": "^14.0.0",
