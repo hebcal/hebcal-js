@@ -90,5 +90,5 @@ console.log('');
 
 if (main) {
 	console.log('Success!');
-	process.kill();
+	process.exit();
 }

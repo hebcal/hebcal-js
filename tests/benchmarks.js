@@ -90,4 +90,4 @@ year.map(function(d){d.getSedra()});
 hrtimer('today.getSedra()');
 console.log('');
 
-process.kill();
+process.exit();
