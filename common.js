@@ -226,6 +226,8 @@ function monthFromName(c) {
 			break;
 		case 'ס':
 			return months.SIVAN;
+		case 'ט':
+			return months.TEVET;
 		case 'ש':
 			return months.SHVAT;
 		case 'א':
@@ -233,7 +235,7 @@ function monthFromName(c) {
 				case 'ב':
 					return months.AV;
 				case 'ד':
-					if (/(2|ii|b|ב)$/i.test(c)) {
+					if (/(1|[^i]i|a|א)$/i.test(c)) {
 						return months.ADAR_I;
 					}
 					return months.ADAR_II; // else assume sheini
