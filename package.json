@@ -23,7 +23,7 @@
 	"homepage": "https://github.com/hebcal/hebcal-js",
 	"bugs": "https://github.com/hebcal/hebcal-js/issues",
 	"license": "GPL-3.0+",
-	"main": "hebcal.js",
+	"main": "src/hebcal.js",
 	"bin": {
 		"hebcaljs": "bin/hebcal.js"
 	},

@@ -44,7 +44,7 @@ function minify(inFile, outFile, inSourceMap, outSourceMap) {
 }
 
 function normal() {
-    var sourceFile = 'client/client.js';
+    var sourceFile = 'src/client.js';
     var fullOutput = 'client/hebcal.js';
     var fullMap = 'client/hebcal.js.map';
     var minOutput = 'client/hebcal.min.js';
@@ -54,7 +54,7 @@ function normal() {
     });
 }
 function noloc() {
-    var sourceFile = 'client/hebcal.noloc.src.js';
+    var sourceFile = 'src/noloc.js';
     var fullOutput = 'client/hebcal.noloc.js';
     var fullMap = 'client/hebcal.noloc.js.map';
     var minOutput = 'client/hebcal.noloc.min.js';
