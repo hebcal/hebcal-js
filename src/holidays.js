@@ -522,7 +522,7 @@ exports.year = function(year) {
 		0
 	));
 
-	for (var day = 6; day < c.daysInYear(year); day += 7) {
+	for (var day = 6; day < c.daysInYear(year) + 7; day += 7) {
 		add(new Event(
 			new HDate(dayOnOrBefore(SAT, new HDate(1, TISHREI, year)[abs]() + day)),
 			[Shabbat, Shabbos, 'שבת'],
