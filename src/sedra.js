@@ -87,7 +87,7 @@ var parshiot = Sedra.parshiot = [
 	[ 'Noach', 0, 'נח' ],
 	[ 'Lech-Lecha', 0, 'לך-לך' ],
 	[ 'Vayera', 0, 'וירא' ],
-	[ 'Chayei Sara', 0, 'חי שרה' ],
+	[ 'Chayei Sara', 0, 'חיי שרה' ],
 	[ 'Toldot', 'Toldos', 'תולדות' ],
 	[ 'Vayetzei', 0, 'ויצא' ],
 	[ 'Vayishlach', 0, 'וישלח' ],
