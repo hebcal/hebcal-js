@@ -72,7 +72,7 @@ Methods that fetch a value from this array expect one of the following strings: 
 Hebcal is not too particular about month names, and only checks up to the second letter. That means that, despite being totally incorrect, "cheese" will return the same value as "cheshvan". Month names work in both Hebrew and English.
 
 Nisan, Iyyar, Sivan, Tamuz, Av, Elul, Tishrei, Cheshvan, Kislev, Tevet, Shvat, Adar (1, 2).
-ניסן, אייר, סיון, תמוז, אב, אלול, תשרי, חשון, כסלב, טבת, שבט, אדר (1, 2).
+ניסן, אייר, סיון, תמוז, אב, אלול, תשרי, חשון, כסלו, טבת, שבט, אדר (1, 2).
 
 ### Sun times
 

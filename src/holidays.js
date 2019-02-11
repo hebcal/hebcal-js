@@ -477,7 +477,7 @@ exports.year = function(year) {
 
 	if (year >= 5727) { // Yom Yerushalayim only celebrated after 1967
 		add(new Event(
-			new HDate(29, months.IYYAR, year),
+			new HDate(28, months.IYYAR, year),
 			['Yom Yerushalayim', 0, 'יום ירושלים'],
 			0
 		));
