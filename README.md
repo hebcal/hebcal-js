@@ -787,6 +787,23 @@ new Hebcal.HDate(8,8,5774).getSedra('h') // [ 'לך-לך' ]
 
 An alias of `getSedra()`. Added v2.1.
 
+### `Hebcal.HDate.prototype.isSedra()`
+
+Return a Boolean of whether the parsha is a regular parsha (true) or special chag reading (false). Added in v2.3.0.
+
+```js
+new Hebcal.HDate(24,12,5773).isSedra() // true
+new Hebcal.HDate(18,1,5774).isSedra() // false
+new Hebcal.HDate(12,6,5774).isSedra() // true
+new Hebcal.HDate(15,7,5774).isSedra() // false
+new Hebcal.HDate(19,12,5773).isSedra() // true
+new Hebcal.HDate(8,8,5774).isSedra() // true
+```
+
+### `Hebcal.HDate.prototype.isParsha()`
+
+An alias of `isSedra()`. Added v2.3.
+
 ### `Hebcal.HDate.prototype.setCity(city)`
 
 Set the location to the coordinates of a given city. For more about cities, see `Hebcal.cities`. Returns the object it was called upon.

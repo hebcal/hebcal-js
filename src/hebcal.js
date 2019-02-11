@@ -568,20 +568,30 @@ HDateProto[getYearObject] = function() {
 	});
 })();
 
-HDateProto.getSedra = (function(){
+var _getCachedSedraYear = (function(){
 	var __cache = {};
 
-	return function(o) {
-		var sedraYear = __cache[this[getFullYear]()];
-		if (!sedraYear || (sedraYear.il != this.il)) {
-			sedraYear = __cache[this[getFullYear]()] = new Sedra(this[getFullYear](), this.il);
+	return function(hd) {
+		var sedraYear = __cache[hd[getFullYear]()];
+		if (!sedraYear || (sedraYear.il != hd.il)) {
+			sedraYear = __cache[hd[getFullYear]()] = new Sedra(hd[getFullYear](), hd.il);
 		}
-		return sedraYear.get(this)[map](function(p){
-			return c.LANG(p, o);
-		});
+		return sedraYear;
 	}
 })();
+HDateProto.getSedra =  function(o) {
+	var sedraYear = _getCachedSedraYear(this);
+	return sedraYear.get(this)[map](function(p){
+		return c.LANG(p, o);
+	});
+};
 HDateProto.getParsha = HDateProto.getSedra;
+
+HDateProto.isSedra =  function() {
+	var sedraYear = _getCachedSedraYear(this);
+	return sedraYear.isParsha(this);
+};
+HDateProto.isParsha = HDateProto.isSedra;
 
 HDateProto.holidays = function(all) {
 	var me = this, days = me[getYearObject]().holidays[me];
