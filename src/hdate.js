@@ -306,8 +306,8 @@ prototype.setLocation = function(lat, lon) {
 		lat = lat.lat;
 	}
 	if (Array.isArray(lat) && typeof lon == 'undefined') {
-		lon = lat[0];
-		lat = lat[1];
+		lon = lat[1];
+		lat = lat[0];
 	}
 	if (Array.isArray(lat)) {
 		lat = (lat[0] * 60 + lat[1]) / 60;
