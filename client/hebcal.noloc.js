@@ -2182,7 +2182,7 @@ prototype.isSameDate = function(other) {
 };
 
 function onOrBefore(day, t, offset) {
-	return new HDate(dayOnOrBefore(day, t[abs]() + offset));
+	return new HDate(dayOnOrBefore(day, t[abs]() + offset)).setLocation(t.lat, t.long);
 }
 
 prototype.before = function(day) {
