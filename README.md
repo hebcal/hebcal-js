@@ -17,10 +17,10 @@ $ npm install hebcal
 
 ...and include Hebcal with `var Hebcal = require('hebcal');`
 
-Hebcal JS is currently at version 2.2.4. It is approximately equivalent to Hebcal C 3.15.
+Hebcal JS is currently at version 2.3.0. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.2.4.
+The version documented here is 2.3.0.
 
 ## Releases
 
@@ -33,6 +33,10 @@ The version documented here is 2.2.4.
 * 2.2.2 - 2016-04-18 (10 Nisan 5776)
 * 2.2.3 - 2017-02-14 (18 Shvat 5777)
 * 2.2.4 - 2017-05-17 (21 Iyyar 5777)
+* 2.2.5 - 2017-07-02 (8 Tamuz 5777)
+* 2.2.6 - 2017-10-29 (10 Cheshvan 5778)
+* 2.3.0 - 2019-02-11 (6 Adar 1 5779)
+
 
 ## Contributors
 
@@ -58,6 +62,19 @@ The original Hebcal is at [hebcal/hebcal](https://github.com/hebcal/hebcal).
 # API
 
 This is where every property and method is listed.
+
+- [CLI](https://github.com/hebcal/hebcal-js#command-line-interface)
+- [`Hebcal`](https://github.com/hebcal/hebcal-js#hebcal)
+- [`Hebcal.HDate`](https://github.com/hebcal/hebcal-js#new-hebcalhdateday-month-year)
+- [`Hebcal.Month`](https://github.com/hebcal/hebcal-js#new-hebcalmonthmonth-year)
+- [`Hebcal.GregYear`](https://github.com/hebcal/hebcal-js#new-hebcalgregyearyear-month)
+- [`Hebcal.GregMonth`](https://github.com/hebcal/hebcal-js#new-hebcalgregmonthmonth-year)
+- [`Hebcal.cities`](https://github.com/hebcal/hebcal-js#hebcalcities)
+- [`Hebcal.holidays`](https://github.com/hebcal/hebcal-js#hebcalholidays)
+- [`Hebcal.events`](https://github.com/hebcal/hebcal-js#hebcalevents)
+- Utilities:
+- - [`gematriya`](https://github.com/hebcal/hebcal-js#hebcalgematriyastring--num-limit)
+- - [`range`](https://github.com/hebcal/hebcal-js#hebcalrangestart-end-step)
 
 ## Information on certain standards
 

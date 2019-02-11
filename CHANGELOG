@@ -1,3 +1,12 @@
+version 2.3.0 (2019-02-11 [6 Adar 1 5779])
+   Add isSedra method to HDate
+	 Fix dependency issues
+   Fix bug of latitude longitude mismatch [haimkastner]
+	 Fix spellings -- חיי שרה [icarpis]
+	 Fix spellings -- כסלו
+	 Fix Yom Yerushalayim date
+	 Fix last Shabbat of year not being listed as Shabbat holiday
+
 version 2.2.6 (2017-10-29 [10 Cheshvan 5778])
 	Fix monthFromName not recognizing טבת
 	Fix monthFromName treating אדר2 as Adar1
