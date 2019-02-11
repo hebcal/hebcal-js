@@ -35,10 +35,9 @@
 		"gematriya": "^1.0.1"
 	},
 	"devDependencies": {
-		"browserify": "^14.0.0",
+		"browserify": "^16.2.3",
 		"exorcist": "^0.4.0",
-		"hrtimer": "",
-		"marked": "^0.3.6",
+		"hrtimer": "0.0.1",
 		"uglify-js": "^2.7.5"
 	},
 	"repository": {

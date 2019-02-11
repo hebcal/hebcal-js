@@ -3,7 +3,6 @@ var browserify = require('browserify'),
     fs         = require('fs'),
     exorcist   = require('exorcist'),
     uglifyjs   = require('uglify-js'),
-    marked     = require('marked'),
     version    = require('./package.json').version;
 var github = 'https://github.com/hebcal/hebcal-js/tree/v'+version+'/';
 
@@ -12,7 +11,6 @@ var minHeader = "/*\n    Hebcal - A Jewish Calendar Generator\n\n    https://git
 // the commands
 normal();
 noloc();
-readme();
 
 // all the functions get hoisted
 
@@ -61,22 +59,5 @@ function noloc() {
     var minMap = 'client/hebcal.noloc.min.js.map';
     compile(sourceFile, fullOutput, fullMap, function () {
         minify(fullOutput, minOutput, fullMap, minMap);
-    });
-}
-
-function readme() {
-    fs.readFile('README.md', function(err, md){
-        if (err) {
-            console.error('Could not open README.md');
-            return;
-        }
-        var output = marked(md.toString(), {gfm: true, breaks: true});
-        fs.writeFile('README.html', output, function(err){
-            if (err) {
-                console.error('Could not write README.html');
-            } else {
-                console.log('Created README.html');
-            }
-        });
     });
 }
