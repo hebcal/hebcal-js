@@ -64,15 +64,22 @@ exports.monthNames = [
 	monthNames.concat([["Adar 1", 0, "אדר א'"],["Adar 2", 0, "אדר ב'"],["Nisan", 0, "ניסן"]])
 ];
 
-exports.days = {
-	SUN: 0,
-	MON: 1,
-	TUE: 2,
-	WED: 3,
-	THU: 4,
-	FRI: 5,
-	SAT: 6
+
+exports.daysNames = {
+		0 : {'h' : 'ראשון','eng' : 'Sunday','varName' : 'SUN'} ,
+		1 : {'h' : 'שני','eng' : 'Monday','varName' : 'MON'} ,
+		2 : {'h' : 'שלישי','eng' : 'Tuesday','varName' : 'TUE'} ,
+		3 : {'h' : 'רביעי','eng' : 'Wednesday','varName' : 'WED'} ,
+		4 : {'h' : 'חמישי','eng' : 'Thursday','varName' : 'THU'} ,
+		5 : {'h' : 'שישי','eng' : 'Friday','varName' : 'FRI'} ,
+		6 : {'h' : 'שבת','eng' : 'Saturday','varName' : 'SAT'} ,
 };
+var daysVars = {};
+for(var i in this.daysNames){
+	daysVars[this.daysNames.varName] = i;
+}
+exports.days = daysVars;
+
 
 exports.LANG = function(str, opts){
 	return opts == 'h' && str[2] || (opts == 'a' && str[1] || str[0]);

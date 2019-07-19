@@ -287,17 +287,36 @@ prototype[abs] = function() {
 };
 
 prototype.toString = function(o) {
-	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o) + ' ' +
+	return this.getDayName(o) + ' ' +
 		this.getMonthName(o) + ' ' +
-		c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
+		this.getYearName(o);
+};
+
+prototype.getWeekDayName = function(o) {
+	let dayObj = c.daysNames[this.getDay()];
+	if (dayObj){
+		return c.daysNames[this.getDay()][o] ? c.daysNames[this.getDay()][o] : c.daysNames[this.getDay()]['eng'];
+	}
+	return "";
 };
 
 prototype.getMonthName = function(o) {
 	return c.LANG(c.monthNames[+this.isLeapYear()][this[getMonth]()], o);
 };
-
+prototype.getDayName = function(o) {
+	return c.LANG([this[getDate](), null, gematriya(this[getDate]())], o);
+};
+prototype.getYearName = function(o) {
+	return c.LANG([this[getFullYear](), null, gematriya(this[getFullYear]())], o);
+};
 prototype.setCity = function(city) {
 	return this.setLocation(cities.getCity(city));
+};
+prototype.dateFormat = function(format, o){
+	let dayMask = "D";
+	let monthMask = "M";
+	let yearMask = "Y";
+	return format.replace(dayMask, this.getDayName(o)).replace(monthMask, this.getMonthName(o)).replace(yearMask, this.getYearName(o));
 };
 
 prototype.setLocation = function(lat, lon) {
