@@ -707,6 +707,7 @@ Number. The month passed to the constructor, possibly fixed up. It is preferred 
 
 Number. The day passed to the constructor, possibly fixed up. It is preferred to get this value with `Hebcal.HDate.prototype.getDate()`. (Not actually a prototype value.)
 
+
 ### `Hebcal.HDate.prototype.lat`
 ### `Hebcal.HDate.prototype.long`
 
@@ -745,6 +746,9 @@ Number. The day of the month of the date.
 
 Number. The day of the week of the date. 0 is Sunday, as with `Date.prototype.getDay()`.
 
+### `Hebcal.HDate.prototype.getWeekDayName()`
+string. get the name of week day.
+
 ### `Hebcal.HDate.prototype.setFullYear(year)`
 
 Sets the year of the date. Returns the object it was called upon.
@@ -776,6 +780,22 @@ Return a number representing the number of days since December 31, 1 BCE, an "ab
 ### `Hebcal.HDate.prototype.toString(o)`
 
 Return a string with the current day, month, and year. Takes a standard language options string.
+
+### `Hebcal.HDate.prototype.getDayName(o)`
+
+Return a string with the current day. Takes a standard language options string.
+
+### `Hebcal.HDate.prototype.getMonthName(o)`
+
+Return a string with the current month. Takes a standard language options string.
+
+### `Hebcal.HDate.prototype.getYearName(o)`
+
+Return a string with the current year. Takes a standard language options string.
+
+### `Hebcal.HDate.prototype.dateFormat(format,o)`
+
+Return a string with the current year. ,the first args the format string ('D' - for day, 'M' - month,'Y' - for year'), the second arg takes a standard language options string.
 
 ```js
 new Hebcal.HDate().toString() // 16 Adar I 5774
