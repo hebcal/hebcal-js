@@ -28,7 +28,8 @@
 		"hebcaljs": "bin/hebcal.js"
 	},
 	"scripts": {
-		"build": "node compile.js"
+		"build": "node compile.js",
+		"test": "node ./tests/sanity.js"
 	},
 	"dependencies": {
 		"suncalc": "^1.8.0",
