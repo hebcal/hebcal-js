@@ -17,10 +17,10 @@ $ npm install hebcal
 
 ...and include Hebcal with `var Hebcal = require('hebcal');`
 
-Hebcal JS is currently at version 2.3.1. It is approximately equivalent to Hebcal C 3.15.
+Hebcal JS is currently at version 2.3.2. It is approximately equivalent to Hebcal C 3.15.
 I (Eyal) did not write Hebcal JS 1.0. 2.x is a nearly-complete rewrite of it.
 
-The version documented here is 2.3.1.
+The version documented here is 2.3.2.
 
 ## Releases
 
@@ -37,6 +37,7 @@ The version documented here is 2.3.1.
 * 2.2.6 - 2017-10-29 (10 Cheshvan 5778)
 * 2.3.0 - 2019-02-11 (6 Adar 1 5779)
 * 2.3.1 - 2019-02-11 (6 Adar 1 5779)
+* 2.3.2 - 2019-09-25 (25 Elul 5779)
 
 
 ## Contributors
@@ -54,9 +55,9 @@ Portions Copyright (c) 2011 Michael J. Radwin. All Rights Reserved.
 
 Hebcal JavaScript is distributed under the GNU Public License version 3. The original Hebcal C is under the GPLv2. The program and its source code may be freely distributed. For details, see the file COPYING in the distribution.
 
-Remember, the GPL means you can't use this in a closed-source program!
+Remember, the GPL means you can't use this in a closed-source program! (But see [#72](https://github.com/hebcal/hebcal-js/issues/72))
 
-If you are going to use this program, please drop me a line. I'd like to know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that i can adjust the program to meet users' needs.
+If you are using this program, I'd like to hear about -- know who you are, what version you're using, and how you're using Hebcal, and anything else you'd like to tell me, so that i can adjust the program to meet users' needs.
 
 The original Hebcal is at [hebcal/hebcal](https://github.com/hebcal/hebcal).
 
