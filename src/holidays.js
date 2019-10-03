@@ -50,7 +50,7 @@ function Chanukah(day) {
 }
 
 function CHM(desc) {
-	return [desc[0] + ' (CH"M)', desc[1] ? desc[1] + ' (CH"M)' : desc[1], desc[2] ? desc[2] + ' )חוה"מ(' : desc[2]];
+	return [desc[0] + ' (CH"M)', desc[1] ? desc[1] + ' (CH"M)' : desc[1], desc[2] ? desc[2] + ' (חוה"מ)' : desc[2]];
 }
 
 function Sukkot(day) {
