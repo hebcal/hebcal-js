@@ -110,7 +110,7 @@ var parshiot = Sedra.parshiot = [
 	[ 'Tzav', 0, 'צו' ],
 	[ 'Shmini', 0, 'שמיני' ],
 	[ 'Tazria', 0, 'תזריע' ],
-	[ 'Metzora', 0, 'מצרע' ],
+	[ 'Metzora', 0, 'מצורע' ],
 	[ 'Achrei Mot', 'Achrei Mos', 'אחרי מות' ],
 	[ 'Kedoshim', 0, 'קדשים' ],
 	[ 'Emor', 0, 'אמור' ], // 30
@@ -151,7 +151,7 @@ var YK = [[ 'Yom Kippur', 0, 'יום כיפור' ]];  //1
 var SUKKOT = [[ 'Sukkot', 'Succos', 'סוכות' ]];  //0
 var CHMSUKOT = [[ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ]];  //0
 var SHMINI = [[ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ]];  //0
-var EOY = [[ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות וסמחת תורה' ]];  //0
+var EOY = [[ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות ושמחת תורה' ]];  //0
 
 var PESACH = [[ 'Pesach', 0, 'פסח' ]]; //25
 var CHMPESACH = [[ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ]];  //25
