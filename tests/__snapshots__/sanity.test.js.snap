@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sanity Test Initialize Hebcal instance should allow initialization using a Date object 1`] = `
+HDate {
+  "day": 29,
+  "il": false,
+  "lat": 0,
+  "long": 0,
+  "month": 10,
+  "year": 5774,
+}
+`;
+
+exports[`Sanity Test Initialize Hebcal instance should initialize an HDate with a Hebrew date string 1`] = `
+HDate {
+  "day": 1,
+  "il": false,
+  "lat": 0,
+  "long": 0,
+  "month": 7,
+  "year": 5774,
+}
+`;
