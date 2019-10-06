@@ -29,16 +29,19 @@
 	},
 	"scripts": {
 		"build": "node compile.js",
-		"test": "node ./tests/sanity.js"
+		"test": "jest",
+		"dev": "jest --watch"
 	},
 	"dependencies": {
 		"suncalc": "^1.8.0",
 		"gematriya": "^1.0.1"
 	},
 	"devDependencies": {
+		"@types/jest": "^24.0.18",
 		"browserify": "^16.2.3",
 		"exorcist": "^0.4.0",
 		"hrtimer": "0.0.1",
+		"jest": "^24.9.0",
 		"uglify-js": "^2.7.5"
 	},
 	"repository": {
