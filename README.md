@@ -1,4 +1,4 @@
-# DEPRECATED
+# ⛔️ DEPRECATED
 
 This package has been deprecated in favor of [@hebcal/core](https://github.com/hebcal/hebcal-es6).
 
