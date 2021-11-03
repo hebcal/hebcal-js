@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This package has been deprecated in favor of [@hebcal/core](https://github.com/hebcal/hebcal-es6).
+
 # Hebcal JavaScript
 
 Original C written by Danny Sadinoff, with portions by Michael J. Radwin.
@@ -38,6 +42,7 @@ The version documented here is 2.3.2.
 * 2.3.0 - 2019-02-11 (6 Adar 1 5779)
 * 2.3.1 - 2019-02-11 (6 Adar 1 5779)
 * 2.3.2 - 2019-09-25 (25 Elul 5779)
+* 2.3.3 - 2021-11-03 (28 Cheshvan 5782)
 
 
 ## Contributors
