@@ -7,6 +7,7 @@
 		"Danny Sadinoff (https://github.com/dsadinoff)"
 	],
 	"description": "⛔️ DEPRECATED - This perpetual Jewish Calendar API has been deprecated in favor of @hebcal/core",
+	"deprecated": "🙌  Thanks for using hebcal: this package has been deprecated in favor of @hebcal/core",
 	"keywords": [
 		"hebcal",
 		"hebrew",
