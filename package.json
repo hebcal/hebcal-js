@@ -6,7 +6,7 @@
 		"Michael J. Radwin (https://github.com/mjradwin)",
 		"Danny Sadinoff (https://github.com/dsadinoff)"
 	],
-	"description": "An easy to use, richly-featured, perpetual Jewish Calendar API",
+	"description": "⛔️ DEPRECATED - This perpetual Jewish Calendar API has been deprecated in favor of @hebcal/core",
 	"keywords": [
 		"hebcal",
 		"hebrew",
