@@ -149,9 +149,8 @@ var RH = [[ 'Rosh Hashana', 0, 'ראש השנה' ]]; //0
 var YK = [[ 'Yom Kippur', 0, 'יום כיפור' ]];  //1
 
 var SUKKOT = [[ 'Sukkot', 'Succos', 'סוכות' ]];  //0
-var CHMSUKOT = [[ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'חול המועד סוכות' ]];  //0
+var CHMSUKOT = [[ 'Chol hamoed Sukkot', 'Chol hamoed Succos', 'שבת חול המועד סוכות' ]];  //0
 var SHMINI = [[ 'Shmini Atzeret', 'Shmini Atzeres', 'שמיני עצרת' ]];  //0
-var EOY = [[ 'End-of-Year: Simchat-Torah, Sukkot', 'End-of-Year: Simchas-Torah, Succos', 'סופשנה: סוכות ושמחת תורה' ]];  //0
 
 var PESACH = [[ 'Pesach', 0, 'פסח' ]]; //25
 var CHMPESACH = [[ 'Chol hamoed Pesach', 0, 'חול המועד פסח' ]];  //25
@@ -170,28 +169,28 @@ var types = {
 	/* Hebrew year that starts on Monday, is `incomplete' (Heshvan and
 	 * Kislev each have 29 days), and has Passover start on Tuesday. */
 	//e.g. 5753
-	'020' : [51, 52][concat](EOY, range(0, 20), D(21), 23, 24, PESACH, 25,
+	'020' : [51, 52][concat](CHMSUKOT, range(0, 20), D(21), 23, 24, PESACH, 25,
 		D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 49), D(50)
 	),
 
 	/* Hebrew year that starts on Monday, is `complete' (Heshvan and
 	 * Kislev each have 30 days), and has Passover start on Thursday. */
 	//e.g. 5756
-	'0220' : [51, 52][concat](EOY, range(0, 20), D(21), 23, 24, PESACH, 25, D(26), D(28),
+	'0220' : [51, 52][concat](CHMSUKOT, range(0, 20), D(21), 23, 24, PESACH, 25, D(26), D(28),
 		30, D(31), 33, SHAVUOT, range(34, 37), D(38), 40, D(41), range(43, 49), D(50)
 	),
 
 	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
 	 * days and Kislev has 30 days), and has Passover start on Saturday. */
 	//e.g. 5701
-	'0510' : [52][concat](YK, EOY, range(0, 20), D(21), 23, 24, PESACH, PESACH,
+	'0510' : [52][concat](YK, CHMSUKOT, range(0, 20), D(21), 23, 24, PESACH, PESACH,
 		25, D(26), D(28), 30, D(31), range(33, 40), D(41), range(43, 50)
 	),
 
 	/* Hebrew year that starts on Thursday, is `regular' (Heshvan has 29
 	 * days and Kislev has 30 days), and has Passover start on Saturday. */
 	// e.g. 5745
-	'0511' : [52][concat](YK, EOY, range(0, 20), D(21), 23, 24, PESACH,
+	'0511' : [52][concat](YK, CHMSUKOT, range(0, 20), D(21), 23, 24, PESACH,
 		25, D(26), D(28), range(30, 40), D(41), range(43, 50)
 	),
 
